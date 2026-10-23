@@ -50,6 +50,8 @@
       var target = sections.filter(function (s) { return s.id === id; })[0] || sections[0];
       var from = sections.filter(function (s) { return !s.hidden; })[0];
       sections.forEach(function (s) { s.hidden = s !== target; s.classList.remove("turn-next", "turn-prev"); });
+      // margin notes written for one section show only with that section
+      sheet.querySelectorAll(".margin [data-for]").forEach(function (n) { n.hidden = n.getAttribute("data-for") !== target.id; });
       // turn the page from the side the reader moved towards
       if (scroll && from && from !== target) {
         void target.offsetWidth;
