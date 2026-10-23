@@ -10,6 +10,9 @@
   var reviewTense = function (name) { widgets.matrix && widgets.matrix.select(name); CLY.go("matrix"); };
   var reviewConditional = function (name) { widgets.condmatrix && widgets.condmatrix.select(name); CLY.go("condmatrix"); };
 
+  // Formulas break only at spaces, never inside "V-ing" or "V3-": a non-breaking hyphen keeps each piece whole.
+  var keepHyphens = function (t) { return t.replace(/-/g, "‑"); };
+
   // Keeps keyboard focus on the same control when a part of the page is redrawn.
   function redraw(container, build) {
     var active = document.activeElement, key = active && container.contains(active) ? active.getAttribute("data-key") : null;
@@ -86,7 +89,7 @@
             return h("tr", null, h("th", { scope: "row" }, t), G.ASPECTS.map(function (a) {
               var name = t + " " + a;
               return h("td", null, h("button", { type: "button", class: "cell", "data-key": name, "aria-pressed": String(name === selected), onclick: function () { select(name); CLY.replay(detail, "swap"); } },
-                name, h("small", null, G.tenseMatrix[name].formula)));
+                h("span", { class: "cell-name" }, name), h("small", null, keepHyphens(G.tenseMatrix[name].formula))));
             }));
           }))
         ));
@@ -737,8 +740,8 @@
               G.COND_TIMES.map(function (t) {
                 var cell = G.COND_CELLS[r + "-" + t];
                 if (!G.conditionalMatrix[cell]) return h("td", null, h("div", { class: "cell-empty" }, cell));
-                return h("td", null, h("button", { type: "button", class: "cell", "data-key": cell, "aria-pressed": String(cell === selected), onclick: function () { select(cell); } },
-                  badge(cell), cell, h("small", null, G.conditionalMatrix[cell].ifPart + ", " + G.conditionalMatrix[cell].mainPart)));
+                return h("td", null, h("button", { type: "button", class: "cell has-badge", "data-key": cell, "aria-pressed": String(cell === selected), onclick: function () { select(cell); } },
+                  badge(cell), h("span", { class: "cell-name" }, cell), h("small", null, keepHyphens(G.conditionalMatrix[cell].ifPart + ", " + G.conditionalMatrix[cell].mainPart))));
               }));
           }))));
       });
