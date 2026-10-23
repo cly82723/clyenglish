@@ -13,9 +13,8 @@
   var an = function (word) { return (/^[aeiou]/i.test(word) ? "an " : "a ") + word; };
   var samePos = function (a, b) { return baseTypes(a).some(function (t) { return baseTypes(b).indexOf(t) >= 0; }); };
 
-  function VocabCloze(root, grade) {
+  function VocabCloze(root, grade, passage) {
     var g = V.GRADES.filter(function (x) { return x.id === grade; })[0];
-    var passage = V.VOCAB_FALLBACK[grade];
     var units = V.vocabLists[grade].units;
     var allWords = Object.keys(units).reduce(function (a, k) { return a.concat(units[k]); }, []);
     var showPos = grade === "s1"; // S.1 always shows the word class
@@ -170,7 +169,36 @@
     root.appendChild(h("div", { class: "actions" }, checkBtn, hintBtn, listBtn, h("button", { type: "button", class: "btn-quiet", onclick: reset }, "Start again")));
     root.appendChild(listEl);
     root.appendChild(results);
+    // Unfinished work: something typed that isn't all marked right yet.
+    return { unfinished: function () { return ids.some(function (id) { return tried(id) && checks.marks[id] !== true; }); } };
   }
 
-  document.querySelectorAll("[data-vocab]").forEach(function (el) { VocabCloze(el, el.getAttribute("data-vocab")); });
+  // Each form has several passages; "Try another passage" moves to the next one, and the page remembers which
+  // passage this browser was on.
+  function VocabSection(root, grade) {
+    var passages = [V.VOCAB_FALLBACK[grade]].concat((V.EXTRA && V.EXTRA[grade]) || []);
+    var key = "cly:vocab-passage:" + grade, n = 0, current = null;
+    try { n = Math.min(Number(localStorage.getItem(key)) || 0, passages.length - 1); } catch (e) { n = 0; }
+    var count = h("p", { class: "count", "aria-live": "polite" });
+    var nextBtn = h("button", { type: "button", class: "btn-quiet", onclick: function () {
+      if (current && current.unfinished() && !window.confirm("Start another passage? Your answers in this one will be cleared.")) return;
+      show((n + 1) % passages.length, true);
+    } }, "Try another passage");
+    var body = h("div");
+
+    function show(i, focus) {
+      n = i;
+      try { localStorage.setItem(key, String(n)); } catch (e) { /* storage blocked: just don't remember it */ }
+      count.textContent = "Passage " + (n + 1) + " of " + passages.length + ": " + passages[n].title;
+      clear(body);
+      current = VocabCloze(body, grade, passages[n]);
+      if (focus) { CLY.scrollTo(root); var first = body.querySelector(".blank input"); if (first) first.focus({ preventScroll: true }); }
+    }
+
+    if (passages.length > 1) root.appendChild(h("div", { class: "passage-switch" }, count, nextBtn));
+    root.appendChild(body);
+    show(n, false);
+  }
+
+  document.querySelectorAll("[data-vocab]").forEach(function (el) { VocabSection(el, el.getAttribute("data-vocab")); });
 })();
