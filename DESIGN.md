@@ -258,6 +258,22 @@ Tables sit in a 2px outlined, 12px-cornered wrapper with cream uppercase copper 
 ### Routes (home)
 Full-width ruled rows: a level mark, a bold title with a faded line under it, and a copper "go" label with an arrow that moves 4px on hover. These are rows, not cards.
 
+### Practice pages (Grammar, Vocab)
+The S.4 grammar and S.1–S.3 vocab exercises are built from the same parts as the guides; nothing new gets a shadow, a card or an emoji.
+- **Form mark:** a form (S.1–S.4) is a square 8px-cornered ink label, so it never reads as a circled level. Conditionals are numbered the same way (0–3).
+- **Grouped index:** a long index takes small uppercase faded-ink group headings (12 Tenses, Proofreading, Conditionals), hidden in the phone chip strip.
+- **Choices:** 1px warm-outlined options; the picked one gets a 2px ink outline on cream. After checking, a wrong pick is struck through in red with a cross; the right one gets a green outline and a tick.
+- **Verdict:** a cream block with a mark in its gutter: tick for solved, a copper question-mark ring for a hint. It sits right under the question or proofreading line it is about; in a passage, notes for a paragraph's blanks sit in a cream block under that paragraph. Hints get stronger on the second try and never give the answer; the MC bigger clue points to the matrix instead of naming the tense or conditional.
+- **Marking like a teacher:** an MC answer is marked as soon as it's chosen. "Check" marks only what the student has tried; untried items get no mark at all, never a red cross.
+- **Blanks:** written on the line (2px faded-ink underline, cream on focus), green underline and tick when right, red underline and cross when wrong. Passages sit in the 2px ink, 12px-cornered wrapper.
+- **Buttons:** the main action is an ink pill; the rest are outlined ink pills. Pickers are pill chips that reverse to ink when selected; a crossed-off chip is struck through in red.
+- **Matrices:** tables of 10px-cornered cells that reverse to ink when selected, followed by a detail panel under a 2px ink rule. The conditionals' "How real is it?" axis reuses the ladder axis.
+- **Proofreading:** numbered lines like the exam paper, with a tick or cross between the number and the text. Corrections are written above the word in copper; a changed word gets a wavy copper underline, an added word a copper caret, and a deleted word a red strike and slash.
+- **Diagrams:** timelines and clause diagrams are drawn in ink, faded ink and copper, with highlighter for spans and green only for "result still matters now". They scroll sideways inside their frame below 520px.
+- **Marking motion:** a new tick or cross draws itself in left to right like a pen stroke (clip-path, 0.3s, ease-out). Hint and correct notes slide up 4px (0.22s), and their mark follows 0.1s later. Only new marks animate; a redraw leaves existing marks still. Choosing a tense or conditional fades its detail panel in (0.18s). With reduced motion, marks appear at once and notes fade.
+- **Results:** after a check, the result sits under a 2px ink rule and leads with what to do next ("2 to fix: blank 4, blank 9"), with a "Go to the first one to fix" button. Untried items are counted, and the score comes last in faded ink. Explanations for right answers fold away under a copper "Why the … you got right are right" summary. Progress is a plain count ("7 of 15 solved"), not a bar.
+- **Phones:** below 760px, the Tense Matrix becomes two chip rows (Time, then Aspect), and the Conditionals Matrix table gives way to the "How real is it?" axis, with the empty cells explained in a fold-out. Lesson tables stack each row so the example sits under the formula.
+
 ### Checklist and reset
 Custom 24px checkboxes (2px ink, 6px corners) that fill tick-green with a paper tick when checked. Completed text fades. The reset button is an outlined ink pill that fills cream on hover.
 
