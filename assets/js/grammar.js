@@ -137,10 +137,10 @@
     genericHint: G.GENERIC_TENSE_HINT,
     where: "the Tense Matrix",
     section: "matrix",
-    bigClue: "decide when it happens, and whether it's finished, in progress or ongoing up to a point. Then find that tense in the Tense Matrix.",
+    bigClue: "ask two questions. When does it happen: past, present or future? Is the action finished, still in progress, or going on up to a certain time? Then find that tense in the Tense Matrix.",
     review: reviewTense,
     reviewHeading: "Tenses to review in the Tense Matrix:",
-    fullMarks: "Full marks! Now try the Cloze Passage to use these tenses in a story."
+    fullMarks: "Full marks! Now try the tenses cloze to use these tenses in a story."
   };
   var COND_KIT = {
     topicOf: function (q) { return q.conditional; },
@@ -148,10 +148,10 @@
     genericHint: G.GENERIC_COND_HINT,
     where: "the Conditionals Matrix",
     section: "condmatrix",
-    bigClue: "decide whether it's real or imaginary, and whether it's about always, the future, now or the past. Then find that conditional in the Conditionals Matrix.",
+    bigClue: "ask two questions. Is it real or imaginary? Is it about always, the future, now or the past? Then find that conditional in the Conditionals Matrix.",
     review: reviewConditional,
     reviewHeading: "Conditionals to review in the Conditionals Matrix:",
-    fullMarks: "Full marks! Now try Match & Change to use the conditionals yourself."
+    fullMarks: "Full marks! Now try Match & change to use the conditionals yourself."
   };
 
   function reviewLink(topic, where, review) {
@@ -198,7 +198,7 @@
     function drawProgress() {
       var n = Object.keys(answers).length;
       var solvedCount = questions.filter(function (q, i) { return solved(i); }).length;
-      count.textContent = solvedCount + " of " + questions.length + " solved" + (n > solvedCount ? " · " + (n - solvedCount) + " still to fix" : "");
+      count.textContent = !n ? questions.length + " questions" : solvedCount + " of " + questions.length + " solved" + (n > solvedCount ? " · " + (n - solvedCount) + " still to fix" : "");
       actions.hidden = !n;
     }
     function drawSummary() {
@@ -302,7 +302,7 @@
         done: "Perfect! You used all " + ids.length + " tenses correctly.",
         scoreText: "Score: " + right.length + " / " + ids.length,
         next: function () { var id = checks.toFix()[0]; if (id) { CLY.scrollTo(fields[id]); fields[id].input.focus({ preventScroll: true }); } },
-        extra: right.length ? h("details", { class: "got-right" }, h("summary", null, "Why the blanks you got right are right (" + right.length + ")"),
+        extra: right.length ? h("details", { class: "got-right" }, h("summary", null, "Explanations for the blanks you got right (" + right.length + ")"),
           h("ul", { class: "marks" }, right.map(function (id) {
             var b = blanks[id];
             return h("li", { class: "do" }, h("strong", null, id + ". " + (inputs[id] || "").trim()), h("span", { class: "meta" }, " (" + b.verb + " → " + b.tense + ")"), h("span", { class: "more" }, b.why));
@@ -540,7 +540,7 @@
       var li = h("li", { class: mark + (fresh.is(i, mark) ? " fresh" : "") },
         h("div", { class: "proof-row" },
           h("div", { class: "proof-text" }, words),
-          h("button", { type: "button", class: "ok-btn", "data-key": "ok" + i, disabled: locked, "aria-pressed": String(!!ok), onclick: function () { setAnswer(i, ok ? null : { type: "ok" }); } }, ok ? "Correct line" : "No mistake")));
+          h("button", { type: "button", class: "ok-btn", "data-key": "ok" + i, disabled: locked, "aria-pressed": String(!!ok), onclick: function () { setAnswer(i, ok ? null : { type: "ok" }); } }, "No mistake")));
       // the hint for this line sits right under it
       var hintState = checks.checked && checks.marks[i] === false ? "hint" + checks.tries[i] : "";
       if (hintState) li.appendChild(h("div", { class: "verdict hint" + (fresh.is("v" + i, hintState) ? " fresh" : "") }, h("strong", null, "Not quite."), guidance(i)));
@@ -555,7 +555,7 @@
       var at = editing.at, plain = lines[i].words[at].replace(/[.,!?;:"]/g, "");
       var buttons = [];
       var mk = function (text, act) { var b = h("button", { type: "button", class: "chip", onclick: act }, text); buttons.push(b); return b; };
-      var warn = h("p", { class: "warn", hidden: true }, "Each correction is just one word.");
+      var warn = h("p", { class: "warn", hidden: true }, "Type just one word. A correction is always a single word.");
       var typed = function () { return draft.trim(); };
       var valid = function () { return !!typed() && !/\s/.test(typed()); };
       var sync = function () { buttons.slice(0, 3).forEach(function (b) { b.disabled = !valid(); }); warn.hidden = !/\s/.test(typed()); };
@@ -566,9 +566,9 @@
           if (e.key === "Escape") { editing = null; drawLines(); }
         } });
       var box = h("div", { class: "editor" },
-        h("p", null, "What's wrong near ", h("strong", null, "“" + plain + "”"), "? Type one word, then choose a correction:"),
+        h("p", null, "Fix a mistake near ", h("strong", null, "“" + plain + "”"), ". To change it or add a word, type the word first, then choose. To remove “" + plain + "”, just tap Delete."),
         h("div", { class: "row" }, input,
-          mk("Change “" + plain + "” to this", function () { setAnswer(i, { type: "replace", at: at, word: typed() }); }),
+          mk("Change “" + plain + "” to my word", function () { setAnswer(i, { type: "replace", at: at, word: typed() }); }),
           mk("Add before “" + plain + "”", function () { setAnswer(i, { type: "insert", at: at, word: typed() }); }),
           mk("Add after “" + plain + "”", function () { setAnswer(i, { type: "insert", at: at + 1, word: typed() }); }),
           mk("Delete “" + plain + "”", function () { setAnswer(i, { type: "delete", at: at }); }),
@@ -612,7 +612,7 @@
           toReview.length ? [h("p", { class: "field-label" }, "Worth reviewing"), h("ul", { class: "chips" }, toReview.map(function (f) {
             return h("li", null, h("button", { type: "button", class: "chip", onclick: function () { CLY.go(G.FOCUS_TABS[f]); } }, f));
           }))] : null,
-          right.length ? h("details", { class: "got-right" }, h("summary", null, "Why the lines you got right are right (" + right.length + ")"),
+          right.length ? h("details", { class: "got-right" }, h("summary", null, "Explanations for the lines you got right (" + right.length + ")"),
             h("ul", { class: "marks" }, right.map(function (i) {
               var e = lines[i].error;
               return h("li", { class: "do" }, h("strong", null, "Line " + (i + 1) + ". "),

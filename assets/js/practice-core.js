@@ -90,7 +90,7 @@
     var fixes = o.fixes, untried = o.untried;
     var lead = !fixes.length && !untried.length ? o.done
       : fixes.length ? fixes.length + " to fix: " + fixes.map(o.label).join(", ")
-      : "Nothing to fix so far.";
+      : "Everything you've tried so far is right.";
     return h("div", { class: "scoreboard" },
       h("p", { class: "score" }, lead),
       fixes.length ? h("p", null, "Read the hint under each one, change your answer, then press “Check again”.") : null,

@@ -75,9 +75,9 @@
     var hintBtn = showPos ? null : h("button", { type: "button", class: "btn-quiet", "aria-pressed": "false", onclick: function () {
       showHints = !showHints;
       hintBtn.setAttribute("aria-pressed", String(showHints));
-      hintBtn.textContent = showHints ? "Hide word class hints" : "Show word class hints";
+      hintBtn.textContent = showHints ? "Hide parts of speech" : "Show parts of speech";
       ids.forEach(function (id) { posTags[id].hidden = !showHints; });
-    } }, "Show word class hints");
+    } }, "Show parts of speech");
 
     var listEl = h("div", { hidden: true },
       Object.keys(units).map(function (unit) {
@@ -149,7 +149,7 @@
         done: "Perfect! You know the words on your " + g.source + ".",
         scoreText: "Score: " + right.length + " / " + ids.length,
         next: function () { var id = checks.toFix()[0]; if (id) { CLY.scrollTo(fields[id]); fields[id].input.focus({ preventScroll: true }); } },
-        extra: right.length ? h("details", { class: "got-right" }, h("summary", null, "What the blanks you got right mean (" + right.length + ")"), h("ul", { class: "marks" }, right.map(rightItem))) : null
+        extra: right.length ? h("details", { class: "got-right" }, h("summary", null, "Meanings of the words you got right (" + right.length + ")"), h("ul", { class: "marks" }, right.map(rightItem))) : null
       }));
     }
 
@@ -164,7 +164,7 @@
     root.appendChild(h("div", { class: "tip" },
       h("p", { class: "field-label" }, "Instructions"),
       h("p", null, "Fill in each blank using ", h("strong", null, "one"), " appropriate word or phrase from the ", h("strong", null, g.source), ". Change the form if necessary. The first letter of the word or phrase is given."),
-      changedCount ? h("p", null, h("strong", null, changedCount), " of the blanks need a ", h("strong", null, "different part of speech"), " from the one on the list (check the Parts of Speech tables). Look at the words around each blank to decide.") : null
+      changedCount ? h("p", null, h("strong", null, changedCount), " of the blanks need a ", h("strong", null, "different part of speech"), " from the one on the list (check the Parts of Speech tables on your worksheet). Look at the words around each blank to decide.") : null
     ));
     root.appendChild(h("div", { class: "passage" }, h("h3", null, passage.title), para));
     root.appendChild(h("div", { class: "actions" }, checkBtn, hintBtn, listBtn, h("button", { type: "button", class: "btn-quiet", onclick: reset }, "Start again")));
