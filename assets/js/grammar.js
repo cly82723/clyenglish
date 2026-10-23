@@ -70,7 +70,7 @@
         s("line", { x1: "20", y1: AXIS, x2: "585", y2: AXIS, class: "axis", "marker-end": "url(#tl-arrow)" }),
         s("text", { x: "24", y: AXIS + 48, class: "soft small" }, "PAST"),
         s("text", { x: "580", y: AXIS + 48, class: "soft small", "text-anchor": "end" }, "FUTURE"),
-        s("line", { x1: X(50), y1: AXIS - 60, x2: X(50), y2: AXIS + 12, class: "now" }),
+        s("line", { x1: X(50), y1: AXIS - 14, x2: X(50), y2: AXIS + 14, class: "now" }),
         s("text", { x: X(50), y: AXIS + 48, class: "copper small", "text-anchor": "middle" }, "NOW"),
         g));
   }

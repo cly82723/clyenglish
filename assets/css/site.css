@@ -706,6 +706,8 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .figure .span { fill: var(--highlight); stroke: var(--copper); stroke-width: 2; }
 .figure .dream { fill: var(--chest); stroke: var(--copper); stroke-width: 2; stroke-dasharray: 6 4; }
 .figure text { font-size: 15px; font-weight: 600; }
+/* labels sit on a thin paper outline, so a line that runs past them (like NOW) goes behind the words, not through them */
+.figure svg text { paint-order: stroke; stroke: var(--paper); stroke-width: 6px; stroke-linejoin: round; }
 .figure .small { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
 .figure .box { stroke-width: 1.5; }
 .figure .box-doer { fill: var(--paper); stroke: var(--ink); }
