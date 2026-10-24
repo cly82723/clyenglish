@@ -67,6 +67,8 @@
     // keyboard is true when Enter opened the section: it changes at once, because a key pressed
     // again and again should never wait for an animation (the level ladder works the same way)
     function show(id, scroll, keyboard) {
+      // pages with their own pickers (Part B text types) open the panel that holds the target first
+      document.dispatchEvent(new CustomEvent("cly:show", { detail: id }));
       var target = sectionOf(id) || sections[0];
       var part = id && id !== target.id ? document.getElementById(id) : null;
       var from = sections.filter(function (s) { return !s.hidden; })[0];

@@ -12,7 +12,7 @@ Static HTML/CSS/JS, multi-page, no build step. Chosen by the user.
 
 ## Users
 
-Hong Kong secondary students (mainly S4–S6) preparing for HKDSE English Language Paper 2 (Writing), across all ability bands: students sitting around Level 2–3 who need structure and confidence, and students at Level 4–5 reaching for 5*/5**. They read on phones between classes and on laptops when revising.
+Hong Kong secondary students in two tracks. Junior (S.1–S.3): vocab revision. Senior (S.4–S.6) preparing for HKDSE English Language Paper 2 (Writing): S.4 grammar, S.5 Part A, Part B and the Toolkit, S.6 final reminders. The S.5 Part B guide is pitched at intermediate-to-strong writers, on average around Level 4–5, working towards 5**; its comparisons run Level 3 → Level 5 → Level 5**. They read on phones between classes and on laptops when revising.
 
 ## Product Purpose
 
@@ -32,8 +32,9 @@ A personal, single-voice guide (CLY) rather than a generic past-paper dump: orig
 
 ## Capabilities and Constraints
 
-- Core content: Part A and Part B guides, organised by text type, navigable via subtabs.
-- Content is original teaching material written for the site; no copied HKEAA papers or sample scripts.
+- Core content: Part A and Part B guides. Part B is a step-by-step guide built on the three marking domains: Step 0 Choose & plan, Step 1 Content, Step 2 Organisation (CREI paragraphs for argumentative text types; own patterns for reports and stories), Step 3 Language, Step 4 Sample writings.
+- Sources: any resource that helps students may be used: real past-paper tasks (cited by year and question), examiner reports, textbooks and dictionaries for tasks, ideas and further reading. Model writing on the site is written for the site. Level labels on samples are CLY's estimates, never official marks.
+- Vocabulary is taught through context and collocation, with no Chinese translations.
 - Open: whether CLY is a tutor, centre, or free resource was not answered. Do not add lesson sales, pricing, or booking flows.
 
 ## Brand Commitments

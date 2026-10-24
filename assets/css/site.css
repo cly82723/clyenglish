@@ -1337,3 +1337,64 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .fox img { transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1); }
 @media (hover: hover) and (pointer: fine) { .fox:hover img { transform: rotate(-3deg); } }
 .fox.hop img { animation-duration: 0.38s; }
+
+/* ---------- Part B, step by step ---------- */
+
+/* a picker: one text type (or topic) at a time, chosen from a row of chips */
+.picker-row { margin: 8px 0 20px; }
+.pick-panel[hidden] { display: none; }
+.pick-panel > h3:first-child { margin-top: 0; }
+.column h4 { font: 700 var(--step-0)/1.3 var(--font-display); margin: 28px 0 8px; }
+
+/* CREI: four moves, four tints, and always the letter too, so colour is never the only signal */
+.crei { padding: 1px 3px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.crei b {
+  display: inline-block; min-width: 1.5em; margin-right: 5px; padding: 0 4px;
+  font: 800 0.875rem/1.45 var(--font-display); text-align: center;
+  border-radius: 4px; color: var(--paper); vertical-align: 0.08em;
+}
+.crei.c { background: #dce8f7; } .crei.c b { background: var(--sky); }
+.crei.r { background: #dcefe2; } .crei.r b { background: var(--do); }
+.crei.e { background: #ffe4c8; } .crei.e b { background: #b4500f; }
+.crei.i { background: #ece4f4; } .crei.i b { background: #6b4596; }
+.crei-key { list-style: none; padding: 0; margin: 18px 0 20px; display: grid; gap: 10px; }
+.crei-key li { line-height: 1.5; }
+.crei-key .crei { font-family: var(--font-display); font-weight: 700; margin-right: 8px; }
+
+/* one paragraph at three levels, stacked so the climb reads top to bottom */
+.levels-stack { display: grid; gap: 14px; margin: 14px 0 28px; }
+.level-card { border: 2px solid var(--ink); border-radius: 12px; padding: 14px 18px 16px; line-height: 1.9; }
+.level-card p { margin: 0; }
+.level-card-head { display: flex; align-items: center; gap: 12px; font: 700 1rem/1.3 var(--font-display); margin-bottom: 8px !important; }
+.level-card-why { margin-top: 10px !important; color: var(--ink-soft); line-height: var(--line); }
+
+/* a whole text, with the note for each paragraph right under it */
+.sample { border: 2px solid var(--ink); border-radius: 12px; padding: 22px 24px; margin: 18px 0 8px; line-height: 1.9; }
+.sample > p { margin: 0 0 8px; }
+.sample-line { font-weight: 700; }
+.para-note {
+  margin: 0 0 22px; padding: 10px 14px; border-radius: 10px;
+  background: var(--chest); font-size: 1rem; line-height: 1.55;
+}
+.para-note b { font-family: var(--font-display); }
+
+/* the CREI drill: a jumbled paragraph, one label per sentence */
+.crei-drill { margin: 18px 0 30px; }
+.drill-task { font: 700 1rem/1.3 var(--font-display); color: var(--sky); margin: 0 0 6px; }
+.drill-items { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--ink); }
+.drill-items > li { padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.drill-items > li > p { margin: 0 0 10px; }
+.drill-items .letter { width: 44px; height: 44px; }
+.crei-drill .verdict p { margin-top: 10px; line-height: 1.9; }
+
+/* the three-level comparison box can hold three lines */
+.versions .pair p + p + p { margin-top: 8px; }
+
+@media (max-width: 760px) {
+  /* the steps stay readable on a phone: each group's name sits inline among its chips */
+  .index .index-group { display: flex; align-items: center; padding: 4px 4px 0; font-size: 0.875rem; flex-basis: 100%; }
+  .sample { padding: 16px; }
+  .level-card { padding: 12px 14px 14px; }
+}
+/* the step names in Part B's contents read as words, not small capitals */
+.index .index-group { text-transform: none; letter-spacing: 0; font-size: 0.875rem; color: var(--sky); }

@@ -27,9 +27,9 @@ window.CLY_TIPS = [
   { tip: "\"Lack\" as a verb has no \"of\".", wrong: "Students are lack of sleep.", right: "Students lack sleep.", href: "final.html#errors", where: "Common errors" },
   { tip: "Lights are turned on, not opened.", wrong: "Can you open the light?", right: "Can you turn on the light?", href: "final.html#errors", where: "Common errors" },
   { tip: "Precise beats fancy. Swap \"bad\" for what actually happens.", wrong: "Phones are bad for students.", right: "Phones distract students in class.", href: "toolkit.html#vocabulary", where: "Precise vocabulary" },
-  { tip: "Admit the other side first, then make your point.", wrong: "Phones are useless in school.", right: "Although phones can be useful, they often distract students.", href: "part-b.html#letter", where: "Letter to the editor" },
+  { tip: "Admit the other side first, then make your point.", wrong: "Phones are useless in school.", right: "Although phones can be useful, they often distract students.", href: "part-b.html#ladder-letter", where: "Answering the other side" },
   { tip: "Open with a picture, not an announcement.", wrong: "I am writing to tell you about the book fair.", right: "Every bookshelf has one: the novel you finished in Form 2 and never opened again.", href: "part-a.html#ladder", where: "Part A openings" },
-  { tip: "Show the feeling; don't just name it.", wrong: "Nowadays, many students are very stressed.", right: "It is 11:47 p.m. Kelly is still not sure it is enough.", href: "part-b.html#story", where: "Story" },
+  { tip: "Show the feeling; don't just name it.", wrong: "Nowadays, many students are very stressed.", right: "It is 11:47 p.m. Kelly is still not sure it is enough.", href: "part-b.html#ladder-story", where: "Showing a feeling" },
   { tip: "Two flat sentences? Make the second one push back.", wrong: "The school has a new rule. Students cannot use phones.", right: "The phone ban arrived quietly. The reaction was anything but quiet.", href: "toolkit.html#variety", where: "Sentence variety" },
   { tip: "Wrong word form? Ask which part of speech the gap needs.", wrong: "He showed real generous.", right: "He showed real generosity.", href: "vocab.html#s1", where: "Vocab revision" }
 ];
