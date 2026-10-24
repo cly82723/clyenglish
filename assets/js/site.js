@@ -141,21 +141,31 @@
     }
     if ("ResizeObserver" in window) new ResizeObserver(measure).observe(axis);
 
+    // focus is true for the arrow keys: the level changes at once, because a key pressed again and
+    // again should never wait for an animation; a click or tap gets the climb, the rise and the swipe
     function select(i, focus) {
+      axis.classList.toggle("instant", !!focus);
       panels.forEach(function (p, j) {
         p.hidden = j !== i;
         buttons[j].setAttribute("aria-selected", j === i ? "true" : "false");
         buttons[j].tabIndex = j === i ? 0 : -1;
         // levels below the chosen one light up as the climb line reaches them
         buttons[j].classList.toggle("passed", j < i);
-        buttons[j].querySelector(".lv").style.transitionDelay = j < i ? (j / i) * 0.3 + "s" : "";
+        buttons[j].querySelector(".lv").style.transitionDelay = j < i && !focus ? (j / i) * 0.3 + "s" : "";
       });
       axis.style.setProperty("--climb", buttons.length > 1 ? i / (buttons.length - 1) : 0);
-      panels[i].querySelectorAll("mark.swipe").forEach(function (m) { m.classList.remove("on"); });
-      // restart the panel entrance and the highlighter
+      var marks = panels[i].querySelectorAll("mark.swipe");
+      if (focus) {
+        panels[i].style.animation = "none";
+        marks.forEach(function (m) { m.style.transition = "none"; m.classList.add("on"); });
+        buttons[i].focus();
+        return;
+      }
+      // restart the panel entrance and the highlighter (wiped instantly, then drawn again)
+      marks.forEach(function (m) { m.style.transition = "none"; m.classList.remove("on"); });
       panels[i].style.animation = "none"; void panels[i].offsetWidth; panels[i].style.animation = "";
+      marks.forEach(function (m) { m.style.transition = ""; });
       requestAnimationFrame(function () { swipe(panels[i]); });
-      if (focus) buttons[i].focus();
     }
 
     ladder.insertBefore(axis, panels[0]);
