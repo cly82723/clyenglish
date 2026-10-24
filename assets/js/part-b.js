@@ -16,15 +16,22 @@
       b.type = "button";
       b.className = "chip";
       b.textContent = p.getAttribute("data-label");
-      b.addEventListener("click", function () { select(i); history.replaceState(null, "", "#" + p.id); });
+      b.addEventListener("click", function (e) { select(i, e.detail !== 0); history.replaceState(null, "", "#" + p.id); });
       li.appendChild(b);
       row.appendChild(li);
       return b;
     });
     box.insertBefore(row, panels[0]);
 
-    function select(i) {
-      panels.forEach(function (p, j) { p.hidden = j !== i; buttons[j].setAttribute("aria-pressed", String(j === i)); });
+    // a tap fades the new panel in, so it is clear the content below the chips has changed;
+    // a key press or a link changes it at once
+    function select(i, animate) {
+      panels.forEach(function (p, j) {
+        p.hidden = j !== i;
+        p.classList.remove("swap");
+        buttons[j].setAttribute("aria-pressed", String(j === i));
+      });
+      if (animate) { void panels[i].offsetWidth; panels[i].classList.add("swap"); }
     }
     select(0);
 
@@ -120,10 +127,12 @@
       done.className = "verdict do fresh";
       done.innerHTML = "<strong>All four right. Here is the paragraph in CREI order:</strong>";
       var para = document.createElement("p");
-      ORDER.forEach(function (k) {
+      // the moves fall into place one after another, Claim to Impact: the order is the lesson
+      ORDER.forEach(function (k, n) {
         var li = items.filter(function (x) { return x.getAttribute("data-answer") === k; })[0];
         var s = document.createElement("span");
-        s.className = "crei " + k.toLowerCase();
+        s.className = "crei rebuild " + k.toLowerCase();
+        s.style.animationDelay = (n * 0.12 + 0.1) + "s";
         s.innerHTML = "<b>" + k + "</b>";
         s.appendChild(document.createTextNode(li.querySelector("p").textContent));
         para.appendChild(s);

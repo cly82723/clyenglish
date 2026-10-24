@@ -45,6 +45,34 @@
       if (prev || next) sec.appendChild(pager);
     });
 
+    // on a phone, a long contents list collapses to one line that names where you are; tapping it opens the list
+    var index = sheet.querySelector(".index[data-collapse]");
+    var toggle = null;
+    if (index) {
+      var list = index.querySelector("ol, ul");
+      list.id = list.id || "contents-list";
+      toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "index-toggle";
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-controls", list.id);
+      index.insertBefore(toggle, list);
+      toggle.addEventListener("click", function () {
+        var open = index.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(open));
+      });
+    }
+    function nameToggle(active) {
+      if (!toggle || !active) return;
+      var g = active.closest("li");
+      while (g && !g.classList.contains("index-group")) g = g.previousElementSibling;
+      toggle.innerHTML = "<small></small><span></span>";
+      toggle.firstChild.textContent = g ? g.textContent : "Contents";
+      toggle.lastChild.textContent = active.textContent;
+      index.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
+    }
+
     function pagerLink(sec, word, cls) {
       var a = document.createElement("a");
       a.href = "#" + sec.id;
@@ -87,6 +115,9 @@
         else a.removeAttribute("aria-current");
       });
       var active = links.filter(function (a) { return a.getAttribute("aria-current"); })[0];
+      nameToggle(active);
+      // the label panel is the page's cover: on a phone it shows on the first section only
+      sheet.toggleAttribute("data-later", target !== sections[0]);
       if (active && active.scrollIntoView && window.innerWidth <= 760) {
         active.scrollIntoView({ block: "nearest", inline: "center", behavior: reduceMotion ? "auto" : "smooth" });
       }
@@ -136,15 +167,16 @@
     var start = ladder.getAttribute("data-start") || panels[0].getAttribute("data-level");
 
     var buttons = panels.map(function (p, i) {
+      // a panel keeps its own id when it has one (part-b.html#sample-story-5 links straight to a script)
       var id = "ladder" + n + "-" + i;
-      p.id = id;
+      if (!p.id) p.id = id;
       p.setAttribute("role", "tabpanel");
       p.setAttribute("aria-labelledby", id + "-tab");
       var b = document.createElement("button");
       b.type = "button";
       b.id = id + "-tab";
       b.setAttribute("role", "tab");
-      b.setAttribute("aria-controls", id);
+      b.setAttribute("aria-controls", p.id);
       b.innerHTML = '<span class="lv"></span><span></span>';
       b.firstChild.textContent = p.getAttribute("data-level");
       b.lastChild.textContent = p.getAttribute("data-name") || "";
@@ -175,9 +207,10 @@
     if ("ResizeObserver" in window) new ResizeObserver(measure).observe(axis);
 
     // focus is true for the arrow keys: the level changes at once, because a key pressed again and
-    // again should never wait for an animation; a click or tap gets the climb, the rise and the swipe
-    function select(i, focus) {
-      axis.classList.toggle("instant", !!focus);
+    // again should never wait for an animation; a click or tap gets the climb, the rise and the swipe.
+    // quiet changes the level at once without moving focus (a link that opens a script directly).
+    function select(i, focus, quiet) {
+      axis.classList.toggle("instant", !!focus || !!quiet);
       panels.forEach(function (p, j) {
         p.hidden = j !== i;
         buttons[j].setAttribute("aria-selected", j === i ? "true" : "false");
@@ -188,10 +221,10 @@
       });
       axis.style.setProperty("--climb", buttons.length > 1 ? i / (buttons.length - 1) : 0);
       var marks = panels[i].querySelectorAll("mark.swipe");
-      if (focus) {
+      if (focus || quiet) {
         panels[i].style.animation = "none";
         marks.forEach(function (m) { m.style.transition = "none"; m.classList.add("on"); });
-        buttons[i].focus();
+        if (focus) buttons[i].focus();
         return;
       }
       // restart the panel entrance and the highlighter (wiped instantly, then drawn again)
@@ -201,10 +234,37 @@
       requestAnimationFrame(function () { swipe(panels[i]); });
     }
 
+    // a ladder of whole scripts ends each one with a step to the next level, so a reader who has
+    // scrolled to the bottom of a long script climbs from there instead of hunting for the axis
+    if (ladder.classList.contains("script-ladder")) panels.forEach(function (p, i) {
+      if (i === panels.length - 1) return;
+      var go = document.createElement("button");
+      go.type = "button";
+      go.className = "btn-quiet ladder-next";
+      go.textContent = "Next: " + panels[i + 1].getAttribute("data-name");
+      go.addEventListener("click", function (e) {
+        select(i + 1, false, e.detail === 0);
+        var top = axis.getBoundingClientRect().top;
+        if (top < 0) window.scrollTo({ top: top + window.scrollY - 16, behavior: reduceMotion ? "auto" : "smooth" });
+        buttons[i + 1].focus({ preventScroll: true });
+      });
+      p.appendChild(go);
+    });
+    // a link to one of the panels (or to something inside one) opens that level
+    document.addEventListener("cly:show", function (e) {
+      var el = e.detail && document.getElementById(e.detail);
+      if (!el) return;
+      var i = panels.findIndex(function (q) { return q === el || q.contains(el); });
+      if (i >= 0) select(i, false, true);
+    });
+
     ladder.insertBefore(axis, panels[0]);
     measure();
     var startIndex = Math.max(0, panels.findIndex(function (p) { return p.getAttribute("data-level") === start; }));
-    select(startIndex, false);
+    // the ladders are built after the first section opens, so a link to a level is honoured here too
+    var linked = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+    var linkedIndex = linked ? panels.findIndex(function (q) { return q === linked || q.contains(linked); }) : -1;
+    select(linkedIndex >= 0 ? linkedIndex : startIndex, false, linkedIndex >= 0);
   }
 
   /* ---------- Checklist: remembered in this browser only ---------- */
