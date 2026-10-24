@@ -109,14 +109,17 @@
       var id = "ladder" + n + "-" + i;
       p.id = id;
       p.setAttribute("role", "tabpanel");
+      p.setAttribute("aria-labelledby", id + "-tab");
       var b = document.createElement("button");
       b.type = "button";
+      b.id = id + "-tab";
       b.setAttribute("role", "tab");
       b.setAttribute("aria-controls", id);
       b.innerHTML = '<span class="lv"></span><span></span>';
       b.firstChild.textContent = p.getAttribute("data-level");
       b.lastChild.textContent = p.getAttribute("data-name") || "";
-      b.setAttribute("aria-label", "Level " + p.getAttribute("data-level"));
+      // read "5**" as "5 double star", not "5 star star"
+      b.setAttribute("aria-label", "Level " + p.getAttribute("data-level").replace("**", " double star"));
       b.addEventListener("click", function () { select(i, false); });
       axis.appendChild(b);
       return b;
