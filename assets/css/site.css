@@ -1398,3 +1398,10 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 }
 /* the step names in Part B's contents read as words, not small capitals */
 .index .index-group { text-transform: none; letter-spacing: 0; font-size: 0.875rem; color: var(--sky); }
+
+/* a past-paper task, set like the question paper; a line quoted from a published sample */
+.task-box { margin: 10px 0 18px; padding: 14px 18px; border: 2px solid var(--ink); border-radius: 12px; background: var(--chest); }
+.sample-quote { margin: 10px 0 12px; padding: 14px 18px; border-radius: 12px; background: #fff1e3; }
+.sample-quote p { margin: 0 0 6px; font-size: var(--step-1); line-height: 1.45; font-family: var(--font-display); font-weight: 600; }
+.sample-quote footer { font-size: 0.875rem; color: var(--ink-soft); }
+.sample-quote p .lv { margin-right: 8px; vertical-align: 0.1em; }
