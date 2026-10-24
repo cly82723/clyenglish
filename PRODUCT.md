@@ -26,7 +26,7 @@ A personal, single-voice guide (CLY) rather than a generic past-paper dump: orig
 
 ## Operating Context
 
-- HKDSE English Paper 2: Part A (compulsory short task, ~200 words) and Part B (choose one of eight questions tied to elective modules, ~400 words).
+- HKDSE English Paper 2 (since the 2024 exam, 2 hours for both parts): Part A (compulsory short task, ~200 words) and Part B (choose one of four questions, no longer tied to the elective modules, ~400 words).
 - Marking domains: Content, Language, Organisation.
 - Students use the site alongside school practice papers and tutor feedback.
 
