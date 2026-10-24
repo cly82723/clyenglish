@@ -42,9 +42,14 @@
   function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); return el; }
 
   // Opens another section of the page through its index link, so the URL, focus and pager stay in step.
+  // A part inside a topic (the Tense Matrix inside Tenses) has no index link of its own, so a stand-in link opens it.
   function go(id) {
     var link = document.querySelector(".index a[href='#" + id + "']");
-    if (link) link.click();
+    if (link) { link.click(); return; }
+    var sheet = document.querySelector("[data-tabs]");
+    if (!sheet) return;
+    var a = h("a", { href: "#" + id, hidden: true });
+    sheet.appendChild(a); a.click(); sheet.removeChild(a);
   }
 
   function scrollTo(el) {

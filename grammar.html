@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Grammar · CLY English</title>
-<meta name="description" content="S.4 grammar practice: the 12 tenses, the passive voice, gerunds and to-infinitives with a proofreading exercise, and the four conditionals.">
+<title>S.4 Grammar · CLY English</title>
+<meta name="description" content="S.4 grammar practice in five topics: tenses, the passive voice, gerunds and to-infinitives, conditionals, and proofreading.">
 <script>document.documentElement.className = "js";</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,231 +19,138 @@
 <header class="cover">
   <a class="brand" href="index.html">
     <img src="images/brand/cly-mark-128.png" alt="" width="76" height="76">
-    <span><span class="brand-name">CLY English</span><span class="brand-sub">HKDSE English · Writing, grammar, vocab</span></span>
+    <span><span class="brand-name">CLY English</span><span class="brand-sub">Senior secondary · HKDSE English</span></span>
   </a>
-  <nav class="tabs" aria-label="Main">
-    <a href="index.html">Home</a>
-    <a href="part-a.html">Part A</a>
-    <a href="part-b.html">Part B</a>
-    <a href="toolkit.html">Toolkit</a>
-    <a href="grammar.html" aria-current="page">Grammar</a>
-    <a href="vocab.html">Vocab</a>
-    <a href="self-study.html">Self-study</a>
+  <nav class="tabs" aria-label="Senior secondary forms">
+    <a href="grammar.html" aria-current="page">S.4</a>
+    <a href="part-a.html">S.5 &amp; S.6</a>
   </nav>
 </header>
 
 <div class="sheet" data-tabs>
-  <nav class="index" aria-label="Grammar sections">
+  <nav class="index" aria-label="Grammar topics">
     <p class="index-title">S.4 Grammar</p>
     <ol>
-      <li class="index-group">12 Tenses</li>
-      <li><a href="#matrix">Tense Matrix</a></li>
-      <li><a href="#practice">Tenses quiz</a></li>
-      <li><a href="#cloze">Tenses cloze</a></li>
-      <li class="index-group">Proofreading</li>
-      <li><a href="#passive">Passive voice lesson</a></li>
-      <li><a href="#gerunds">Gerunds lesson</a></li>
-      <li><a href="#infinitives">To-infinitives lesson</a></li>
-      <li><a href="#proofreading">Proofreading exercise</a></li>
-      <li class="index-group">Conditionals</li>
-      <li><a href="#condmatrix">Conditionals Matrix</a></li>
-      <li><a href="#condquiz">Conditionals quiz</a></li>
-      <li><a href="#condmatch">Match &amp; change</a></li>
+      <li><a href="#tenses">Tenses</a></li>
+      <li><a href="#passive">Passive voice</a></li>
+      <li><a href="#gerunds-infinitives">Gerunds &amp; infinitives</a></li>
+      <li><a href="#conditionals">Conditionals</a></li>
+      <li><a href="#proofreading">Proofreading</a></li>
     </ol>
   </nav>
 
   <main class="column" id="main">
-    <dl class="label">
-      <dt>Subject</dt><dd>Grammar · S.4</dd>
-      <dt>Covers</dt><dd>Tenses, proofreading, conditionals</dd>
-      <dt>Aim</dt><dd>The right verb form, every time</dd>
-    </dl>
-
-    <h1 class="title">Grammar practice</h1>
+    <h1 class="title">S.4 Grammar</h1>
     <noscript><p class="tip">These exercises need JavaScript. Turn it on in your browser to practise.</p></noscript>
 
-    <section id="matrix">
-      <h2>The Tense Matrix</h2>
-      <p class="lead">Every English tense combines a <strong>time</strong> (past, present, future) with an <strong>aspect</strong> (simple, continuous, perfect, perfect continuous). <mark class="swipe">Choose a tense to see its formula, keywords and examples.</mark></p>
-      <div data-grammar="matrix"></div>
-    </section>
-
-    <section id="practice">
-      <h2>Tenses: short MC quiz</h2>
-      <p class="lead">Choose the correct tense for each blank. Look for the keywords first. Each answer is marked as soon as you choose it, and if it's wrong, you'll get a hint and another try.</p>
-      <div data-grammar="practice"></div>
-    </section>
-
-    <section id="cloze">
-      <h2>Tenses cloze: The Summer Intern</h2>
-      <p class="lead">Fill in each blank by choosing a verb from the verb bank and typing it in the correct tense. Each verb is used once at most, and some verbs are not needed. All 12 blanks test a different tense. If an answer is wrong, you'll get a hint so you can fix it.</p>
-      <div data-grammar="cloze"></div>
+    <section id="tenses">
+      <h2>Tenses</h2>
+      <div class="part" id="matrix">
+        <h3>The Tense Matrix</h3>
+        <p>Every tense is a <strong>time</strong> plus an <strong>aspect</strong>. <mark class="swipe">Choose a tense to see its formula and examples.</mark></p>
+        <div data-grammar="matrix"></div>
+      </div>
+      <div class="part" id="practice">
+        <h3>Quick quiz</h3>
+        <p>Find the time words first. Wrong answers get a hint and another try.</p>
+        <div data-grammar="practice"></div>
+      </div>
+      <div class="part" id="cloze">
+        <h3>Cloze: The Summer Intern</h3>
+        <p>Pick a verb from the bank and type it in the right tense. Each verb is used once at most.</p>
+        <div data-grammar="cloze"></div>
+      </div>
+      <aside class="versions" aria-label="Two versions">
+        <p class="versions-title">Two versions</p>
+        <div class="pair">
+          <p><span class="lv">3</span><s>I have finished the paper yesterday.</s></p>
+          <p><span class="lv">4</span>I finished the paper yesterday.</p>
+        </div>
+        <p class="cly"><b>CLY:</b> Find the time words first (<em>yesterday</em>, <em>since</em>, <em>by next year</em>). They choose the tense for you.</p>
+      </aside>
     </section>
 
     <section id="passive">
       <h2>The passive voice</h2>
       <div data-grammar="passive"></div>
-    </section>
-
-    <section id="gerunds">
-      <h2>Gerunds (V-ing as a noun)</h2>
-      <div data-grammar="gerunds"></div>
-    </section>
-
-    <section id="infinitives">
-      <h2>To-infinitives (to + V1)</h2>
-      <div data-grammar="infinitives"></div>
-    </section>
-
-    <section id="proofreading">
-      <h2>Proofreading: Our Beach Clean-up Day</h2>
-      <p class="lead">Most lines in this article for the school magazine contain one mistake with the passive voice, a gerund or a to-infinitive. A few lines are correct.</p>
-      <div data-grammar="proofreading"></div>
-    </section>
-
-    <section id="condmatrix">
-      <h2>The Conditionals Matrix</h2>
-      <p class="lead">Every conditional combines <strong>how real</strong> a situation is (real or imaginary) with <strong>when</strong> it happens (always, now and future, or past). <mark class="swipe">Choose a conditional to see its formula, meaning, a picture of it and examples.</mark></p>
-      <div data-grammar="condmatrix"></div>
-    </section>
-
-    <section id="condquiz">
-      <h2>Conditionals: quick quiz</h2>
-      <p class="lead">Choose the right verb form or the right meaning for each conditional. Ask yourself: is it real or imaginary, and when does it happen? Each answer is marked as soon as you choose it, and if it's wrong, you'll get a hint and another try.</p>
-      <div data-grammar="condquiz"></div>
-    </section>
-
-    <section id="condmatch">
-      <h2>Match &amp; change: Rainstorms, Bubble Tea and Bad Luck</h2>
-      <p class="lead"><strong>Part A:</strong> the sentences in each scene look alike, but they mean different things. Match each one to its meaning. <strong>Part B:</strong> read the situation, decide which conditional fits, and type the verbs in the right form.</p>
-      <div data-grammar="condmatch"></div>
-    </section>
-  </main>
-
-  <aside class="margin" aria-label="Notes from CLY">
-    <div class="margin-inner">
-      <!-- One set of notes per section; the page shows the set for the open section. -->
-      <div data-for="matrix">
-        <h2>Two versions</h2>
-        <div class="pair">
-          <p><span class="lv">3</span><s>I have finished the paper yesterday.</s></p>
-          <p><span class="lv">4</span>I finished the paper yesterday.</p>
-        </div>
-        <h2>How it works</h2>
-        <div class="note"><p>Start with the matrix or the lesson. Then try the quiz.</p></div>
-        <div class="note"><p>Wrong answer? You get a hint first, then a bigger clue. The answer is never just given.</p></div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p><span class="lv">2–3</span> Find the time words first: <em>yesterday</em>, <em>since</em>, <em>by next year</em>. They choose the tense for you.</p></div>
-        <div class="note"><p><span class="lv">5**</span> Strong writers mix tenses on purpose: a past story, a present comment, a future hope.</p></div>
-      </div>
-
-      <div data-for="practice">
-        <h2>Two versions</h2>
-        <div class="pair">
-          <p><span class="lv">3</span><s>When I arrived, the bus left.</s></p>
-          <p><span class="lv">4</span>When I arrived, the bus had left.</p>
-        </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Read the whole sentence before you choose. The time clue is often at the end.</p></div>
-        <div class="note"><p>A wrong answer is useful. Read the hint and try again before you open the matrix.</p></div>
-      </div>
-
-      <div data-for="cloze">
-        <h2>Two versions</h2>
-        <div class="pair">
-          <p><span class="lv">3</span><s>She works here for two years.</s></p>
-          <p><span class="lv">4</span>She has worked here for two years.</p>
-        </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Cross off each verb in the bank as you use it. Some verbs are not needed.</p></div>
-        <div class="note"><p><span class="lv">2–3</span> Check the subject too: <em>he</em>, <em>she</em> and <em>it</em> need -s in the present simple.</p></div>
-      </div>
-
-      <div data-for="passive">
-        <h2>Two versions</h2>
+      <aside class="versions" aria-label="Two versions">
+        <p class="versions-title">Two versions</p>
         <div class="pair">
           <p><span class="lv">3</span><s>The new library was build last year.</s></p>
           <p><span class="lv">4</span>The new library was built last year.</p>
         </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Use the passive when the doer doesn't matter: <em>The results will be announced on Friday.</em></p></div>
-        <div class="note"><p><span class="lv">5**</span> In a report or proposal, the passive sounds objective: <em>A survey was conducted.</em></p></div>
-      </div>
+        <p class="cly"><b>CLY:</b> Use the passive when the doer doesn't matter: <em>The results will be announced on Friday.</em></p>
+      </aside>
+    </section>
 
-      <div data-for="gerunds">
-        <h2>Two versions</h2>
+    <section id="gerunds-infinitives">
+      <h2>Gerunds &amp; infinitives</h2>
+      <div class="part" id="gerunds">
+        <h3>Gerunds (V-ing as a noun)</h3>
+        <div data-grammar="gerunds"></div>
+      </div>
+      <div class="part" id="infinitives">
+        <h3>To-infinitives (to + V1)</h3>
+        <div data-grammar="infinitives"></div>
+      </div>
+      <aside class="versions" aria-label="Two versions">
+        <p class="versions-title">Two versions</p>
         <div class="pair">
           <p><span class="lv">3</span><s>I'm interested in join the drama club.</s></p>
           <p><span class="lv">4</span>I'm interested in joining the drama club.</p>
         </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>After a preposition (<em>in, at, for, by, without</em>), the verb ends in -ing.</p></div>
-        <div class="note"><p><span class="lv">5**</span> A gerund makes a strong opening line: <em>Saying no is a skill.</em></p></div>
-      </div>
+        <p class="cly"><b>CLY:</b> After a preposition, use V-ing; after <em>decide</em>, <em>hope</em> or <em>promise</em>, use to + V1.</p>
+      </aside>
+    </section>
 
-      <div data-for="infinitives">
-        <h2>Two versions</h2>
-        <div class="pair">
-          <p><span class="lv">3</span><s>She promised calling me after school.</s></p>
-          <p><span class="lv">4</span>She promised to call me after school.</p>
-        </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Ask: does <em>to</em> point forward, to a plan or a purpose? Then use to + V1.</p></div>
-        <div class="note"><p><em>Make</em> and <em>let</em> never take <em>to</em>: <em>The film made me cry.</em></p></div>
+    <section id="conditionals">
+      <h2>Conditionals</h2>
+      <div class="part" id="condmatrix">
+        <h3>The Conditionals Matrix</h3>
+        <p>Every conditional is <strong>how real</strong> plus <strong>when</strong>. <mark class="swipe">Choose one to see its formula and a picture of it.</mark></p>
+        <div data-grammar="condmatrix"></div>
       </div>
-
-      <div data-for="proofreading">
-        <h2>Two versions</h2>
-        <div class="pair">
-          <p><span class="lv">3</span><s>Students are not allow to use phones in class.</s></p>
-          <p><span class="lv">4</span>Students are not allowed to use phones in class.</p>
-        </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Read each line twice: once for meaning, once for verb forms.</p></div>
-        <div class="note"><p>Some lines have no mistake. Don't change a correct line just to be safe.</p></div>
-        <div class="note"><p><span class="lv">2–3</span> Check every verb before you hand in: the tense, the -s ending, and V3 after <em>be</em> or <em>have</em>.</p></div>
+      <div class="part" id="condquiz">
+        <h3>Quick quiz</h3>
+        <p>Ask: is it real or imaginary, and when does it happen?</p>
+        <div data-grammar="condquiz"></div>
       </div>
-
-      <div data-for="condmatrix">
-        <h2>Two versions</h2>
+      <div class="part" id="condmatch">
+        <h3>Match &amp; change: Rainstorms, Bubble Tea and Bad Luck</h3>
+        <p><strong>Part A:</strong> match each sentence to its meaning. <strong>Part B:</strong> type the verbs in the right form.</p>
+        <div data-grammar="condmatch"></div>
+      </div>
+      <aside class="versions" aria-label="Two versions">
+        <p class="versions-title">Two versions</p>
         <div class="pair">
           <p><span class="lv">3</span><s>If it will rain tomorrow, we stay home.</s></p>
           <p><span class="lv">4</span>If it rains tomorrow, we will stay home.</p>
         </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Never put <em>will</em> straight after <em>if</em>.</p></div>
-        <div class="note"><p><span class="lv">5**</span> Conditionals let you argue about what could happen. Try one in your next Part B argument.</p></div>
-      </div>
+        <p class="cly"><b>CLY:</b> Never put <em>will</em> straight after <em>if</em>.</p>
+      </aside>
+    </section>
 
-      <div data-for="condquiz">
-        <h2>Two versions</h2>
+    <section id="proofreading">
+      <h2>Proofreading: Our Beach Clean-up Day</h2>
+      <p class="covers">Covers: passive voice, gerunds &amp; to-infinitives</p>
+      <p>Most lines have one mistake. A few lines are correct.</p>
+      <div data-grammar="proofreading"></div>
+      <aside class="versions" aria-label="Two versions">
+        <p class="versions-title">Two versions</p>
         <div class="pair">
-          <p><span class="lv">3</span><s>If I am you, I would apologise.</s></p>
-          <p><span class="lv">4</span>If I were you, I would apologise.</p>
+          <p><span class="lv">3</span><s>Students are not allow to use phones in class.</s></p>
+          <p><span class="lv">4</span>Students are not allowed to use phones in class.</p>
         </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Look at the other half of the sentence first. <em>Would have</em> points to the past.</p></div>
-        <div class="note"><p><em>Unless</em> means <em>if … not</em>: <em>Unless you hurry, you'll miss the bus.</em></p></div>
-      </div>
-
-      <div data-for="condmatch">
-        <h2>Two versions</h2>
-        <div class="pair">
-          <p><span class="lv">3</span><s>If I would have known, I would have helped.</s></p>
-          <p><span class="lv">4</span>If I had known, I would have helped.</p>
-        </div>
-        <h2>CLY's notes</h2>
-        <div class="note"><p>Read the situation first. Did it happen, could it happen, or is it only imagined?</p></div>
-        <div class="note"><p>Short forms are fine: <em>hadn't</em> and <em>had not</em> are both marked right.</p></div>
-      </div>
-    </div>
-  </aside>
+        <p class="cly"><b>CLY:</b> Some lines have no mistake, so don't change a correct line just to be safe.</p>
+      </aside>
+    </section>
+  </main>
 </div>
 
 <footer class="back-cover">
-  <p>CLY English · Original guides for HKDSE English Paper 2. Not affiliated with the HKEAA.</p>
+  <p>CLY English · Original guides for HKDSE English. Not affiliated with the HKEAA.</p>
   <nav aria-label="Footer">
-    <a href="index.html">Home</a><a href="part-a.html">Part A</a><a href="part-b.html">Part B</a><a href="toolkit.html">Toolkit</a><a href="vocab.html">Vocab</a><a href="self-study.html">Self-study</a>
+    <a href="index.html">All forms</a><a href="self-study.html">Beyond the exam: self-study</a>
   </nav>
 </footer>
 <script src="assets/js/practice-core.js"></script>

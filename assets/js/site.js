@@ -19,6 +19,14 @@
     marks.forEach(function (m) { io.observe(m); });
   }
 
+  /* ---------- Where the student was: the next visit opens there (see the redirect in index.html) ---------- */
+  try { sessionStorage.setItem("cly:visit", "1"); } catch (e) { /* storage blocked: every visit starts at home */ }
+  function remember(section) {
+    var page = location.pathname.split("/").pop() || "index.html";
+    if (page === "index.html") return;
+    try { localStorage.setItem("cly:last", page + "#" + section.id); } catch (e) {}
+  }
+
   /* ---------- Subtabs: one section of the page at a time ---------- */
   function initTabs(sheet) {
     var column = sheet.querySelector(".column");
@@ -46,12 +54,20 @@
       return a;
     }
 
+    // an id names a section, or a part inside one (grammar.html#matrix opens Tenses at the Tense Matrix)
+    function sectionOf(id) {
+      var el = id && document.getElementById(id);
+      return el ? sections.filter(function (s) { return s === el || s.contains(el); })[0] : null;
+    }
+    // the cover's form tabs can point into this page too (vocab.html#s2): they light up with their section
+    var coverLinks = Array.prototype.slice.call(document.querySelectorAll(".tabs a[href*='#']")).filter(samePage);
+    function samePage(a) { return a.pathname === location.pathname && a.hash.length > 1; }
+
     function show(id, scroll) {
-      var target = sections.filter(function (s) { return s.id === id; })[0] || sections[0];
+      var target = sectionOf(id) || sections[0];
+      var part = id && id !== target.id ? document.getElementById(id) : null;
       var from = sections.filter(function (s) { return !s.hidden; })[0];
       sections.forEach(function (s) { s.hidden = s !== target; s.classList.remove("turn-next", "turn-prev"); });
-      // margin notes written for one section show only with that section
-      sheet.querySelectorAll(".margin [data-for]").forEach(function (n) { n.hidden = n.getAttribute("data-for") !== target.id; });
       // turn the page from the side the reader moved towards
       if (scroll && from && from !== target) {
         void target.offsetWidth;
@@ -61,26 +77,35 @@
         if (a.getAttribute("href") === "#" + target.id) a.setAttribute("aria-current", "true");
         else a.removeAttribute("aria-current");
       });
+      coverLinks.forEach(function (a) {
+        if (a.hash === "#" + target.id) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      });
       var active = links.filter(function (a) { return a.getAttribute("aria-current"); })[0];
       if (active && active.scrollIntoView && window.innerWidth <= 760) {
         active.scrollIntoView({ block: "nearest", inline: "center", behavior: reduceMotion ? "auto" : "smooth" });
       }
-      if (scroll) {
+      if (scroll && part) {
+        var at = part.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: at, behavior: reduceMotion ? "auto" : "smooth" });
+      } else if (scroll) {
         var top = sheet.getBoundingClientRect().top + window.scrollY - 8;
         if (window.scrollY > top) window.scrollTo({ top: top, behavior: reduceMotion ? "auto" : "smooth" });
       }
+      remember(target);
       swipe(target);
     }
 
-    sheet.addEventListener("click", function (e) {
-      var a = e.target.closest("a[href^='#']");
-      if (!a) return;
-      var id = a.getAttribute("href").slice(1);
-      if (!sections.some(function (s) { return s.id === id; })) return;
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest("a[href*='#']");
+      if (!a || !samePage(a)) return;
+      var id = a.hash.slice(1);
+      if (!sectionOf(id)) return;
       e.preventDefault();
       history.pushState(null, "", "#" + id);
       show(id, true);
-      var h = document.getElementById(id).querySelector("h2");
+      var h = document.getElementById(id);
+      h = h.matches("h2, h3") ? h : h.querySelector("h2, h3");
       if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
     });
     window.addEventListener("popstate", function () { show(location.hash.slice(1), true); });
@@ -187,7 +212,7 @@
     function count() {
       if (!out) return;
       var done = boxes.filter(function (b) { return b.checked; }).length;
-      out.textContent = done + " of " + boxes.length + " done this week";
+      out.textContent = done + " of " + boxes.length + " " + (list.getAttribute("data-count") || "done this week");
     }
     boxes.forEach(function (b) {
       b.checked = !!saved[b.id];
