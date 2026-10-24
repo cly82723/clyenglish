@@ -735,11 +735,14 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .formula { font: 700 0.95rem/1.4 var(--font-display); background: var(--chest); border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
 
 /* the tense and conditional matrices: a table of buttons */
-.matrix { border-collapse: separate; border-spacing: 6px; width: 100%; table-layout: fixed; }
+/* every cell fills its row: the table is 1px tall and grows to its content, and rows and cells take 100% of that.
+   (A 1px cell alone works only in Chrome; Firefox and Safari then squash the buttons and the text spills out.) */
+.matrix { border-collapse: separate; border-spacing: 6px; width: 100%; table-layout: fixed; height: 1px; }
+.matrix tr { height: 100%; }
 .matrix thead th:first-child, .matrix tbody th { width: 6.5em; }
 .matrix th { border: 0; background: none; padding: 4px 6px; vertical-align: bottom; }
 .matrix tbody th { vertical-align: middle; font: 700 1.05rem var(--font-display); }
-.matrix td { border: 0; padding: 0; height: 1px; }
+.matrix td { border: 0; padding: 0; height: 100%; }
 /* a cell: name on top, formula under it; a conditional's number sits in its own column beside both */
 .cell {
   appearance: none; cursor: pointer; width: 100%; height: 100%; text-align: left;
