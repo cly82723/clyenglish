@@ -58,6 +58,7 @@
       group.className = "letters";
       group.setAttribute("role", "group");
       group.setAttribute("aria-label", "Label sentence " + (n + 1));
+      group.id = (box.id || "drill") + "-" + n;
       ORDER.forEach(function (k) {
         var b = document.createElement("button");
         b.type = "button";
@@ -108,6 +109,8 @@
         picked.classList.toggle("wrong", !ok);
         if (ok) { right++; return; }
         var v = document.createElement("div");
+        v.id = "hint-" + (box.id || "drill") + "-" + n;
+        picked.setAttribute("aria-describedby", v.id);
         v.className = "verdict hint fresh";
         v.innerHTML = "<strong>Not quite. Have another go.</strong>";
         v.appendChild(document.createTextNode(li.getAttribute("data-hint")));
@@ -116,12 +119,16 @@
       result.textContent = "";
       if (right < items.length) {
         var missing = chosen.filter(function (c) { return !c; }).length;
+        var toFix = items.map(function (li, n) { return chosen[n] && chosen[n] !== li.getAttribute("data-answer") ? n + 1 : 0; }).filter(Boolean);
         var p = document.createElement("p");
         p.className = "count";
-        p.textContent = right + " of " + items.length + " right" + (missing ? " · " + missing + " not labelled yet" : "");
+        p.textContent = right + " of " + items.length + " right" +
+          (toFix.length ? " · look again at sentence " + toFix.join(" and ") : "") +
+          (missing ? " · " + missing + " not labelled yet" : "");
         result.appendChild(p);
         return;
       }
+      setDone(true);
       // all four right: the paragraph is put back together in CREI order, in its colours
       var done = document.createElement("div");
       done.className = "verdict do fresh";
@@ -142,17 +149,24 @@
       result.appendChild(done);
     });
 
+    function setDone(done) {
+      box.classList.toggle("solved", done);
+      check.disabled = done;
+      box.querySelectorAll(".letter").forEach(function (x) { x.disabled = done; });
+    }
+
     again.addEventListener("click", function () {
+      setDone(false);
       chosen = chosen.map(function () { return null; });
       items.forEach(function (li) {
         var v = li.querySelector(".verdict");
         if (v) v.remove();
-        li.querySelectorAll(".letter").forEach(function (x) { x.classList.remove("right", "wrong"); x.setAttribute("aria-pressed", "false"); });
+        li.querySelectorAll(".letter").forEach(function (x) { x.classList.remove("right", "wrong"); x.setAttribute("aria-pressed", "false"); x.removeAttribute("aria-describedby"); });
       });
       result.textContent = "";
     });
   }
 
   document.querySelectorAll("[data-picker]").forEach(initPicker);
-  document.querySelectorAll("[data-drill]").forEach(initDrill);
+  document.querySelectorAll("[data-drill]").forEach(function (box, n) { if (!box.id) box.id = "drill" + (n + 1); initDrill(box); });
 })();
