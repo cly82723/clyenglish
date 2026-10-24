@@ -64,13 +64,15 @@
     var coverLinks = Array.prototype.slice.call(document.querySelectorAll(".tabs a[href*='#']")).filter(samePage);
     function samePage(a) { return a.pathname === location.pathname && a.hash.length > 1; }
 
-    function show(id, scroll) {
+    // keyboard is true when Enter opened the section: it changes at once, because a key pressed
+    // again and again should never wait for an animation (the level ladder works the same way)
+    function show(id, scroll, keyboard) {
       var target = sectionOf(id) || sections[0];
       var part = id && id !== target.id ? document.getElementById(id) : null;
       var from = sections.filter(function (s) { return !s.hidden; })[0];
       sections.forEach(function (s) { s.hidden = s !== target; s.classList.remove("turn-next", "turn-prev"); });
       // turn the page from the side the reader moved towards
-      if (scroll && from && from !== target) {
+      if (scroll && !keyboard && from && from !== target) {
         void target.offsetWidth;
         target.classList.add(sections.indexOf(target) > sections.indexOf(from) ? "turn-next" : "turn-prev");
       }
@@ -104,7 +106,7 @@
       if (!sectionOf(id)) return;
       e.preventDefault();
       history.pushState(null, "", "#" + id);
-      show(id, true);
+      show(id, true, e.detail === 0);
       var h = document.getElementById(id);
       h = h.matches("h2, h3") ? h : h.querySelector("h2, h3");
       if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
@@ -236,4 +238,7 @@
   document.querySelectorAll(".ladder").forEach(initLadder);
   document.querySelectorAll(".checklist[data-store]").forEach(initChecklist);
   swipe(document);
+
+  // transitions wait until the page has settled, so tabs the script marks as open do not fade in on load
+  requestAnimationFrame(function () { requestAnimationFrame(function () { document.documentElement.classList.remove("preload"); }); });
 })();

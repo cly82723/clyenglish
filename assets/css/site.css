@@ -37,8 +37,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
@@ -1309,3 +1308,32 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 
   .directory li a { padding: 0 13px; }
 }
+
+/* ---------- Motion details ---------- */
+
+/* tabs the script marks as open on load take their colour at once, not in a fade */
+.preload .tabs a, .preload .forms a { transition: none; }
+
+/* the climb: each step is seen often in one sitting, so it rises quickly and the highlighter draws briskly */
+.js .levelup-levels > li:not([hidden]) { animation-duration: 0.2s; }
+.levelup mark.swipe { transition-duration: 0.5s; }
+/* a key press changes the level at once */
+.levelup.instant .levelup-levels > li:not([hidden]) { animation: none; }
+.levelup.instant mark.swipe { transition: none; }
+
+/* every pressable thing gives a little under the finger */
+.levelup-steps [role="group"] button, .resume a, .index a, .pager a, .word, .spot button, .cond-ladder > li > button {
+  transition: background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out, transform 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.levelup-steps [role="group"] button:active, .resume a:active, .index a:active, .pager a:active,
+.word:active:not(:disabled) { transform: scale(0.97); }
+.spot button:active, .cond-ladder > li > button:active { transform: scale(0.98); } /* wide rows give less */
+@media (prefers-reduced-motion: reduce) {
+  .levelup-steps [role="group"] button:active, .resume a:active, .index a:active, .pager a:active,
+  .word:active, .spot button:active, .cond-ladder > li > button:active { transform: none; }
+}
+
+/* the fox leans in under a mouse, so it says "tap me" even after the hint has gone */
+.fox img { transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1); }
+@media (hover: hover) and (pointer: fine) { .fox:hover img { transform: rotate(-3deg); } }
+.fox.hop img { animation-duration: 0.38s; }

@@ -77,11 +77,17 @@
     more.textContent = "Another tip";
     bubble.querySelector(".bubble-go").appendChild(more);
 
+    // a hop that is still in the air is left to land, and the words only slide in when they are not
+    // still sliding: a student tapping fast sees each new tip at once, not a stutter of restarts
+    var hopping = false, swapped = 0;
+    fox.addEventListener("animationend", function () { hopping = false; });
     function next() {
       at = (at + 1) % tips.length;
       draw();
-      replay(fox, "hop");
-      replay(bubble, "swap");
+      if (!hopping) { hopping = true; replay(fox, "hop"); }
+      var now = Date.now();
+      if (now - swapped > 250) replay(bubble, "swap"); else bubble.classList.remove("swap");
+      swapped = now;
       if (!hint.hidden) { hint.hidden = true; store("cly:fox", "1"); }
     }
     fox.addEventListener("click", next);
@@ -104,21 +110,23 @@
       b.type = "button";
       b.textContent = li.getAttribute("data-level");
       b.setAttribute("aria-label", "Level " + li.getAttribute("data-level").replace("**", " double star"));
-      b.addEventListener("click", function () { select(i, true); });
+      b.addEventListener("click", function (e) { select(i, true, e.detail === 0); });
       steps.appendChild(b);
       return b;
     });
     var next = document.createElement("button");
     next.type = "button";
     next.className = "btn levelup-next";
-    next.addEventListener("click", function () { select(current < levels.length - 1 ? current + 1 : 0, true); });
+    next.addEventListener("click", function (e) { select(current < levels.length - 1 ? current + 1 : 0, true, e.detail === 0); });
     bar.appendChild(steps);
     bar.appendChild(next);
     box.appendChild(bar);
 
     var current = 0;
-    function select(i, moved) {
+    // keyboard is true for Enter or Space: the level changes at once, with no rise and no highlighter stroke
+    function select(i, moved, keyboard) {
       current = i;
+      box.classList.toggle("instant", !!keyboard);
       levels.forEach(function (li, j) { li.hidden = j !== i; });
       buttons.forEach(function (b, j) {
         b.setAttribute("aria-pressed", String(j === i));
