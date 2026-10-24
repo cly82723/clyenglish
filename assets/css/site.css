@@ -1560,3 +1560,8 @@ body:has(.hub) .back-cover { max-width: 1040px; }
   .drill-items .letter.right::before, .drill-items .letter.wrong::before,
   .drill-items .letter.right::after, .drill-items .letter.wrong::after { animation: none; }
 }
+
+/* Labels read as words: uppercase stays only in the label panel, table headers and summary keys (DESIGN.md) */
+.index-title, .versions-title, .pager a small, .bubble-label, .resume small, .directory h3, .field-label, .ladder-panel .tag {
+  text-transform: none; letter-spacing: 0; font-size: 1rem;
+}
