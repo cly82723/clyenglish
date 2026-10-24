@@ -19,12 +19,13 @@
     marks.forEach(function (m) { io.observe(m); });
   }
 
-  /* ---------- Where the student was: the next visit opens there (see the redirect in index.html) ---------- */
-  try { sessionStorage.setItem("cly:visit", "1"); } catch (e) { /* storage blocked: every visit starts at home */ }
+  /* ---------- Where the student was: home offers "Continue: Part B › Article" ---------- */
   function remember(section) {
     var page = location.pathname.split("/").pop() || "index.html";
     if (page === "index.html") return;
-    try { localStorage.setItem("cly:last", page + "#" + section.id); } catch (e) {}
+    var h = section.querySelector("h2");
+    var label = document.title.split(" · ")[0] + (h ? " › " + h.textContent : "");
+    try { localStorage.setItem("cly:last", JSON.stringify({ href: page + "#" + section.id, label: label })); } catch (e) { /* storage blocked: home simply shows no "Continue" */ }
   }
 
   /* ---------- Subtabs: one section of the page at a time ---------- */

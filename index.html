@@ -4,15 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CLY English · HKDSE English, one level higher</title>
-<meta name="description" content="English practice for Hong Kong secondary students: vocab for S.1 to S.3, grammar for S.4, and HKDSE Paper 2 writing guides for S.5 and S.6.">
-<script>
-  document.documentElement.className = "js";
-  // A new visit opens where the student left off; once they are moving around the site, home stays home.
-  try {
-    var last = localStorage.getItem("cly:last");
-    if (last && !sessionStorage.getItem("cly:visit") && /^[a-z0-9-]+\.html(#[a-z0-9-]+)?$/.test(last)) location.replace(last);
-  } catch (e) { /* storage blocked: start at home */ }
-</script>
+<meta name="description" content="English practice for Hong Kong secondary students: grammar for S.4, HKDSE Paper 2 writing guides for S.5 and S.6, and vocab for S.1 to S.3.">
+<script>document.documentElement.className = "js";</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -25,22 +18,50 @@
 
 <main class="hub" id="main">
   <section class="hello" aria-label="CLY's tip of the day">
-    <button class="fox" type="button" aria-label="Another tip from CLY">
-      <img src="images/brand/cly-mark-512.png" alt="" width="168" height="168">
-    </button>
     <h1>CLY English<small>English practice from S.1 to the HKDSE</small></h1>
-    <div class="bubble" aria-live="polite">
-      <p class="bubble-label">Tip of the day</p>
-      <p class="bubble-tip">Find the time words first. They choose the tense for you.</p>
-      <p class="bubble-eg"><s>I have finished the paper yesterday.</s><span class="to" aria-label="becomes">→</span><strong>I finished the paper yesterday.</strong></p>
+    <button class="fox" type="button" tabindex="-1" aria-hidden="true">
+      <img src="images/brand/cly-mark-512.png" alt="" width="168" height="168">
+      <span class="fox-hint" hidden>Tap me</span>
+    </button>
+    <div class="bubble">
+      <div class="bubble-body" aria-live="polite">
+        <p class="bubble-label">Tip of the day</p>
+        <p class="bubble-tip">Find the time words first. They choose the tense for you.</p>
+        <ul class="marks bubble-eg">
+          <li class="avoid"><span class="visually-hidden">Wrong: </span><span data-wrong>I have finished the paper yesterday.</span></li>
+          <li class="do"><span class="visually-hidden">Right: </span><span data-right>I finished the paper yesterday.</span></li>
+        </ul>
+      </div>
       <p class="bubble-go"><a href="grammar.html#tenses">Practise this: Tenses</a></p>
     </div>
   </section>
 
+  <p class="resume" hidden><a href="index.html"><small>Continue where you left off</small><span></span></a></p>
+
+  <nav class="directory" id="directory" aria-labelledby="directory-title">
+    <h2 id="directory-title">Pick your form</h2>
+    <div class="tracks">
+      <div>
+        <h3>Senior secondary</h3>
+        <ul>
+          <li><span class="form-mark">S.4</span><a href="grammar.html">Grammar</a></li>
+          <li><span class="form-mark">S.5</span><a href="part-a.html">Part A</a><a href="part-b.html">Part B</a><a href="toolkit.html">Toolkit</a></li>
+          <li><span class="form-mark">S.6</span><a href="final.html">Final reminders</a><a href="part-a.html">Part A</a><a href="part-b.html">Part B</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Junior secondary</h3>
+        <ul>
+          <li><span class="row-label">Vocab revision</span><a href="vocab.html#s1">S.1</a><a href="vocab.html#s2">S.2</a><a href="vocab.html#s3">S.3</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
   <section class="levelup" aria-labelledby="levelup-title">
     <div class="levelup-head">
-      <h2 id="levelup-title">Watch one sentence climb to 5**</h2>
-      <button type="button" class="link-btn" data-replay hidden>Watch again</button>
+      <h2 id="levelup-title">One sentence, from Level 2 to 5**</h2>
+      <p>Should schools ban mobile phones?</p>
     </div>
     <ol class="levelup-levels">
       <li data-level="2">
@@ -50,49 +71,32 @@
       </li>
       <li data-level="3">
         <span class="lv">3</span>
-        <p class="levelup-line">In my opinion, mobile phones are bad for students because they always play games in class.</p>
-        <p class="levelup-why">Accurate, but "bad" and "always" say nothing specific.</p>
+        <p class="levelup-line">In my opinion, <mark class="swipe">mobile phones</mark> are bad for <mark class="swipe">students</mark> because they always play games in class.</p>
+        <p class="levelup-why">The plurals are fixed, but "bad" and "always" still say nothing specific.</p>
       </li>
       <li data-level="4">
         <span class="lv">4</span>
-        <p class="levelup-line">Mobile phones distract students in class, as many find it hard to resist checking their messages.</p>
+        <p class="levelup-line">Mobile phones <mark class="swipe">distract</mark> students in class, as many find it hard to resist checking their messages.</p>
         <p class="levelup-why">A precise verb, "distract", replaces "bad".</p>
       </li>
       <li data-level="5">
         <span class="lv">5</span>
-        <p class="levelup-line">Although phones can be useful learning tools, they often distract students, who find it hard to ignore a notification mid-lesson.</p>
+        <p class="levelup-line"><mark class="swipe">Although phones can be useful learning tools,</mark> they often distract students, who find it hard to ignore a notification mid-lesson.</p>
         <p class="levelup-why">It admits the other side first, then makes the point.</p>
       </li>
       <li data-level="5**">
         <span class="lv" aria-label="5 double star">5**</span>
-        <p class="levelup-line">A phone in a pocket is a lesson half-heard: even when students ignore it, every buzz pulls a little attention away.</p>
+        <p class="levelup-line"><mark class="swipe">A phone in a pocket is a lesson half-heard:</mark> even when students ignore it, every buzz pulls a little attention away.</p>
         <p class="levelup-why">One memorable image carries the whole argument.</p>
       </li>
     </ol>
+    <p class="visually-hidden" aria-live="polite" data-announce></p>
   </section>
 
-  <nav class="directory" id="directory" aria-labelledby="directory-title">
-    <h2 id="directory-title">Pick your form</h2>
-    <div class="tracks">
-      <div>
-        <h3>Junior secondary</h3>
-        <ul>
-          <li><span class="form-mark">S.1</span><a href="vocab.html#s1">Vocab revision</a></li>
-          <li><span class="form-mark">S.2</span><a href="vocab.html#s2">Vocab revision</a></li>
-          <li><span class="form-mark">S.3</span><a href="vocab.html#s3">Vocab revision</a></li>
-        </ul>
-      </div>
-      <div>
-        <h3>Senior secondary</h3>
-        <ul>
-          <li><span class="form-mark">S.4</span><a href="grammar.html">Grammar</a></li>
-          <li><span class="form-mark">S.5</span><a href="part-a.html">Part A</a><a href="part-b.html">Part B</a><a href="toolkit.html">Toolkit</a></li>
-          <li><span class="form-mark">S.6</span><a href="final.html">Final reminders</a></li>
-        </ul>
-      </div>
-    </div>
-    <p class="extra">Beyond the exam: <a href="self-study.html">learn English on your own terms</a></p>
-  </nav>
+  <section class="closing" aria-labelledby="closing-title">
+    <h2 id="closing-title">English beyond the exam</h2>
+    <p>Fifteen minutes a day, things worth reading, and a weekly rewrite challenge. <a href="self-study.html">Learn English on your own terms</a></p>
+  </section>
 </main>
 
 <footer class="back-cover">

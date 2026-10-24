@@ -140,6 +140,7 @@ a.ext::after {
 @media (hover: hover) { .tabs a:hover { background: var(--leaf-deep); } }
 .tabs a[aria-current="page"] {
   background: var(--paper); color: var(--ink);
+  box-shadow: inset 0 4px 0 var(--fox); /* the open tab: fox-orange top edge marks where you are */
   padding-top: 20px; /* stands 4px taller; the label stays on its neighbours' baseline */
 }
 
@@ -1003,7 +1004,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 /* ---------- Tracks: form tabs on the cover, the S.5 & S.6 strip on the sheet ---------- */
 
 /* a page with no contents column (vocab: its forms are the cover tabs) */
-.sheet.solo { grid-template-columns: minmax(0, 1fr); }
+.sheet.solo { grid-template-columns: minmax(0, 1fr); max-width: 1040px; }
 
 /* S.5 & S.6 share one cover tab; this strip splits it into the two forms and their guides */
 .forms {
@@ -1044,94 +1045,92 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 .column .part > h3:first-child { font-size: var(--step-2); margin: 0 0 10px; }
 .covers { font: 600 1rem/1.4 var(--font-display); color: var(--sky); margin: -6px 0 16px; }
 
-/* ---------- Home: the fox, one sentence climbing, and the directory ---------- */
+/* ---------- Home: the fox's tip, where you left off, the directory, one sentence climbing ---------- */
 
 .hub {
   max-width: 1040px; margin: 32px auto 0;
   background: var(--paper); box-shadow: 0 18px 40px rgb(16 38 59 / 0.18);
   padding: 40px clamp(20px, 5vw, 64px) 48px;
 }
-.hello { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 28px; align-items: center; }
+/* the name on its own line; below it the fox speaks, its bubble pointing straight at it */
+.hello {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px 28px; align-items: center;
+  grid-template-areas: "title title" "fox bubble";
+}
+.hello h1 { grid-area: title; font-size: clamp(2.2rem, 1.4rem + 3vw, 3.6rem); letter-spacing: -0.04em; }
+.hello h1 small { display: block; font: 600 var(--step-0)/1.3 var(--font-display); letter-spacing: 0; color: var(--ink-soft); margin-top: 6px; }
 .fox {
+  grid-area: fox; position: relative;
   appearance: none; border: 0; padding: 0; background: none; cursor: pointer;
-  border-radius: 50%; grid-row: span 2;
+  display: grid; justify-items: center; gap: 8px;
 }
 .fox img {
-  width: 168px; height: 168px; border-radius: 50%; background: var(--paper);
+  width: 148px; height: 148px; border-radius: 50%; background: var(--paper);
   box-shadow: 0 8px 22px rgb(16 38 59 / 0.22);
 }
-.fox.hop img { animation: hop 0.5s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.fox-hint {
+  font: 700 0.85rem/1 var(--font-display); color: var(--ink);
+  background: var(--highlight); border-radius: 999px; padding: 6px 12px;
+}
+.fox-hint[hidden] { display: none; }
+.fox.hop img { animation: hop 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes hop {
   0% { transform: translateY(0) scale(1, 1); }
-  25% { transform: translateY(0) scale(1.06, 0.92); }
-  55% { transform: translateY(-18px) scale(0.97, 1.04) rotate(-4deg); }
+  20% { transform: translateY(0) scale(1.05, 0.93); }
+  50% { transform: translateY(-16px) scale(0.98, 1.03) rotate(-4deg); }
   100% { transform: translateY(0) scale(1, 1); }
 }
 @media (prefers-reduced-motion: reduce) { .fox.hop img { animation: none; } }
-.hello h1 { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.6rem); letter-spacing: -0.04em; align-self: end; }
-.hello h1 small { display: block; font: 600 var(--step-0)/1.3 var(--font-display); letter-spacing: 0; color: var(--ink-soft); margin-top: 6px; }
 
-/* the fox's speech bubble: today's tip, a wrong line put right, and where to practise it */
+/* the fox's speech bubble: today's tip, the wrong line and the right one, and where to practise it */
 .bubble {
-  position: relative; align-self: start;
-  background: var(--chest); border-radius: 14px; padding: 14px 18px 16px;
+  grid-area: bubble; position: relative;
+  background: var(--chest); border-radius: 14px; padding: 16px 20px 18px;
   font-family: var(--font-display);
 }
 .bubble::before {
-  content: ""; position: absolute; left: -9px; top: 22px; width: 18px; height: 18px;
+  content: ""; position: absolute; left: -9px; top: calc(50% - 9px); width: 18px; height: 18px;
   background: var(--chest); transform: rotate(45deg); border-radius: 3px;
 }
 .bubble p { margin: 0; }
 .bubble-label { font: 700 0.75rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--sky); }
 .bubble .bubble-tip { font: 700 var(--step-1)/1.3 var(--font-display); margin-top: 4px; }
-.bubble .bubble-eg { margin-top: 6px; line-height: 1.5; }
-.bubble-eg s { text-decoration-color: var(--avoid); text-decoration-thickness: 2px; color: var(--ink-soft); }
-.bubble-eg .to { color: var(--ink-soft); margin: 0 6px; }
-.bubble .bubble-go { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: 10px; }
+.bubble-eg { margin: 8px 0 0; font-family: var(--font-body); }
+.bubble-eg li { padding: 4px 0 4px 34px; }
+.bubble-eg li::before { top: 0.45em; width: 20px; height: 20px; }
+.bubble-eg .avoid { color: var(--ink); }
+.bubble-eg .do { font-weight: 700; }
+.bubble-eg u { text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
+.bubble-eg .avoid u { text-decoration-color: var(--avoid); }
+.bubble-eg .do u { text-decoration-color: var(--do); }
+.bubble .bubble-go { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 12px; }
 .bubble-go a { font-weight: 600; }
-.bubble .link-btn { color: var(--ink-soft); }
-.bubble.swap > * { animation: note-in 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
-@media (prefers-reduced-motion: reduce) { .bubble.swap > * { animation: fade-in 0.15s ease-out; } }
+.bubble-go .btn-quiet { min-height: 44px; }
+.bubble.swap .bubble-body > * { animation: note-in 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) { .bubble.swap .bubble-body > * { animation: fade-in 0.15s ease-out; } }
 
-/* one sentence, rewritten from Level 2 to 5** */
-.levelup { margin: 40px 0 0; border: 2px solid var(--ink); border-radius: 14px; overflow: hidden; }
-.levelup-head {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px;
-  padding: 12px 20px; background: var(--ink); color: var(--paper);
+/* where you left off: one tap back into the page you had open */
+.resume { margin: 28px 0 0; }
+.resume[hidden] { display: none; }
+.resume a {
+  display: inline-grid; grid-template-columns: auto auto; align-items: center; gap: 2px 14px;
+  padding: 10px 18px; min-height: 44px; border-radius: 12px;
+  border: 2px solid var(--ink); color: var(--ink); text-decoration: none; font-family: var(--font-display);
 }
-.levelup-head h2 { font: 600 1rem/1.3 var(--font-display); letter-spacing: 0; }
-.levelup-head .link-btn { color: var(--paper); }
-.levelup-levels { list-style: none; margin: 0; padding: 18px 20px 6px; display: grid; }
-/* every level shares one cell, so the box keeps the height of its longest line and nothing below it jumps */
-.levelup-levels > li { grid-area: 1 / 1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: start; }
-.js .levelup-levels > li[hidden] { display: grid; visibility: hidden; }
-.no-js .levelup-levels { gap: 18px; }
-.no-js .levelup-levels > li { grid-area: auto; }
-.levelup-levels .lv { width: 3.2em; height: 3.2em; font-size: 0.95rem; background: var(--fox); border-color: var(--fox); color: var(--ink); grid-row: span 2; }
-.levelup-line { font-size: var(--step-1); line-height: 1.5; margin: 0; }
-.levelup-why { color: var(--ink-soft); margin: 0; font-size: 0.98rem; }
-.js .levelup-levels > li:not([hidden]) { animation: rise 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
-.js .levelup-levels > li:not([hidden]) .lv { animation: pop 0.36s cubic-bezier(0.34, 1.56, 0.64, 1); }
-@keyframes pop { from { transform: scale(0.6); } }
-@media (prefers-reduced-motion: reduce) {
-  .js .levelup-levels > li:not([hidden]), .js .levelup-levels > li:not([hidden]) .lv { animation: none; }
+.resume small { grid-column: 1; font: 700 0.75rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--sky); }
+.resume span { grid-column: 1; font-weight: 700; font-size: 1.05rem; }
+.resume a::after {
+  content: ""; grid-column: 2; grid-row: 1 / span 2; width: 20px; height: 20px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.levelup-steps { display: flex; gap: 6px; padding: 12px 20px 16px; }
-.no-js .levelup-steps { display: none; }
-.levelup-steps button {
-  appearance: none; cursor: pointer; flex: 1; min-height: 40px;
-  font: 700 0.9rem/1 var(--font-display); color: var(--ink-soft);
-  background: var(--paper); border: 2px solid var(--ring); border-radius: 999px;
-  transition: background-color 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
-}
-.levelup-steps button.passed { border-color: var(--sky); color: var(--sky); }
-.levelup-steps button[aria-pressed="true"] { background: var(--fox); border-color: var(--fox); color: var(--ink); }
-@media (hover: hover) { .levelup-steps button:hover { border-color: var(--sky); } }
+@media (hover: hover) { .resume a:hover { background: var(--chest); } .resume a:hover::after { transform: translateX(4px); } }
 
 /* the directory: every form, every guide, one tap away */
-.directory { margin: 40px 0 0; }
+.directory { margin: 36px 0 0; }
 .directory > h2 { font-size: var(--step-3); margin: 0 0 18px; }
-.directory .tracks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+.directory .tracks { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 0 40px; }
 .directory h3 {
   font: 700 var(--step--1)/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--sky); margin: 0 0 4px; padding-bottom: 10px; border-bottom: 2px solid var(--ink);
@@ -1139,13 +1138,55 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 .directory ul { list-style: none; margin: 0; padding: 0; }
 .directory li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
 .directory .form-mark { width: 3.6em; margin-right: 6px; }
+.directory .row-label { font: 600 1rem/1.2 var(--font-display); color: var(--ink-soft); margin-right: 6px; }
 .directory li a {
   display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
   font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
   border: 1px solid var(--rule-strong); border-radius: 999px; background: var(--paper);
 }
 @media (hover: hover) { .directory li a:hover { background: var(--chest); border-color: var(--ink); } }
-.directory .extra { margin: 22px 0 0; font-family: var(--font-display); color: var(--ink-soft); }
+
+/* one sentence, rewritten from Level 2 to 5**: the student climbs, the highlighter marks what changed */
+.levelup { margin: 48px 0 0; border: 2px solid var(--ink); border-radius: 14px; overflow: hidden; }
+.levelup-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px;
+  padding: 14px 20px; background: var(--ink); color: var(--paper);
+}
+.levelup-head h2 { font-size: var(--step-2); }
+.levelup-head p { margin: 0; font: 500 1rem/1.3 var(--font-display); color: var(--paper); opacity: 0.85; }
+.levelup-levels { list-style: none; margin: 0; padding: 22px 20px 8px; display: grid; }
+/* every level shares one cell, so the box keeps the height of its longest line and nothing below it jumps */
+.levelup-levels > li { grid-area: 1 / 1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; align-items: start; }
+.js .levelup-levels > li[hidden] { display: grid; visibility: hidden; }
+.no-js .levelup-levels { gap: 18px; }
+.no-js .levelup-levels > li { grid-area: auto; }
+.levelup-levels .lv {
+  min-width: 3.4em; height: 3.4em; padding: 0 0.5em; font-size: 0.95rem; grid-row: span 2;
+  background: var(--fox); border-color: var(--fox); color: var(--ink);
+}
+.levelup-line { font-size: var(--step-1); line-height: 1.55; margin: 0; }
+.levelup-why { color: var(--ink-soft); margin: 0; font-size: 0.98rem; }
+.js .levelup-levels > li:not([hidden]) { animation: rise 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) { .js .levelup-levels > li:not([hidden]) { animation: none; } }
+.levelup-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 14px 20px 18px; }
+.no-js .levelup-steps { display: none; }
+.levelup-steps [role="group"] { display: flex; gap: 6px; flex: 1 1 280px; }
+.levelup-steps [role="group"] button {
+  appearance: none; cursor: pointer; flex: 1; min-height: 44px;
+  font: 700 0.9rem/1 var(--font-display); color: var(--ink-soft);
+  background: var(--paper); border: 2px solid var(--ring); border-radius: 999px;
+  transition: background-color 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
+}
+.levelup-steps [role="group"] button.passed { border-color: var(--sky); color: var(--sky); }
+.levelup-steps [role="group"] button[aria-pressed="true"] { background: var(--fox); border-color: var(--fox); color: var(--ink); }
+@media (hover: hover) { .levelup-steps [role="group"] button:hover { border-color: var(--sky); } }
+.levelup-next { min-height: 44px; min-width: 9em; }
+
+/* the page closes on an invitation, not on the small print */
+.closing { margin: 44px 0 0; padding-top: 22px; border-top: 2px solid var(--ink); }
+.closing h2 { font-size: var(--step-2); margin: 0 0 8px; }
+.closing p { margin: 0; color: var(--ink-soft); max-width: 60ch; }
+.closing a { font-weight: 700; white-space: nowrap; }
 
 /* ---------- Responsive ---------- */
 
@@ -1202,16 +1243,24 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   .ladder-panel { padding: 6px 16px 20px; }
 
   .hub { margin-top: 0; box-shadow: none; padding: 24px var(--gutter) 36px; }
-  .hello { gap: 14px 16px; }
-  .fox { grid-row: auto; }
-  .fox img { width: 84px; height: 84px; }
-  .bubble { grid-column: 1 / -1; }
-  .bubble::before { left: 32px; top: -8px; }
-  .levelup { margin-top: 28px; }
+  /* phone: the fox sits beside the name, and the bubble points up at it */
+  .hello { grid-template-areas: "fox title" "bubble bubble"; gap: 14px 16px; }
+  .fox img { width: 72px; height: 72px; }
+  .fox-hint { font-size: 0.75rem; padding: 4px 8px; }
+  .bubble::before { left: 28px; top: -8px; }
+  .resume { margin-top: 20px; }
+  .resume a { display: grid; }
+  .directory { margin-top: 28px; }
+  .directory .tracks { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .levelup { margin-top: 36px; }
+  .levelup-head { padding: 12px 16px; }
   .levelup-levels { padding: 16px 16px 4px; }
-  .levelup-levels .lv { width: 2.8em; height: 2.8em; font-size: 0.85rem; }
+  .levelup-levels .lv { min-width: 3em; height: 3em; font-size: 0.85rem; }
   .levelup-line { font-size: 1.1rem; }
-  .levelup-steps { padding: 10px 16px 14px; }
-  .directory { margin-top: 32px; }
-  .directory .tracks { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .levelup-steps { padding: 12px 16px 16px; }
+  .levelup-next { flex: 1 1 100%; }
 }
+
+/* a narrow sheet (vocab) keeps its cover and back cover the same width */
+body:has(.sheet.solo) .cover, body:has(.sheet.solo) .back-cover { max-width: 1040px; }
+body:has(.hub) .back-cover { max-width: 1040px; }
