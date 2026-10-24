@@ -41,6 +41,13 @@
   --step-4: clamp(2.4rem, 1.6rem + 3.2vw, 4rem);
 
   --line: 1.65;
+
+  /* motion: one strong ease-out for everything that arrives or responds, plain ease for colour */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-colour: ease;
+  --dur-fast: 150ms;    /* colour and hover */
+  --dur-press: 160ms;   /* press feedback */
+  --dur-base: 220ms;    /* panels and notes arriving */
   --sheet-max: 1160px;
   --gutter: clamp(16px, 4vw, 56px);
 }
@@ -143,7 +150,6 @@ a.ext::after {
   text-decoration: none;
   padding: 16px 22px 15px;
   border-radius: 10px 10px 0 0;
-  transition: background 0.2s, transform 0.2s;
 }
 @media (hover: hover) { .tabs a:hover { background: var(--leaf-deep); } }
 .tabs a[aria-current="page"] {
@@ -185,7 +191,7 @@ a.ext::after {
   text-decoration: none;
   padding: 9px 12px;
   border-radius: 6px;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour);
 }
 @media (hover: hover) { .index a:hover { background: var(--chest); } }
 .index a[aria-current="true"] {
@@ -247,7 +253,7 @@ mark, .hl {
   padding: 0 2px;
   box-decoration-break: clone; -webkit-box-decoration-break: clone;
 }
-.js mark.swipe { background-size: 0% 100%; transition: background-size 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+.js mark.swipe { background-size: 0% 100%; transition: background-size 0.9s var(--ease-out); }
 .js mark.swipe.on { background-size: 100% 100%; }
 @media (prefers-reduced-motion: reduce) { .js mark.swipe { transition: none; background-size: 100% 100%; } }
 
@@ -321,7 +327,7 @@ mark, .hl {
 .ladder-axis::after {
   background: var(--fox);
   transform: scaleX(var(--climb, 0)); transform-origin: left center;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s var(--ease-out);
 }
 .ladder-axis button {
   position: relative; z-index: 1;
@@ -333,7 +339,7 @@ mark, .hl {
 .ladder-axis .lv {
   background: var(--paper); color: var(--ink-soft); border-color: var(--ring);
   transition-property: transform, background-color, border-color, color;
-  transition-duration: 0.25s; transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 0.25s; transition-timing-function: var(--ease-out);
 }
 @media (hover: hover) { .ladder-axis button:hover .lv { border-color: var(--sky); color: var(--sky); } }
 .ladder-axis button.passed .lv { border-color: var(--sky); color: var(--sky); }
@@ -360,19 +366,21 @@ mark, .hl {
 .no-js .ladder-axis { display: none; }
 .no-js .ladder-panel + .ladder-panel { border-top: 1px solid var(--rule); }
 .ladder-panel .tag { font: 700 var(--step--1) var(--font-display); color: var(--sky); text-transform: uppercase; letter-spacing: 0.06em; }
-.js .ladder-panel { animation: rise 0.26s cubic-bezier(0.16, 1, 0.3, 1); }
+.js .ladder-panel { transition: opacity 0.26s var(--ease-out), transform 0.26s var(--ease-out); }
+.js .ladder-panel[hidden] { opacity: 0; transform: translateY(6px); transition-duration: 0s; }
+.ladder-axis.instant ~ .ladder-panel { transition: none; }
 @keyframes rise { from { opacity: 0.2; transform: translateY(6px); } }
 /* stepping with the arrow keys changes level at once: no climb, no rise, no redrawn highlighter */
 .ladder-axis.instant::after, .ladder-axis.instant .lv { transition-duration: 0s; transition-delay: 0s !important; }
 @media (prefers-reduced-motion: reduce) {
-  .js .ladder-panel { animation: none; }
+  .js .ladder-panel, .js .ladder-panel[hidden] { transform: none; transition: opacity 0.15s var(--ease-colour); }
   .ladder-axis::after { transition: none; }
   .ladder-axis .lv { transition-delay: 0s !important; }
 }
 
 /* subtabs: the new section turns in from the side you moved towards */
-.js [data-tabs] .column > section.turn-next { animation: turn-next 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
-.js [data-tabs] .column > section.turn-prev { animation: turn-prev 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
+.js [data-tabs] .column > section.turn-next { animation: turn-next 0.24s var(--ease-out); }
+.js [data-tabs] .column > section.turn-prev { animation: turn-prev 0.24s var(--ease-out); }
 @keyframes turn-next { from { opacity: 0; transform: translateX(16px); } }
 @keyframes turn-prev { from { opacity: 0; transform: translateX(-16px); } }
 @keyframes turn-fade { from { opacity: 0; } }
@@ -486,9 +494,9 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   appearance: none; flex: none; margin: 2px 0 0;
   width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper);
   display: grid; place-items: center; cursor: pointer;
-  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour);
 }
-.checklist label span { transition: color 0.2s ease-out; }
+.checklist label span { transition: color var(--dur-fast) var(--ease-colour); }
 .checklist input::after {
   content: ""; width: 14px; height: 14px; background: var(--paper);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 13l5 5L20 6'/%3E%3C/svg%3E") center / contain no-repeat;
@@ -497,7 +505,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   clip-path: inset(0 100% 0 0); transition: clip-path 0.12s ease-out;
 }
 .checklist input:checked { background: var(--do); border-color: var(--do); }
-.checklist input:checked::after { clip-path: inset(0 0 0 0); transition: clip-path 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.checklist input:checked::after { clip-path: inset(0 0 0 0); transition: clip-path 0.3s var(--ease-out); }
 @media (prefers-reduced-motion: reduce) { .checklist input::after, .checklist input:checked::after { transition: none; } }
 .checklist input:checked + span { color: var(--ink-soft); }
 .progress { font: 600 1rem var(--font-display); color: var(--sky); margin: 0 0 6px; }
@@ -507,7 +515,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   color: var(--ink); background: var(--paper);
   border: 2px solid var(--ink); border-radius: 999px;
   padding: 10px 18px;
-  transition: background 0.2s;
+  transition: background-color var(--dur-fast) var(--ease-colour);
 }
 @media (hover: hover) { .reset:hover { background: var(--chest); } }
 .no-js .reset { display: none; }
@@ -548,7 +556,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   font: 600 1rem/1.2 var(--font-display);
   border: 2px solid var(--ink); border-radius: 999px;
   padding: 11px 20px;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour);
 }
 .btn { background: var(--ink); color: var(--paper); }
 @media (hover: hover) { .btn:hover { background: #33465c; border-color: #33465c; } }
@@ -569,7 +577,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   font: 600 1rem/1.2 var(--font-display); color: var(--ink);
   background: var(--paper); border: 1px solid var(--edge); border-radius: 999px;
   padding: 7px 14px;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour);
 }
 @media (hover: hover) { .chip:hover { background: var(--chest); } }
 .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
@@ -586,7 +594,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   font: inherit; font-size: 1rem; line-height: 1.4; color: var(--ink);
   background: var(--paper); border: 1px solid var(--edge); border-radius: 10px;
   padding: 11px 40px 11px 14px; position: relative;
-  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour);
 }
 .choice b { font-family: var(--font-display); color: var(--sky); margin-right: 8px; }
 @media (hover: hover) { .choice:hover:not(:disabled) { background: var(--chest); border-color: var(--sky); } }
@@ -634,7 +642,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   width: 9em; padding: 3px 8px 2px;
   border: 0; border-bottom: 2px solid var(--ink-soft); border-radius: 4px 4px 0 0;
   background: transparent;
-  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour);
 }
 .blank input:focus { outline: none; background: var(--chest); border-bottom-color: var(--sky); }
 .blank input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
@@ -670,7 +678,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   font: 600 1rem/1.3 var(--font-display); color: var(--ink);
   background: var(--paper); border: 1px solid var(--edge); border-radius: 10px; padding: 12px 14px;
   overflow-wrap: break-word;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour);
 }
 .cell.has-badge { grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; }
 .cell.has-badge .cn { grid-row: span 2; }
@@ -761,7 +769,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
   appearance: none; cursor: pointer; width: 100%; text-align: left;
   font: inherit; color: var(--ink); background: none; border: 0;
   padding: 14px 4px 14px 40px; position: relative;
-  transition: background-color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour);
 }
 @media (hover: hover) { .spot button:hover { background: var(--chest); } }
 .spot button::before {
@@ -889,7 +897,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   appearance: none; cursor: pointer; width: 100%; text-align: left; font: inherit; color: var(--ink);
   display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: start;
   background: var(--paper); border: 1px solid var(--edge); border-radius: 12px; padding: 12px 14px;
-  transition: background-color 0.15s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour);
 }
 @media (hover: hover) { .cond-ladder > li > button:hover { background: var(--chest); } }
 .cond-ladder .head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font: 700 1rem var(--font-display); }
@@ -942,7 +950,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 
 /* Press feedback: every control gives a little under the finger, then springs back quickly */
 .tabs a, .btn, .btn-quiet, .reset, .chip, .ok-btn, .step-btn, .cell, .letter, .choice, .forms a, .directory a {
-  transition: background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out, transform 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.16s var(--ease-out);
 }
 .tabs a:active, .btn:active:not(:disabled), .btn-quiet:active:not(:disabled), .reset:active,
 .chip:active:not(:disabled), .ok-btn:active:not(:disabled), .step-btn:active:not(:disabled),
@@ -962,10 +970,10 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 .blank.right::after, .blank.wrong::after,
 .proof > li.fresh::after,
 .verdict.fresh::before,
-.spot [aria-expanded="true"]::before { animation: pen 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.verdict.fresh { animation: note-in 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+.spot [aria-expanded="true"]::before { animation: pen 0.3s var(--ease-out) both; }
+.verdict.fresh { animation: note-in 0.22s var(--ease-out); }
 .verdict.fresh::before { animation-delay: 0.1s; }
-.spot [aria-expanded="true"] .fix, .spot [aria-expanded="true"] .why { animation: note-in 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+.spot [aria-expanded="true"] .fix, .spot [aria-expanded="true"] .why { animation: note-in 0.22s var(--ease-out); }
 .detail.swap { animation: fade-in 0.18s ease-out; }
 @media (prefers-reduced-motion: reduce) {
   .choice.fresh::after, .blank.right::after, .blank.wrong::after, .proof > li.fresh::after,
@@ -1082,7 +1090,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   background: var(--highlight); border-radius: 999px; padding: 6px 12px;
 }
 .fox-hint[hidden] { display: none; }
-.fox.hop img { animation: hop 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.fox.hop img { animation: hop 0.5s var(--ease-out); }
 @keyframes hop {
   0% { transform: translateY(0) scale(1, 1); }
   20% { transform: translateY(0) scale(1.05, 0.93); }
@@ -1115,7 +1123,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 .bubble .bubble-go { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 12px; }
 .bubble-go a { font-weight: 600; }
 .bubble-go .btn-quiet { min-height: 44px; }
-.bubble.swap .bubble-body > * { animation: note-in 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
+.bubble.swap .bubble-body > * { animation: note-in 0.24s var(--ease-out); }
 @media (prefers-reduced-motion: reduce) { .bubble.swap .bubble-body > * { animation: fade-in 0.15s ease-out; } }
 
 /* where you left off: one tap back into the page you had open */
@@ -1132,7 +1140,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   content: ""; grid-column: 2; grid-row: 1 / span 2; width: 20px; height: 20px; background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s var(--ease-out);
 }
 @media (hover: hover) { .resume a:hover { background: var(--chest); } .resume a:hover::after { transform: translateX(4px); } }
 
@@ -1175,8 +1183,10 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 }
 .levelup-line { font-size: var(--step-1); line-height: 1.55; margin: 0; }
 .levelup-why { color: var(--ink-soft); margin: 0; font-size: 1rem; }
-.js .levelup-levels > li:not([hidden]) { animation: rise 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-@media (prefers-reduced-motion: reduce) { .js .levelup-levels > li:not([hidden]) { animation: none; } }
+.js .levelup-levels > li { transition: opacity 0.22s var(--ease-out), transform 0.22s var(--ease-out); }
+.js .levelup-levels > li[hidden] { opacity: 0; transform: translateY(6px); transition-duration: 0s; }
+.levelup.instant .levelup-levels > li { transition: none; }
+@media (prefers-reduced-motion: reduce) { .js .levelup-levels > li, .js .levelup-levels > li[hidden] { transform: none; } }
 .levelup-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 14px 20px 18px; }
 .no-js .levelup-steps { display: none; }
 .levelup-steps [role="group"] { display: flex; gap: 6px; flex: 1 1 280px; }
@@ -1184,7 +1194,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   appearance: none; cursor: pointer; flex: 1; min-height: 44px;
   font: 700 1rem/1 var(--font-display); color: var(--ink-soft);
   background: var(--paper); border: 2px solid var(--ring); border-radius: 999px;
-  transition: background-color 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour);
 }
 .levelup-steps [role="group"] button.passed { border-color: var(--sky); color: var(--sky); }
 .levelup-steps [role="group"] button[aria-pressed="true"] { background: var(--fox); border-color: var(--fox); color: var(--ink); }
@@ -1324,15 +1334,13 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .preload .tabs a, .preload .forms a { transition: none; }
 
 /* the climb: each step is seen often in one sitting, so it rises quickly and the highlighter draws briskly */
-.js .levelup-levels > li:not([hidden]) { animation-duration: 0.2s; }
-.levelup mark.swipe { transition-duration: 0.5s; }
+.levelup mark.swipe { transition-duration: 0.4s; }
 /* a key press changes the level at once */
-.levelup.instant .levelup-levels > li:not([hidden]) { animation: none; }
 .levelup.instant mark.swipe { transition: none; }
 
 /* every pressable thing gives a little under the finger */
 .levelup-steps [role="group"] button, .resume a, .index a, .pager a, .word, .spot button, .cond-ladder > li > button {
-  transition: background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out, transform 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.16s var(--ease-out);
 }
 .levelup-steps [role="group"] button:active, .resume a:active, .index a:active, .pager a:active,
 .word:active:not(:disabled) { transform: scale(0.97); }
@@ -1343,7 +1351,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 }
 
 /* the fox leans in under a mouse, so it says "tap me" even after the hint has gone */
-.fox img { transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1); }
+.fox img { transition: transform 0.16s var(--ease-out); }
 @media (hover: hover) and (pointer: fine) { .fox:hover img { transform: rotate(-3deg); } }
 .fox.hop img { animation-duration: 0.38s; }
 
@@ -1459,17 +1467,18 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 
 /* a chip switch fades the new panel up into place; a key press or a link changes it at once */
 .picker-row .chip { min-height: 44px; }
-.pick-panel.swap { animation: rise 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+.pick-panel.swap { animation: rise 0.22s var(--ease-out); }
 @media (prefers-reduced-motion: reduce) { .pick-panel.swap { animation: fade-in 0.15s ease-out; } }
 
 /* the solved CREI paragraph falls into place move by move */
-.crei.rebuild { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.crei.rebuild { animation: fade-in 0.3s var(--ease-out) both; }
 @media (prefers-reduced-motion: reduce) { .crei.rebuild { animation: none; } }
 
 /* Step 4: a ladder of whole scripts. Levels keep their own heights (a Level 3 story is a third of a
    Level 5 one), so hidden panels leave the flow; the climb line and a quick fade carry the change. */
 .script-ladder { margin-top: 18px; }
-.js .script-ladder .ladder-panel { grid-row: auto; animation: fade-in 0.2s cubic-bezier(0.23, 1, 0.32, 1); }
+.js .script-ladder .ladder-panel { grid-row: auto; transition: opacity 0.2s var(--ease-out); }
+@starting-style { .js .script-ladder .ladder-panel:not([hidden]) { opacity: 0; } }
 .js .script-ladder .ladder-panel[hidden] { display: none; }
 .ladder-head h4 { margin: 0; font: 600 1rem/1.3 var(--font-display); }
 .script-ladder .ladder-axis button:last-child .lv { border-style: dashed; } /* CLY's rewrite, not an exam level */
@@ -1478,7 +1487,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
   content: ""; width: 18px; height: 18px; background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s var(--ease-out);
 }
 @media (hover: hover) { .ladder-next:hover::after { transform: translateX(4px); } }
 
@@ -1507,12 +1516,12 @@ body:has(.hub) .back-cover { max-width: 1040px; }
     content: ""; grid-column: 2; grid-row: 1 / span 2; width: 18px; height: 18px; background: currentColor;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.2s var(--ease-out);
   }
   .index.open .index-toggle::after { transform: rotate(180deg); }
   .js .index[data-collapse]:not(.open) ol { display: none; }
   .js .index[data-collapse] ol { padding: 10px 0 2px; }
-  .index[data-collapse].open ol { animation: rise 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+  .index[data-collapse].open ol { animation: rise 0.2s var(--ease-out); }
   .js [data-tabs][data-later] .column > .label { display: none; }
 }
 @media (max-width: 760px) and (prefers-reduced-motion: reduce) {
@@ -1550,10 +1559,10 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .crei-drill .btn:disabled { opacity: 0.45; }
 
 /* the phone contents button gives under the finger like every other control */
-.index-toggle { transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1); }
+.index-toggle { transition: transform 0.16s var(--ease-out); }
 .index-toggle:active { transform: scale(0.98); }
 /* a drill mark draws itself in like every other tick and cross on the site */
-.drill-items .letter.right::before, .drill-items .letter.wrong::before { animation: pen 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both; }
+.drill-items .letter.right::before, .drill-items .letter.wrong::before { animation: pen 0.3s var(--ease-out) 0.06s both; }
 .drill-items .letter.right::after, .drill-items .letter.wrong::after { animation: fade-in 0.15s ease-out both; }
 @media (prefers-reduced-motion: reduce) {
   .index-toggle:active { transform: none; }
@@ -1565,3 +1574,6 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .index-title, .versions-title, .pager a small, .bubble-label, .resume small, .directory h3, .field-label, .ladder-panel .tag {
   text-transform: none; letter-spacing: 0; font-size: 1rem;
 }
+
+/* the checklist count confirms a tick with a quick fade of the new number */
+.progress.bump { animation: fade-in var(--dur-fast) var(--ease-out); }

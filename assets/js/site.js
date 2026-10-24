@@ -217,20 +217,19 @@
         buttons[j].tabIndex = j === i ? 0 : -1;
         // levels below the chosen one light up as the climb line reaches them
         buttons[j].classList.toggle("passed", j < i);
-        buttons[j].querySelector(".lv").style.transitionDelay = j < i && !focus ? (j / i) * 0.3 + "s" : "";
+        buttons[j].querySelector(".lv").style.transitionDelay = j < i && !focus ? (j / i) * 0.15 + "s" : "";
       });
       axis.style.setProperty("--climb", buttons.length > 1 ? i / (buttons.length - 1) : 0);
       var marks = panels[i].querySelectorAll("mark.swipe");
       if (focus || quiet) {
-        panels[i].style.animation = "none";
         marks.forEach(function (m) { m.style.transition = "none"; m.classList.add("on"); });
         if (focus) buttons[i].focus();
         return;
       }
-      // restart the panel entrance and the highlighter (wiped instantly, then drawn again)
+      // the highlighter is wiped at once and drawn again, quicker than its first draw: this is a repeat
       marks.forEach(function (m) { m.style.transition = "none"; m.classList.remove("on"); });
-      panels[i].style.animation = "none"; void panels[i].offsetWidth; panels[i].style.animation = "";
-      marks.forEach(function (m) { m.style.transition = ""; });
+      void panels[i].offsetWidth;
+      marks.forEach(function (m) { m.style.transition = ""; m.style.transitionDuration = "0.4s"; });
       requestAnimationFrame(function () { swipe(panels[i]); });
     }
 
@@ -277,7 +276,9 @@
     function count() {
       if (!out) return;
       var done = boxes.filter(function (b) { return b.checked; }).length;
-      out.textContent = done + " of " + boxes.length + " " + (list.getAttribute("data-count") || "done this week");
+      var text = done + " of " + boxes.length + " " + (list.getAttribute("data-count") || "done this week");
+      if (out.textContent && out.textContent !== text) { out.classList.remove("bump"); void out.offsetWidth; out.classList.add("bump"); }
+      out.textContent = text;
     }
     boxes.forEach(function (b) {
       b.checked = !!saved[b.id];
