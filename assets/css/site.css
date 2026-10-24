@@ -1469,7 +1469,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 /* Step 4: a ladder of whole scripts. Levels keep their own heights (a Level 3 story is a third of a
    Level 5 one), so hidden panels leave the flow; the climb line and a quick fade carry the change. */
 .script-ladder { margin-top: 18px; }
-.js .script-ladder .ladder-panel { grid-row: auto; animation: fade-in 0.2s ease-out; }
+.js .script-ladder .ladder-panel { grid-row: auto; animation: fade-in 0.2s cubic-bezier(0.23, 1, 0.32, 1); }
 .js .script-ladder .ladder-panel[hidden] { display: none; }
 .ladder-head h4 { margin: 0; font: 600 1rem/1.3 var(--font-display); }
 .script-ladder .ladder-axis button:last-child .lv { border-style: dashed; } /* CLY's rewrite, not an exam level */
@@ -1548,3 +1548,15 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .drill-items .letter.wrong::before { --icon: var(--i-cross); }
 .crei-drill.solved .letter:disabled { opacity: 1; cursor: default; }
 .crei-drill .btn:disabled { opacity: 0.45; }
+
+/* the phone contents button gives under the finger like every other control */
+.index-toggle { transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1); }
+.index-toggle:active { transform: scale(0.98); }
+/* a drill mark draws itself in like every other tick and cross on the site */
+.drill-items .letter.right::before, .drill-items .letter.wrong::before { animation: pen 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both; }
+.drill-items .letter.right::after, .drill-items .letter.wrong::after { animation: fade-in 0.15s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .index-toggle:active { transform: none; }
+  .drill-items .letter.right::before, .drill-items .letter.wrong::before,
+  .drill-items .letter.right::after, .drill-items .letter.wrong::after { animation: none; }
+}

@@ -25,7 +25,12 @@
 
     // a tap fades the new panel in, so it is clear the content below the chips has changed;
     // a key press or a link changes it at once
+    // a student flicking through chips quickly sees each panel at once, not a stutter of restarted fades
+    var lastSwap = 0;
     function select(i, animate) {
+      var now = Date.now();
+      if (now - lastSwap < 250) animate = false;
+      if (animate) lastSwap = now;
       panels.forEach(function (p, j) {
         p.hidden = j !== i;
         p.classList.remove("swap");
@@ -139,7 +144,7 @@
         var li = items.filter(function (x) { return x.getAttribute("data-answer") === k; })[0];
         var s = document.createElement("span");
         s.className = "crei rebuild " + k.toLowerCase();
-        s.style.animationDelay = (n * 0.12 + 0.1) + "s";
+        s.style.animationDelay = (n * 0.08 + 0.1) + "s";
         s.innerHTML = "<b>" + k + "</b>";
         s.appendChild(document.createTextNode(li.querySelector("p").textContent));
         para.appendChild(s);
