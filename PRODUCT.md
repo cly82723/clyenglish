@@ -39,7 +39,7 @@ A personal, single-voice guide (CLY) rather than a generic past-paper dump: orig
 ## Brand Commitments
 
 - Name: CLY English.
-- Logo: `images/image_1792159441498114.png` — a fox seated within the letters C-L-Y inside a copper ring; colours are fox orange/copper, cream, and charcoal. The user requires the site to take its colours from this logo and to use the image.
+- Logo: `images/image_1792159441498114.png` — a fox seated within the letters C-L-Y inside a copper ring. The site must use the image. Since 2026-10-24 the user chose a lively "picnic day" palette (sky blue, leaf green, mint, navy) over the logo's copper; the logo's fox orange stays as the one warm accent.
 - Tone: professional, encouraging toward learners of every level.
 
 ## Evidence on Hand
