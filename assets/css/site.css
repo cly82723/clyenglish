@@ -1405,3 +1405,27 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .sample-quote p { margin: 0 0 6px; font-size: var(--step-1); line-height: 1.45; font-family: var(--font-display); font-weight: 600; }
 .sample-quote footer { font-size: 0.875rem; color: var(--ink-soft); }
 .sample-quote p .lv { margin-right: 8px; vertical-align: 0.1em; }
+
+/* Step 3: vocabulary entries and sentence patterns */
+.words, .patterns-list { list-style: none; padding: 0; margin: 14px 0 24px; border-top: 2px solid var(--ink); }
+.words > li, .patterns-list > li { padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.words p, .patterns-list p { margin: 0; }
+.word-head { font-family: var(--font-display); }
+.word-head b { font-size: var(--step-1); margin-right: 8px; }
+.word-head span { color: var(--ink-soft); font-weight: 600; }
+.word-ex, .pattern-ex { margin-top: 4px !important; }
+.word-ex strong { background: var(--chest); padding: 0 3px; border-radius: 3px; }
+.word-up { margin-top: 8px !important; font-family: var(--font-display); font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.word-up .lv { height: 26px; min-width: 26px; font-size: 0.875rem; }
+.word-up s { text-decoration-color: var(--avoid); text-decoration-thickness: 2px; color: var(--ink-soft); }
+.word-up .to { color: var(--ink-soft); }
+.from-real {
+  display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px;
+  font: 600 0.875rem/1.5 var(--font-display); color: var(--ink) !important; background: var(--highlight);
+}
+.pattern { font: 700 var(--step-1)/1.35 var(--font-display); }
+.pattern-note { margin-top: 4px !important; color: var(--ink-soft); font-size: 1rem; }
+.model-para { margin: 0 0 8px; padding: 16px 20px; border-radius: 12px; background: var(--chest); line-height: 1.8; }
+.model-para p { margin: 0; }
+.model-para-title { font: 700 1rem/1.3 var(--font-display); color: var(--sky); margin-bottom: 6px !important; }
+.model-para strong { text-decoration: underline; text-decoration-color: var(--sky); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
