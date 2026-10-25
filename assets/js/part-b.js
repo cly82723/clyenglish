@@ -50,6 +50,7 @@
 
   /* ---------- CREI drill: label each sentence of a jumbled paragraph ---------- */
   var MOVES = { C: "Claim", R: "Reason", E: "Evidence / Example", I: "Impact" };
+  var SHORT = { C: "Claim", R: "Reason", E: "Example", I: "Impact" };
   var ORDER = ["C", "R", "E", "I"];
 
   function initDrill(box) {
@@ -68,7 +69,9 @@
         var b = document.createElement("button");
         b.type = "button";
         b.className = "letter";
-        b.textContent = k;
+        b.setAttribute("data-move", k);
+        // the move is named under its letter, so nobody has to scroll back up to the key
+        b.innerHTML = "<b>" + k + "</b><small>" + SHORT[k] + "</small>";
         b.setAttribute("aria-label", MOVES[k]);
         b.setAttribute("aria-pressed", "false");
         b.addEventListener("click", function () {
@@ -173,34 +176,22 @@
   }
 
   /* ---------- Drill sets: one set of paragraphs at a time ---------- */
-  // "Try another set" moves on; the page remembers which set this browser was on. Answers in a set
-  // are kept, so a student who comes back to it sees where they left off.
+  // The set marks (sets.js) open one set at a time. Answers in a set are kept, so a student who comes
+  // back to it sees where they left off; a set is finished when both its paragraphs are solved.
   function initDrillSets(box) {
     var sets = Array.prototype.slice.call(box.querySelectorAll(":scope > .drill-set"));
-    if (sets.length < 2) return;
-    var key = "cly:crei-set", n = 0;
-    try { n = Math.min(Number(localStorage.getItem(key)) || 0, sets.length - 1); } catch (e) { n = 0; }
-    var count = document.createElement("p");
-    count.className = "count";
-    count.setAttribute("aria-live", "polite");
-    var next = document.createElement("button");
-    next.type = "button";
-    next.className = "btn-quiet";
-    next.textContent = "Try another set";
-    var bar = document.createElement("div");
-    bar.className = "passage-switch";
-    bar.appendChild(count);
-    bar.appendChild(next);
-    box.insertBefore(bar, sets[0]);
-
-    function show(i) {
-      n = i;
-      try { localStorage.setItem(key, String(n)); } catch (e) { /* storage blocked: just don't remember it */ }
-      sets.forEach(function (set, j) { set.hidden = j !== i; });
-      count.textContent = "Set " + (n + 1) + " of " + sets.length + ": " + sets[n].getAttribute("data-title");
-    }
-    next.addEventListener("click", function () { show((n + 1) % sets.length); });
-    show(n);
+    if (sets.length < 2 || !window.CLYSets) return;
+    window.CLYSets(box, sets[0], {
+      name: "crei",
+      // each set is two paragraphs on two different topics
+      titles: sets.map(function (s) { return "2 paragraphs: " + s.getAttribute("data-title").split(" · ").join(", "); }),
+      panels: sets,
+      state: function (i) {
+        var s = sets[i], drills = s.querySelectorAll("[data-drill]");
+        return s.querySelectorAll("[data-drill].solved").length === drills.length ? "done"
+          : s.querySelector(".letter[aria-pressed='true']") ? "started" : "";
+      }
+    });
   }
 
   document.querySelectorAll("[data-picker]").forEach(initPicker);

@@ -198,7 +198,9 @@
     function drawProgress() {
       var n = Object.keys(answers).length;
       var solvedCount = questions.filter(function (q, i) { return solved(i); }).length;
-      count.textContent = !n ? questions.length + " questions" : solvedCount + " of " + questions.length + " solved" + (n > solvedCount ? " · " + (n - solvedCount) + " still to fix" : "");
+      // the set's title already says how many questions there are, so the count waits for the first answer
+      count.hidden = !n;
+      count.textContent = !n ? "" : solvedCount + " of " + questions.length + " solved" + (n > solvedCount ? " · " + (n - solvedCount) + " still to fix" : "");
       actions.hidden = !n;
     }
     function drawSummary() {
@@ -207,7 +209,7 @@
       if (solvedCount < questions.length) return;
       var firstTry = questions.filter(function (q, i) { return !wrong[i]; }).length;
       var toReview = questions.filter(function (q, i) { return wrong[i]; }).map(kit.topicOf).filter(function (t, i, a) { return a.indexOf(t) === i; });
-      summary.appendChild(h("div", { class: "scoreboard" },
+      summary.appendChild(h("div", { class: "scoreboard done" },
         h("p", { class: "score" }, "All " + questions.length + " solved."),
         firstTry === questions.length ? h("p", null, kit.fullMarks) : null,
         toReview.length ? [h("p", { class: "field-label" }, kit.reviewHeading), h("ul", { class: "chips" }, toReview.map(function (t) {
@@ -646,8 +648,11 @@
       drawLines(); drawResults(); CLY.scrollTo(root);
     }
 
-    root.appendChild(h("div", { class: "tip" },
-      h("p", { class: "field-label" }, "How to mark a line"),
+    // the key is open the first time; after that it folds away, so the lines start near the top
+    var seenKey = false;
+    try { seenKey = !!localStorage.getItem("cly:proof-key"); localStorage.setItem("cly:proof-key", "1"); } catch (e) { seenKey = false; }
+    root.appendChild(h("details", { class: "tip proof-help", open: !seenKey },
+      h("summary", { class: "field-label" }, "How to mark a line"),
       h("ul", { class: "proof-key" },
         h("li", null, h("span", { class: "word-wrap" }, h("span", { class: "above" }, "built"), h("span", { class: "word changed" }, "build")), " change a word"),
         h("li", null, "look forward ", h("span", { class: "caret" }, h("b", null, "to"), h("i", null, "^")), " seeing: add a word"),
@@ -987,37 +992,31 @@
 
   // ---------- Sets: every exercise has five ----------
 
-  // "Try another set" moves on to the next set, and the page remembers which set this browser was on.
-  // Leaving a set the student has started asks first, because its answers are cleared.
+  // Five squares above the exercise, one per set (sets.js). Each set is drawn the first time it opens
+  // and then kept, so a student can switch between sets without losing any answers.
   function Sets(root, name, sets, titleOf, render) {
-    var key = "cly:grammar-set:" + name, n = 0;
-    try { n = Math.min(Number(localStorage.getItem(key)) || 0, sets.length - 1); } catch (e) { n = 0; }
-    var count = h("p", { class: "count", "aria-live": "polite" });
-    var body = h("div");
-    var started = function () {
+    if (sets.length < 2 || !window.CLYSets) { render(root, sets[0]); return; }
+    var bodies = [];
+    var started = function (body) {
       var typed = Array.prototype.some.call(body.querySelectorAll("input"), function (i) { return !!i.value.trim(); });
       // the proofreading key shows example marks too, so only marks outside it count as answers
       var marks = body.querySelectorAll(".choice.right, .choice.crossed, .letter[aria-pressed='true'], .word.changed, .word.deleted, .caret, .ok-btn[aria-pressed='true']");
       return typed || Array.prototype.some.call(marks, function (m) { return !m.closest(".proof-key"); });
     };
-    var nextBtn = h("button", { type: "button", class: "btn-quiet", onclick: function () {
-      if (started() && !window.confirm("Start another set? Your answers in this one will be cleared.")) return;
-      show((n + 1) % sets.length, true);
-    } }, "Try another set");
-
-    function show(i, focus) {
-      n = i;
-      try { localStorage.setItem(key, String(n)); } catch (e) { /* storage blocked: just don't remember it */ }
-      var title = titleOf(sets[n]);
-      count.textContent = "Set " + (n + 1) + " of " + sets.length + (title ? ": " + title : "");
-      clear(body);
-      render(body, sets[n]);
-      if (focus) CLY.scrollTo(root);
-    }
-
-    if (sets.length > 1) root.appendChild(h("div", { class: "passage-switch" }, count, nextBtn));
-    root.appendChild(body);
-    show(n, false);
+    window.CLYSets(root, null, {
+      name: "grammar:" + name,
+      titles: sets.map(titleOf),
+      panels: function (i) {
+        var body = bodies[i] = h("div", { class: "set-panel" });
+        root.appendChild(body);
+        render(body, sets[i]);
+        return body;
+      },
+      state: function (i) {
+        var body = bodies[i];
+        return body.querySelector(".scoreboard.done") ? "done" : started(body) ? "started" : "";
+      }
+    });
   }
 
   // extra sets are written plainly in grammar-sets.js; proofreading lines are parsed the same way as set 1
@@ -1029,21 +1028,21 @@
       return { words: r.words, fixed: r.fixed, error: r.error && Object.assign({}, r.error, { focus: l[1], why: l[2], hint: l[3] }) };
     }) };
   };
-  var noTitle = function () { return ""; };
+  var howMany = function (q) { return q.length + " questions"; };
   var titled = function (set) { return set.title; };
 
   // ---------- Mount ----------
 
   var mount = {
     matrix: function (el) { widgets.matrix = TenseMatrix(el); },
-    practice: function (el) { Sets(el, "practice", [G.practiceQuestions].concat(more("practice")), noTitle, function (b, q) { McQuiz(b, q, TENSE_KIT); }); },
+    practice: function (el) { Sets(el, "practice", [G.practiceQuestions].concat(more("practice")), howMany, function (b, q) { McQuiz(b, q, TENSE_KIT); }); },
     cloze: function (el) { Sets(el, "cloze", [G.defaultCloze].concat(more("cloze")), titled, Cloze); },
     passive: function (el) { Lesson(el, G.LESSONS.passive); },
     gerunds: function (el) { Lesson(el, G.LESSONS.gerunds); },
     infinitives: function (el) { Lesson(el, G.LESSONS.infinitives); },
     proofreading: function (el) { Sets(el, "proofreading", [G.defaultProofreading].concat(more("proofreading").map(proofPassage)), titled, Proofreading); },
     condmatrix: function (el) { widgets.condmatrix = ConditionalsMatrix(el); },
-    condquiz: function (el) { Sets(el, "condquiz", [G.condQuizQuestions].concat(more("condquiz")), noTitle, function (b, q) { McQuiz(b, q, COND_KIT); }); },
+    condquiz: function (el) { Sets(el, "condquiz", [G.condQuizQuestions].concat(more("condquiz")), howMany, function (b, q) { McQuiz(b, q, COND_KIT); }); },
     condmatch: function (el) { Sets(el, "condmatch", [G.defaultCondMatch].concat(more("condmatch")), titled, ConditionalMatch); }
   };
   document.querySelectorAll("[data-grammar]").forEach(function (el) {

@@ -1577,3 +1577,79 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 
 /* the checklist count confirms a tick with a quick fade of the new number */
 .progress.bump { animation: fade-in var(--dur-fast) var(--ease-out); }
+
+/* ---------- Set marks: one square per set, like the form marks, so they never read as circled levels ---------- */
+.set-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 18px; padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.set-title { flex: 1 1 16rem; margin: 0; font: 600 1rem/1.3 var(--font-display); color: var(--sky); }
+.set-marks { display: flex; gap: 5px; }
+@media (max-width: 480px) { .set-bar { gap: 8px 10px; } .set-bar .btn-quiet { padding-left: 14px; padding-right: 14px; } }
+.set-mark {
+  position: relative; appearance: none; cursor: pointer;
+  width: 44px; height: 44px; border-radius: 8px;
+  font: 700 1rem/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--ink-soft);
+  background: var(--paper); border: 2px solid var(--edge);
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour);
+}
+@media (hover: hover) { .set-mark:hover { border-color: var(--ring); } }
+/* started: filled halfway, like a page half done */
+.set-mark[data-state="started"] { background: linear-gradient(to top, var(--chest) 50%, var(--paper) 50%); }
+/* finished: filled, with a tick in the corner */
+.set-mark[data-state="done"] { background: var(--chest); color: var(--ink); }
+.set-mark[data-state="done"]::after {
+  content: ""; position: absolute; right: -6px; top: -6px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--do);
+  -webkit-mask: none; mask: none;
+}
+.set-mark[data-state="done"]::before {
+  content: ""; position: absolute; right: -3px; top: -3px; width: 12px; height: 12px; z-index: 1; background: var(--paper);
+  -webkit-mask: var(--i-tick) center / contain no-repeat; mask: var(--i-tick) center / contain no-repeat;
+}
+/* the set that is open */
+.set-mark[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); }
+.set-mark:active { transform: scale(0.97); }
+.set-panel:focus, .drill-set:focus { outline: none; }
+.set-panel[hidden], .drill-set[hidden] { display: none; }
+
+/* ---------- CREI drill: numbered sentences, and each button names its move ---------- */
+.drill-items { counter-reset: sentence; }
+.drill-items > li > p::before {
+  counter-increment: sentence; content: counter(sentence) ". ";
+  font: 700 1rem var(--font-display); font-variant-numeric: tabular-nums; color: var(--ink-soft);
+}
+.drill-items .letter {
+  width: auto; min-width: 72px; height: 52px; padding: 4px 10px;
+  display: inline-grid; place-content: center; gap: 3px; line-height: 1;
+  border-color: transparent;
+}
+.drill-items .letter b { font: 800 1.0625rem/1 var(--font-display); }
+.drill-items .letter small { font: 600 0.75rem/1 var(--font-body); }
+.drill-items .letter[data-move="C"] { background: var(--crei-claim-tint); }
+.drill-items .letter[data-move="R"] { background: var(--crei-reason-tint); }
+.drill-items .letter[data-move="E"] { background: var(--crei-evidence-tint); }
+.drill-items .letter[data-move="I"] { background: var(--crei-impact-tint); }
+@media (hover: hover) { .drill-items .letter:hover:not(:disabled) { border-color: var(--ink-soft); } }
+/* chosen, or checked right: navy, with the tick sticker; never the Reason green */
+.drill-items .letter[aria-pressed="true"], .drill-items .letter.right { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.drill-items .letter.wrong { background: var(--paper); border: 2px solid var(--avoid); color: var(--avoid); }
+
+/* every answer letter is a full 44px target */
+.letter { width: 44px; height: 44px; }
+
+/* ---------- The fox's tip: levels for an upgrade, cross and tick for a mistake ---------- */
+.marks .rung::before { content: none; }
+.bubble-eg .rung { padding-left: 38px; }
+.bubble-eg .rung .lv { position: absolute; left: 0; top: 0.2em; font-size: 0.7rem; min-width: 2.4em; color: var(--ink-soft); }
+.bubble-eg .rung.up { font-weight: 700; }
+.bubble-eg .rung.up .lv { color: var(--sky); }
+.bubble-eg .avoid .lv, .bubble-eg .do .lv { display: none; }
+.bubble-eg .rung u { text-decoration-color: var(--ring); }
+.bubble-eg .rung.up u { text-decoration-color: var(--sky); }
+/* the built-in tip waits a moment for today's; if the script never runs, it shows anyway */
+.js .hello .bubble-body:not(.drawn) { animation: fade-in 0.2s 1s both; }
+
+/* ---------- Proofreading: the key folds away after the first visit ---------- */
+.proof-help > summary { cursor: pointer; margin: 0; list-style-position: inside; }
+.proof-help[open] > summary { margin-bottom: 10px; }
+
+/* a paragraph's notes sit on the passage itself, under a dashed rule, not in a box of their own */
+.passage .para-notes { background: none; border-radius: 0; padding: 10px 0 2px; border-top: 1px dashed var(--rule-dash); }

@@ -10,17 +10,17 @@ const TIMES = ["Past", "Present", "Future"];
 const ASPECTS = ["Simple", "Continuous", "Perfect", "Perfect Continuous"];
 
 const tenseMatrix = {
-    "Past Simple": { formula: "S + V2", use: "A completed action at a specific time in the past.", signals: "yesterday, last week, in 2010, ago", examples: ["He finished the paper yesterday.", "I visited Tai O last summer."], tip: "Don't mix it with 'since' or 'ever' — those usually need the Present Perfect." },
+    "Past Simple": { formula: "S + V2", use: "A completed action at a specific time in the past.", signals: "yesterday, last week, in 2010, ago", examples: ["He finished the paper yesterday.", "I visited Tai O last summer."], tip: "Don't mix it with 'since' or 'ever': those usually need the Present Perfect." },
     "Past Continuous": { formula: "S + was/were + V-ing", use: "An action in progress at a past moment, often interrupted by a Past Simple action.", signals: "while, when, at 8 pm yesterday", examples: ["I was studying when the phone rang.", "While I was revising, the power went out."], tip: "The long background action takes Past Continuous; the short interruption takes Past Simple." },
-    "Past Perfect": { formula: "S + had + V3", use: "An action completed before another past action — the \"past of the past\".", signals: "by the time, before, after, already", examples: ["He had left before I arrived.", "The bus had left before we reached the stop."], tip: "Only use it when there are two past events and you need to show which happened first." },
+    "Past Perfect": { formula: "S + had + V3", use: "An action completed before another past action: the \"past of the past\".", signals: "by the time, before, after, already", examples: ["He had left before I arrived.", "The bus had left before we reached the stop."], tip: "Only use it when there are two past events and you need to show which happened first." },
     "Past Perfect Continuous": { formula: "S + had been + V-ing", use: "The duration of an ongoing action up to a point in the past.", signals: "for hours before, since, how long", examples: ["They had been waiting for an hour before the bus came.", "She had been studying for hours before she took a break."], tip: "Look for a duration (for an hour) plus a later past event (before the bus came)." },
-    "Present Simple": { formula: "S + V1 (s/es)", use: "Facts, habits, routines and fixed timetables.", signals: "always, usually, every day, often", examples: ["She writes excellent essays.", "The MTR runs every three minutes during rush hour."], tip: "Remember the -s/-es with he, she and it — a very common Paper 2 slip." },
+    "Present Simple": { formula: "S + V1 (s/es)", use: "Facts, habits, routines and fixed timetables.", signals: "always, usually, every day, often", examples: ["She writes excellent essays.", "The MTR runs every three minutes during rush hour."], tip: "Remember the -s/-es with he, she and it: a very common Paper 2 slip." },
     "Present Continuous": { formula: "S + am/is/are + V-ing", use: "Actions happening now, temporary situations, or fixed future arrangements.", signals: "now, at the moment, currently, these days", examples: ["We are practising for the DSE now.", "We are meeting our tutor this Friday."], tip: "Stative verbs (know, believe, own, need) are rarely used in the continuous form." },
     "Present Perfect": { formula: "S + have/has + V3", use: "Past actions with present relevance, life experiences, or unfinished time periods.", signals: "already, yet, ever, never, recently, since, for", examples: ["I have already finished Paper 1.", "Hong Kong has become more environmentally aware."], tip: "Never use it with a finished time expression like 'yesterday' or 'in 2019'." },
     "Present Perfect Continuous": { formula: "S + have/has been + V-ing", use: "An action that started in the past and is still continuing, stressing duration.", signals: "lately, all morning, for, since, recently", examples: ["She has been studying all morning.", "Residents have been protesting for months."], tip: "Choose it over the Present Perfect when you want to stress how long, not how much." },
     "Future Simple": { formula: "S + will + V1", use: "Predictions, promises and spontaneous decisions.", signals: "tomorrow, next year, I think, probably", examples: ["They will announce the results tomorrow.", "I think technology will replace many jobs."], tip: "For predictions based on evidence you can see now, use 'be going to' instead." },
     "Future Continuous": { formula: "S + will be + V-ing", use: "An action in progress at a specific future time.", signals: "at this time tomorrow, at 9 am next Monday", examples: ["At 9 AM tomorrow, I will be sitting the exam.", "In five years, I will be working as an engineer."], tip: "Picture yourself in the middle of the action at that future moment." },
-    "Future Perfect": { formula: "S + will have + V3", use: "An action that will be completed before a future point.", signals: "by next month, by 2030, by the time", examples: ["By April, I will have completed all past papers.", "By June, I will have completed my SBA."], tip: "'By + future time' is the key signal — the action is finished before that point." },
+    "Future Perfect": { formula: "S + will have + V3", use: "An action that will be completed before a future point.", signals: "by next month, by 2030, by the time", examples: ["By April, I will have completed all past papers.", "By June, I will have completed my SBA."], tip: "'By + future time' is the key signal: the action is finished before that point." },
     "Future Perfect Continuous": { formula: "S + will have been + V-ing", use: "The duration of an action up to a future point.", signals: "by next year … for X years", examples: ["By next year, I will have been learning English for 12 years.", "By 2030, I will have been living here for 15 years."], tip: "You need both a future point (by next year) and a duration (for 12 years)." }
 };
 
@@ -43,18 +43,18 @@ const tenseTimelines = {
 };
 
 const practiceQuestions = [
-    { q: "By the time the police arrived, the thief ______ (escape).", options: ["escaped", "has escaped", "had escaped", "was escaping"], answer: 2, tense: "Past Perfect", explanation: "The escape was complete before another past event (the police arriving), so use Past Perfect.", hint: "Which happened first — the escape or the police arriving? How do we show the earlier of two past actions?" },
+    { q: "By the time the police arrived, the thief ______ (escape).", options: ["escaped", "has escaped", "had escaped", "was escaping"], answer: 2, tense: "Past Perfect", explanation: "The escape was complete before another past event (the police arriving), so use Past Perfect.", hint: "Which happened first: the escape or the police arriving? How do we show the earlier of two past actions?" },
     { q: "I ______ (be) to the UK three times in my life.", options: ["went", "have been", "had been", "am going"], answer: 1, tense: "Present Perfect", explanation: "Life experiences up to now ('in my life') take the Present Perfect.", hint: "'In my life' means up to now. Which tense talks about experiences without saying exactly when they happened?" },
     { q: "Look at those dark clouds! It ______ (rain).", options: ["will rain", "rains", "is going to rain", "has rained"], answer: 2, tense: "Future Simple", explanation: "'Be going to' is used for predictions based on present evidence (the dark clouds).", hint: "Can you already see evidence that it will rain? Which future form do we use for a prediction based on what we can see now?" },
     { q: "While I ______ (type) the report, my computer suddenly crashed.", options: ["typed", "was typing", "had typed", "am typing"], answer: 1, tense: "Past Continuous", explanation: "Past Continuous gives the background action, interrupted by the Past Simple 'crashed'.", hint: "Was the typing finished, or was it still going on when the computer crashed?" },
     { q: "By the time the examiner arrived, the candidates ______ (wait) outside the hall for over an hour.", options: ["waited", "have been waiting", "had been waiting", "were waiting"], answer: 2, tense: "Past Perfect Continuous", explanation: "Past Perfect Continuous shows the duration of an action leading up to another past event ('arrived').", hint: "The waiting went on 'for over an hour' and stopped when the examiner arrived, all in the past. How do we show how long an action lasted before another past event?" },
     { q: "Since the new policy was introduced, the number of plastic bags used ______ (drop) significantly.", options: ["dropped", "has dropped", "had dropped", "is dropping"], answer: 1, tense: "Present Perfect", explanation: "'Since' + a past starting point with a present result calls for the Present Perfect.", hint: "'Since' links a past starting point to now. Which tense connects the past with the present?" },
     { q: "Don't call me at 8 pm tonight. I ______ (attend) my online English class.", options: ["will attend", "attend", "will be attending", "will have attended"], answer: 2, tense: "Future Continuous", explanation: "Future Continuous describes an action in progress at a specific future time.", hint: "At 8 pm tonight, will the class be over, or will you be in the middle of it?" },
-    { q: "The school bus ______ (leave) at 7:15 am every weekday.", options: ["leaves", "is leaving", "will leave", "has left"], answer: 0, tense: "Present Simple", explanation: "Present Simple is used for timetables and regular schedules.", hint: "'Every weekday' — is this a one-off event, or a regular timetable?" },
+    { q: "The school bus ______ (leave) at 7:15 am every weekday.", options: ["leaves", "is leaving", "will leave", "has left"], answer: 0, tense: "Present Simple", explanation: "Present Simple is used for timetables and regular schedules.", hint: "'Every weekday': is this a one-off event, or a regular timetable?" },
     { q: "While I ______ (scroll) through social media, I came across an article about youth unemployment.", options: ["scrolled", "had scrolled", "was scrolling", "have scrolled"], answer: 2, tense: "Past Continuous", explanation: "Past Continuous gives the background action, interrupted by the Past Simple 'came across'.", hint: "Were you in the middle of scrolling when you came across the article?" },
-    { q: "By the end of this term, our class ______ (finish) all five mock papers.", options: ["will finish", "will have finished", "finishes", "has finished"], answer: 1, tense: "Future Perfect", explanation: "Future Perfect describes an action completed before a future deadline ('by the end of this term').", hint: "'By the end of this term' — will the papers be finished before that point in the future?" },
+    { q: "By the end of this term, our class ______ (finish) all five mock papers.", options: ["will finish", "will have finished", "finishes", "has finished"], answer: 1, tense: "Future Perfect", explanation: "Future Perfect describes an action completed before a future deadline ('by the end of this term').", hint: "'By the end of this term': will the papers be finished before that point in the future?" },
     { q: "\"The phone is ringing!\" \"Don't worry, I ______ (get) it.\"", options: ["am getting", "get", "will get", "am going to get"], answer: 2, tense: "Future Simple", explanation: "'Will' is used for a spontaneous decision made at the moment of speaking.", hint: "Did the speaker plan this earlier, or decide at the moment of speaking?" },
-    { q: "When the fire engines finally arrived, the fire ______ (already / spread) to the second floor.", options: ["already spread", "has already spread", "had already spread", "was already spreading"], answer: 2, tense: "Past Perfect", explanation: "Past Perfect shows that the spreading was complete before the fire engines arrived.", hint: "Which happened first — the spreading or the fire engines arriving? Notice the word 'already'." },
+    { q: "When the fire engines finally arrived, the fire ______ (already / spread) to the second floor.", options: ["already spread", "has already spread", "had already spread", "was already spreading"], answer: 2, tense: "Past Perfect", explanation: "Past Perfect shows that the spreading was complete before the fire engines arrived.", hint: "Which happened first: the spreading or the fire engines arriving? Notice the word 'already'." },
     { q: "Hong Kong ______ (host) many international events over the past decade.", options: ["hosted", "has hosted", "had hosted", "hosts"], answer: 1, tense: "Present Perfect", explanation: "'Over the past decade' is an unfinished time period that continues to the present, so Present Perfect fits.", hint: "Is 'the past decade' a finished period, or does it continue up to now?" },
     { q: "My little brother ______ (play) video games all afternoon, and his eyes are red now.", options: ["played", "has been playing", "had played", "is playing"], answer: 1, tense: "Present Perfect Continuous", explanation: "The action has continued up to now and has a visible present result, stressing duration ('all afternoon').", hint: "The playing lasted 'all afternoon' and you can see the result now. Which tense stresses how long something has been going on up to now?" },
     { q: "By next September, Ms Chan ______ (teach) at our school for 20 years.", options: ["will teach", "will be teaching", "will have taught", "will have been teaching"], answer: 3, tense: "Future Perfect Continuous", explanation: "A future point ('by next September') plus a duration ('for 20 years') needs the Future Perfect Continuous.", hint: "There is a future point ('by next September') and a length of time ('for 20 years'). Which tense combines both?" }
@@ -63,17 +63,17 @@ const practiceQuestions = [
 const GENERIC_TENSE_HINT = "Find the time signal in the sentence. When does the action happen, and is it finished, in progress or repeated?";
 
 const clozeBlanks = {
-    1: { answers: ["arrives"], verb: "arrive", tense: "Present Simple", why: "'Every weekday' signals a routine.", hint: "'Every weekday' — is this a single event or a routine? Remember who the subject is." },
-    2: { answers: ["is writing"], verb: "write", tense: "Present Continuous", why: "'At the moment' signals an action in progress now.", hint: "'At the moment' — is the action happening right now?" },
-    3: { answers: ["has interviewed"], verb: "interview", tense: "Present Perfect", why: "'So far' connects past actions to the present.", hint: "'So far' — does this connect actions in the past with the present?" },
-    4: { answers: ["has been researching"], verb: "research", tense: "Present Perfect Continuous", why: "'Non-stop for the past three weeks' stresses an ongoing duration up to now.", hint: "'Non-stop for the past three weeks' — is she still doing it? Which tense stresses how long?" },
-    5: { answers: ["was waiting"], verb: "wait", tense: "Past Continuous", why: "'While' introduces a background action in progress in the past.", hint: "'While' — was this action in progress when something else happened?" },
+    1: { answers: ["arrives"], verb: "arrive", tense: "Present Simple", why: "'Every weekday' signals a routine.", hint: "'Every weekday': is this a single event or a routine? Remember who the subject is." },
+    2: { answers: ["is writing"], verb: "write", tense: "Present Continuous", why: "'At the moment' signals an action in progress now.", hint: "'At the moment': is the action happening right now?" },
+    3: { answers: ["has interviewed"], verb: "interview", tense: "Present Perfect", why: "'So far' connects past actions to the present.", hint: "'So far': does this connect actions in the past with the present?" },
+    4: { answers: ["has been researching"], verb: "research", tense: "Present Perfect Continuous", why: "'Non-stop for the past three weeks' stresses an ongoing duration up to now.", hint: "'Non-stop for the past three weeks': is she still doing it? Which tense stresses how long?" },
+    5: { answers: ["was waiting"], verb: "wait", tense: "Past Continuous", why: "'While' introduces a background action in progress in the past.", hint: "'While': was this action in progress when something else happened?" },
     6: { answers: ["rang"], verb: "ring", tense: "Past Simple", why: "A sudden, completed action that interrupted the waiting. 'Ring' is irregular: ring – rang – rung.", hint: "Was this a short, sudden action that interrupted the waiting? Check the past form of this irregular verb." },
-    7: { answers: ["had cancelled", "had canceled"], verb: "cancel", tense: "Past Perfect", why: "The cancellation happened 'an hour earlier' — before the phone call, so it is the past of the past.", hint: "The cancellation happened 'an hour earlier' than the phone call. How do we show the earlier of two past events?" },
+    7: { answers: ["had cancelled", "had canceled"], verb: "cancel", tense: "Past Perfect", why: "The cancellation happened 'an hour earlier': before the phone call, so it is the past of the past.", hint: "The cancellation happened 'an hour earlier' than the phone call. How do we show the earlier of two past events?" },
     8: { answers: ["had been standing"], verb: "stand", tense: "Past Perfect Continuous", why: "'For almost two hours' shows duration up to a past point ('by the time she got back').", hint: "She stood there 'for almost two hours' up to the moment she got back. How do we show how long something lasted up to a point in the past?" },
-    9: { answers: ["will become", "is going to become"], verb: "become", tense: "Future Simple", why: "'Believes … one day' is a prediction about the future.", hint: "'One day' — is Mr Lau making a prediction about the future?" },
-    10: { answers: ["will be presenting"], verb: "present", tense: "Future Continuous", why: "'This time next week' signals an action in progress at a specific future time.", hint: "'This time next week' — will she be in the middle of doing something at that future moment?" },
-    11: { answers: ["will have published"], verb: "publish", tense: "Future Perfect", why: "'By the end of August' signals an action completed before a future point.", hint: "'By the end of August' — will the articles be finished before that future point?" },
+    9: { answers: ["will become", "is going to become"], verb: "become", tense: "Future Simple", why: "'Believes … one day' is a prediction about the future.", hint: "'One day': is Mr Lau making a prediction about the future?" },
+    10: { answers: ["will be presenting"], verb: "present", tense: "Future Continuous", why: "'This time next week' signals an action in progress at a specific future time.", hint: "'This time next week': will she be in the middle of doing something at that future moment?" },
+    11: { answers: ["will have published"], verb: "publish", tense: "Future Perfect", why: "'By the end of August' signals an action completed before a future point.", hint: "'By the end of August': will the articles be finished before that future point?" },
     12: { answers: ["will have been working"], verb: "work", tense: "Future Perfect Continuous", why: "A future point ('by then') plus a duration ('for exactly ten weeks').", hint: "There's a future point ('by then') and a length of time ('for exactly ten weeks'). Which tense combines both?" }
 };
 
@@ -144,10 +144,10 @@ const LESSONS = {
         extra: "passive-tenses",
         functions: [
             { title: "The doer is unknown", text: "We don't know who did it.", examples: ["My bike **was stolen** outside the MTR station.", "The wallet **was found** under a seat."] },
-            { title: "The doer is obvious or unimportant", text: "Everyone knows who did it, or it doesn't matter.", examples: ["The suspect **has been arrested**. (by the police — obvious)", "Lunch **is served** at 12:30."] },
+            { title: "The doer is obvious or unimportant", text: "Everyone knows who did it, or it doesn't matter.", examples: ["The suspect **has been arrested**. (by the police: obvious)", "Lunch **is served** at 12:30."] },
             { title: "Focus on the receiver or result", text: "Put the important idea first, which is useful for keeping the topic of a paragraph steady.", examples: ["The Star Ferry is a symbol of Hong Kong. It **was founded** in 1888.", "Over 3,000 tonnes of food **are thrown away** every day."] },
             { title: "Formal and factual writing", text: "Reports, news, science and instructions sound objective in the passive.", examples: ["A survey **was conducted** among 200 students.", "The mixture **is heated** to 100°C."] },
-            { title: "Reporting opinions", text: "It + be + said/believed/thought + that … — common in articles and reports.", examples: ["**It is believed** that the tunnel will open next year.", "The singer **is said to be** shy in real life."] },
+            { title: "Reporting opinions", text: "It + be + said/believed/thought + that …: common in articles and reports.", examples: ["**It is believed** that the tunnel will open next year.", "The singer **is said to be** shy in real life."] },
             { title: "Have/get something done", text: "Someone else does a job for you (the causative).", examples: ["I **had my hair cut** in Mong Kok yesterday.", "You should **get your eyes tested**."] }
         ],
         mistakes: [
@@ -158,7 +158,7 @@ const LESSONS = {
             { wrong: "The results will announced on Friday.", right: "The results will be announced on Friday.", why: "Future passive: will + be + V3." },
             { wrong: "This problem must be solve soon.", right: "This problem must be solved soon.", why: "After \"be\" in a passive, the verb is always V3." }
         ],
-        tip: "In proofreading, check every \"be + verb\": a passive needs V3 (was built, not was build). Then check every past participle has its \"be\". Watch out for \"was happened\" and \"is occurred\" — favourite exam traps."
+        tip: "In proofreading, check every \"be + verb\": a passive needs V3 (was built, not was build). Then check every past participle has its \"be\". Watch out for \"was happened\" and \"is occurred\": favourite exam traps."
     },
     gerunds: {
         title: "Gerunds (V-ing as a noun)",
@@ -175,7 +175,7 @@ const LESSONS = {
         functions: [
             { title: "As the subject", text: "The gerund is the topic of the sentence. The verb after it is singular.", examples: ["**Swimming** is good for your health.", "**Using** phones in class is not allowed."] },
             { title: "After certain verbs", text: "enjoy, avoid, finish, mind, keep, suggest, consider, practise, admit, deny, miss, risk, give up, can't help.", examples: ["I **enjoy hiking** on Dragon's Back.", "She **suggested taking** the minibus."] },
-            { title: "After prepositions", text: "in, on, at, of, for, about, by, without, before, after, instead of — always + V-ing.", examples: ["He is interested **in joining** the band.", "**After finishing** my homework, I went out."] },
+            { title: "After prepositions", text: "in, on, at, of, for, about, by, without, before, after, instead of: always + V-ing.", examples: ["He is interested **in joining** the band.", "**After finishing** my homework, I went out."] },
             { title: "After \"to\" when it is a preposition", text: "look forward to, be used to, get used to, object to, be committed to, when it comes to. Test: if a noun fits after \"to\", use V-ing.", examples: ["I look forward **to hearing** from you.", "She is used **to waking** up early."] },
             { title: "After fixed expressions", text: "It's no use, It's (not) worth, There's no point (in), have difficulty (in), spend/waste time, be busy, can't stand, feel like.", examples: ["It's **no use crying** over spilt milk.", "I **spent** the weekend **revising** for the test."] },
             { title: "Go + V-ing for activities", text: "go shopping, go swimming, go hiking, go camping.", examples: ["Let's **go hiking** in Sai Kung this Sunday."] }
@@ -189,7 +189,7 @@ const LESSONS = {
             { wrong: "Thank you for help me.", right: "Thank you for helping me.", why: "\"For\" is a preposition, so V-ing follows." },
             { wrong: "Reading comics are my favourite pastime.", right: "Reading comics is my favourite pastime.", why: "A gerund subject is singular: \"is\", not \"are\"." }
         ],
-        tip: "In proofreading, circle every preposition and check the verb after it: it must be V-ing. Be extra careful with \"look forward to\", \"be used to\" and \"object to\" — the \"to\" looks like an infinitive, but it isn't."
+        tip: "In proofreading, circle every preposition and check the verb after it: it must be V-ing. Be extra careful with \"look forward to\", \"be used to\" and \"object to\": the \"to\" looks like an infinitive, but it isn't."
     },
     infinitives: {
         title: "To-infinitives (to + V1)",
@@ -282,7 +282,7 @@ const CONDITIONALS = ["Zero Conditional", "First Conditional", "Second Condition
 
 const conditionalMatrix = {
     "Zero Conditional": {
-        short: "Zero", ifPart: "If + Present Simple", mainPart: "Present Simple", time: "Any time — always", reality: "Real: always true",
+        short: "Zero", ifPart: "If + Present Simple", mainPart: "Present Simple", time: "Any time: always", reality: "Real: always true",
         meaning: "When A happens, B always happens.",
         use: "Facts, science, rules and habits: whenever the condition happens, the result always follows.",
         signals: "if = when / whenever, always, every time, usually",
@@ -305,7 +305,7 @@ const conditionalMatrix = {
         use: "Imaginary or very unlikely situations in the present or future, dreams, and advice (If I were you …).",
         signals: "If I were you, imagine, suppose, wish-like dreams, 'but …' showing reality",
         examples: ["If I won the Mark Six, I would buy my parents a flat.", "If I were you, I would apologise to her.", "If there were an MTR station near my home, I would never be late."],
-        tip: "The Past Simple here does NOT mean past time — it means 'not real'. Use 'were' for every person in formal writing (If he were …).",
+        tip: "The Past Simple here does NOT mean past time: it means 'not real'. Use 'were' for every person in formal writing (If he were …).",
         diagram: { a: "won the Mark Six", b: "would buy a flat", real: "reality: I haven't won" }
     },
     "Third Conditional": {
@@ -336,7 +336,7 @@ const COND_IDEAS = [
         label: "Rain & the picnic",
         rows: [
             ["If it [[rains]], picnics {{are}} cancelled.", "A general rule: it happens every time."],
-            ["If it [[rains]] tomorrow, the picnic {{will be}} cancelled.", "The forecast says it might rain — a real chance."],
+            ["If it [[rains]] tomorrow, the picnic {{will be}} cancelled.", "The forecast says it might rain: a real chance."],
             ["If it [[rained]] today, the picnic {{would be}} cancelled.", "It's sunny now. We're only imagining rain."],
             ["If it [[had rained]] yesterday, the picnic {{would have been}} cancelled.", "It didn't rain, so the picnic went ahead."]
         ]
@@ -345,7 +345,7 @@ const COND_IDEAS = [
         label: "Revision & the test",
         rows: [
             ["If you [[revise]] a little every day, you {{remember}} more.", "This is always true for everyone."],
-            ["If I [[revise]] tonight, I {{will pass}} the test tomorrow.", "I can still revise tonight — it's possible."],
+            ["If I [[revise]] tonight, I {{will pass}} the test tomorrow.", "I can still revise tonight: it's possible."],
             ["If I [[revised]] every night, I {{would pass}} every test.", "I don't revise every night. It's an imagined habit."],
             ["If I [[had revised]] last night, I {{would have passed}} the test.", "I didn't revise, and I failed. Too late now!"]
         ]
@@ -354,7 +354,7 @@ const COND_IDEAS = [
         label: "MTR & being on time",
         rows: [
             ["If you [[take]] the MTR, you {{avoid}} traffic jams.", "A general fact about the MTR."],
-            ["If we [[take]] the MTR, we {{will arrive}} on time.", "We haven't left yet — we can still choose the MTR."],
+            ["If we [[take]] the MTR, we {{will arrive}} on time.", "We haven't left yet: we can still choose the MTR."],
             ["If there [[were]] an MTR station near my home, I {{would arrive}} on time every day.", "There isn't one. It's imaginary."],
             ["If we [[had taken]] the MTR, we {{would have arrived}} on time.", "We took a taxi and got stuck in traffic."]
         ]
@@ -365,13 +365,13 @@ const GENERIC_COND_HINT = "Ask yourself two questions: is this real or imaginary
 
 const condQuizQuestions = [
     { q: "If you ______ (heat) chocolate, it melts.", options: ["heat", "will heat", "heated", "had heated"], answer: 0, conditional: "Zero Conditional", explanation: "A fact that is always true: Present Simple in both clauses.", hint: "Is this something that happens every time, like a science fact?" },
-    { q: "If it rains tomorrow, the school picnic ______ (be) cancelled.", options: ["is", "will be", "would be", "would have been"], answer: 1, conditional: "First Conditional", explanation: "Rain tomorrow is a real possibility, so the result takes will + V1.", hint: "'Tomorrow' — could this really happen? What do we use for a likely future result?" },
+    { q: "If it rains tomorrow, the school picnic ______ (be) cancelled.", options: ["is", "will be", "would be", "would have been"], answer: 1, conditional: "First Conditional", explanation: "Rain tomorrow is a real possibility, so the result takes will + V1.", hint: "'Tomorrow': could this really happen? What do we use for a likely future result?" },
     { q: "If I ______ (win) the Mark Six, I would buy my parents a flat.", options: ["win", "will win", "won", "had won"], answer: 2, conditional: "Second Conditional", explanation: "Winning the Mark Six is an imaginary, unlikely situation, so the if-clause takes the Past Simple.", hint: "The main clause uses 'would'. Is winning likely, or just a dream?" },
     { q: "If we had left home earlier, we ______ (not miss) the ferry to Cheung Chau.", options: ["wouldn't miss", "won't miss", "wouldn't have missed", "didn't miss"], answer: 2, conditional: "Third Conditional", explanation: "'Had left' imagines a different past, so the result is would have + V3.", hint: "The if-clause looks back at the past with 'had left'. What form does the result need to match it?" },
     { q: "Which conditional is this? \"If I were you, I would apologise to her.\"", options: ["Zero Conditional", "First Conditional", "Second Conditional", "Third Conditional"], answer: 2, conditional: "Second Conditional", explanation: "'If I were you' is imaginary (I'm not you), with would + V1: Second Conditional.", hint: "Can the speaker really be the other person? Look at the verbs 'were' and 'would'." },
     { q: "If you ______ (not hurry), you will miss the last MTR train.", options: ["don't hurry", "won't hurry", "didn't hurry", "hadn't hurried"], answer: 0, conditional: "First Conditional", explanation: "A real warning about the future: Present Simple in the if-clause, will in the main clause. Never 'will' after 'if'.", hint: "The main clause already has 'will'. Which tense goes in the if-clause of a real future possibility?" },
     { q: "Plants die if they ______ (not get) enough water.", options: ["don't get", "won't get", "didn't get", "wouldn't get"], answer: 0, conditional: "Zero Conditional", explanation: "A general scientific fact: Present Simple in both clauses.", hint: "Is this true for all plants, all the time?" },
-    { q: "If Ms Wong ______ (know) about the test, she would have told us.", options: ["knew", "had known", "knows", "would know"], answer: 1, conditional: "Third Conditional", explanation: "'Would have told' shows an imagined past, so the if-clause needs had + V3.", hint: "The result is 'would have told' — that's about the past. What does the if-clause need to match?" },
+    { q: "If Ms Wong ______ (know) about the test, she would have told us.", options: ["knew", "had known", "knows", "would know"], answer: 1, conditional: "Third Conditional", explanation: "'Would have told' shows an imagined past, so the if-clause needs had + V3.", hint: "The result is 'would have told': that's about the past. What does the if-clause need to match?" },
     { q: "If I ______ (be) taller, I would join the school basketball team.", options: ["am", "were", "will be", "had been"], answer: 1, conditional: "Second Conditional", explanation: "The speaker isn't tall, so this is imaginary: Past Simple 'were' (used for all persons).", hint: "Is the speaker actually tall? Imaginary present situations step the verb back one tense." },
     { q: "Which sentence describes something that is always true?", options: ["If you press this button, the light turns on.", "If you pressed this button, the light would turn on.", "If you had pressed this button, the light would have turned on.", "If you press this button tomorrow, the light will turn on."], answer: 0, conditional: "Zero Conditional", explanation: "Present Simple in both clauses describes a fact that happens every time.", hint: "Which sentence works every single time, with no 'will' or 'would'?" },
     { q: "Unless you ______ (book) now, the tickets will sell out.", options: ["book", "will book", "booked", "had booked"], answer: 0, conditional: "First Conditional", explanation: "'Unless' means 'if … not'. It works like 'if' in the First Conditional, so it takes the Present Simple.", hint: "'Unless' = 'if not'. Which tense follows 'if' when the result uses 'will'?" },
@@ -387,19 +387,19 @@ const defaultCondMatch = {
         {
             scene: "The Black Rainstorm Signal",
             items: [
-                { sentence: "If the Black Rainstorm Signal is raised, classes are suspended.", meaning: "This is the rule — it happens every single time.", conditional: "Zero Conditional" },
-                { sentence: "If the Black Rainstorm Signal is raised tomorrow morning, classes will be suspended.", meaning: "The Observatory says heavy rain is coming tomorrow — it could really happen.", conditional: "First Conditional" },
-                { sentence: "If the Black Rainstorm Signal were raised right now, classes would be suspended.", meaning: "The sun is shining at the moment — the speaker is only imagining it.", conditional: "Second Conditional" },
+                { sentence: "If the Black Rainstorm Signal is raised, classes are suspended.", meaning: "This is the rule: it happens every single time.", conditional: "Zero Conditional" },
+                { sentence: "If the Black Rainstorm Signal is raised tomorrow morning, classes will be suspended.", meaning: "The Observatory says heavy rain is coming tomorrow: it could really happen.", conditional: "First Conditional" },
+                { sentence: "If the Black Rainstorm Signal were raised right now, classes would be suspended.", meaning: "The sun is shining at the moment: the speaker is only imagining it.", conditional: "Second Conditional" },
                 { sentence: "If the Black Rainstorm Signal had been raised yesterday, classes would have been suspended.", meaning: "The signal wasn't raised yesterday, so everyone had to go to school.", conditional: "Third Conditional" }
             ]
         },
         {
             scene: "Bubble tea at night",
             items: [
-                { sentence: "If I drink bubble tea at night, I can't sleep.", meaning: "This happens to me every time — it's a fact about my body.", conditional: "Zero Conditional" },
-                { sentence: "If I drink bubble tea tonight, I won't be able to sleep.", meaning: "I'm thinking about buying one after dinner today — it's a real choice.", conditional: "First Conditional" },
+                { sentence: "If I drink bubble tea at night, I can't sleep.", meaning: "This happens to me every time: it's a fact about my body.", conditional: "Zero Conditional" },
+                { sentence: "If I drink bubble tea tonight, I won't be able to sleep.", meaning: "I'm thinking about buying one after dinner today: it's a real choice.", conditional: "First Conditional" },
                 { sentence: "If I drank bubble tea, I wouldn't be able to sleep.", meaning: "I never drink bubble tea, so this is only imaginary.", conditional: "Second Conditional" },
-                { sentence: "If I hadn't drunk bubble tea last night, I would have slept well.", meaning: "I did have one last night and stayed awake — now I regret it.", conditional: "Third Conditional" }
+                { sentence: "If I hadn't drunk bubble tea last night, I would have slept well.", meaning: "I did have one last night and stayed awake: now I regret it.", conditional: "Third Conditional" }
             ]
         }
     ],
@@ -408,10 +408,10 @@ const defaultCondMatch = {
         { context: "The weather forecast says it might rain this Saturday. It's a real possibility.", sentence: "If it ___ (rain) on Saturday, we ___ (watch) a film instead of hiking.", blanks: [["rains"], ["will watch", "are going to watch"]], conditional: "First Conditional", why: "A real future possibility: Present Simple in the if-clause, will + V1 in the result.", hint: "Saturday is in the future and rain is possible. Remember: no 'will' after 'if'." },
         { context: "Chloe's flat is too small, so she can't have a dog. She is daydreaming.", sentence: "If Chloe ___ (have) a dog, she ___ (walk) it along the harbour every evening.", blanks: [["had"], ["would walk"]], conditional: "Second Conditional", why: "An imaginary present: Past Simple in the if-clause, would + V1 in the result.", hint: "Does Chloe have a dog now? Imaginary situations move the verb one step back." },
         { context: "This is a science fact your teacher showed you in art class. It's always true.", sentence: "If you ___ (mix) red and yellow paint, you ___ (get) orange.", blanks: [["mix"], ["get"]], conditional: "Zero Conditional", why: "A fact that is always true: Present Simple in both clauses.", hint: "It happens every time. Do you need 'will' or 'would' for a fact?" },
-        { context: "Your friend's desk is very messy, and you're giving her advice before the class inspection.", sentence: "If I ___ (be) you, I ___ (tidy) your desk before the inspection.", blanks: [["were", "was"], ["would tidy"]], conditional: "Second Conditional", why: "Advice with 'If I were you': you can't really be her, so it's imaginary — Past Simple + would.", hint: "Can you really be your friend? Think about the famous phrase for giving advice." },
-        { context: "The class forgot to book the barbecue pit last month, so the party in Sai Kung didn't happen.", sentence: "If we ___ (book) the barbecue pit, we ___ (have) our party in Sai Kung.", blanks: [["had booked"], ["would have had"]], conditional: "Third Conditional", why: "The party didn't happen — it's an imagined past: had + V3, would have + V3.", hint: "'Last month' — is it too late to change? Both verbs need to go back into the past." },
+        { context: "Your friend's desk is very messy, and you're giving her advice before the class inspection.", sentence: "If I ___ (be) you, I ___ (tidy) your desk before the inspection.", blanks: [["were", "was"], ["would tidy"]], conditional: "Second Conditional", why: "Advice with 'If I were you': you can't really be her, so it's imaginary: Past Simple + would.", hint: "Can you really be your friend? Think about the famous phrase for giving advice." },
+        { context: "The class forgot to book the barbecue pit last month, so the party in Sai Kung didn't happen.", sentence: "If we ___ (book) the barbecue pit, we ___ (have) our party in Sai Kung.", blanks: [["had booked"], ["would have had"]], conditional: "Third Conditional", why: "The party didn't happen: it's an imagined past: had + V3, would have + V3.", hint: "'Last month': is it too late to change? Both verbs need to go back into the past." },
         { context: "Mum is warning you about tomorrow's test. You can still revise tonight.", sentence: "You ___ (fail) the test tomorrow if you ___ (not revise) tonight.", blanks: [["will fail", "are going to fail"], ["don't revise", "do not revise"]], conditional: "First Conditional", why: "A real warning about the future. The main clause comes first here: will + V1 … if + Present Simple.", hint: "Careful: the main clause comes first this time! Which half is the if-clause?" },
-        { context: "This happens every time you travel on the MTR.", sentence: "When the door alarm ___ (beep), the train doors ___ (close).", blanks: [["beeps"], ["close"]], conditional: "Zero Conditional", why: "Something that happens every time ('when' = 'if'): Present Simple in both clauses.", hint: "'Every time' — is this a general fact? Check the subject–verb agreement too." }
+        { context: "This happens every time you travel on the MTR.", sentence: "When the door alarm ___ (beep), the train doors ___ (close).", blanks: [["beeps"], ["close"]], conditional: "Zero Conditional", why: "Something that happens every time ('when' = 'if'): Present Simple in both clauses.", hint: "'Every time': is this a general fact? Check the subject–verb agreement too." }
     ]
 };
 

@@ -96,7 +96,7 @@
     var lead = !fixes.length && !untried.length ? o.done
       : fixes.length ? fixes.length + " to fix: " + fixes.map(o.label).join(", ")
       : "Everything you've tried so far is right.";
-    return h("div", { class: "scoreboard" },
+    return h("div", { class: "scoreboard" + (lead === o.done ? " done" : "") },
       h("p", { class: "score" }, lead),
       fixes.length ? h("p", null, "Read the hint under each one, change your answer, then press “Check again”.") : null,
       untried.length ? h("p", null, untried.length + " not tried yet" + (untried.length <= 5 ? ": " + untried.map(o.label).join(", ") : "") + ".") : null,

@@ -40,9 +40,12 @@
     }
     return keep;
   }
+  // Only when the two lines mostly match: on a full rewrite nearly every word would be underlined,
+  // and the marks would say nothing. Then the level marks carry the comparison on their own.
   function underline(el, line, other) {
-    var a = line.split(" "), keep = shared(a, other.split(" "));
+    var a = line.split(" "), b = other.split(" "), keep = shared(a, b);
     el.textContent = "";
+    if (Object.keys(keep).length < Math.min(a.length, b.length) / 2) { el.textContent = line; return; }
     a.forEach(function (w, i) {
       if (i) el.appendChild(document.createTextNode(" "));
       if (keep[i]) { el.appendChild(document.createTextNode(w)); return; }
@@ -50,6 +53,32 @@
       u.textContent = w;
       el.appendChild(u);
     });
+  }
+
+  // A word of the day highlights just its phrase in the stronger line: the words of the tip
+  // ("alleviate + pressure / a burden") found there, with the small words between them.
+  var SMALL = /^(a|an|the|of|to|on|in|for|with|and|or|your|our|someone|\+|\/)$/;
+  function highlight(el, line, tip) {
+    var stems = tip.split(/[\s+\/]+/).map(bare).filter(function (w) { return w && !SMALL.test(w); })
+      .map(function (w) { return w.length > 4 ? w.replace(/e$/, "") : w; });
+    var words = line.split(" "), hits = [];
+    words.forEach(function (w, i) {
+      var x = bare(w);
+      if (stems.some(function (s) { return x.indexOf(s) === 0; })) hits.push(i);
+    });
+    el.textContent = "";
+    if (!hits.length) { el.textContent = line; return; }
+    // one run: from the first hit, joined to later hits no more than two words away
+    var from = hits[0], to = hits[0];
+    hits.slice(1).forEach(function (i) { if (i - to <= 3) to = i; });
+    var mark = document.createElement("mark");
+    mark.className = "swipe";
+    mark.textContent = words.slice(from, to + 1).join(" ");
+    if (from) el.appendChild(document.createTextNode(words.slice(0, from).join(" ") + " "));
+    el.appendChild(mark);
+    if (to < words.length - 1) el.appendChild(document.createTextNode(" " + words.slice(to + 1).join(" ")));
+    void mark.offsetWidth;
+    mark.classList.add("on");
   }
 
   // Three kinds of tip take turns day by day. Day n shows kind n mod 3, and the next tip of that kind,
@@ -71,16 +100,33 @@
     var day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
     var at = day;
 
+    // A grammar tip fixes a mistake, so it keeps the cross and the tick. A writing tip or a word of the
+    // day lifts a line that is already correct, so it gets the circled levels instead: 3, then 5.
+    var rows = bubble.querySelectorAll(".bubble-eg li");
+    var LOOK = {
+      error: [["avoid", "Wrong: "], ["do", "Right: "]],
+      level: [["rung", "Weaker: "], ["rung up", "Stronger: "]]
+    };
     function draw() {
-      var pick = tipAt(tips, at), t = pick.tip;
+      var pick = tipAt(tips, at), t = pick.tip, look = LOOK[pick.kind.key === "grammar" ? "error" : "level"];
       bubble.querySelector(".bubble-label").textContent = at === day ? pick.kind.today : pick.kind.more;
       bubble.setAttribute("data-kind", pick.kind.key);
-      bubble.querySelector(".bubble-tip").textContent = t.tip;
-      underline(bubble.querySelector("[data-wrong]"), t.wrong, t.right);
-      underline(bubble.querySelector("[data-right]"), t.right, t.wrong);
+      bubble.querySelector(".bubble-tip").textContent = pick.kind.key === "vocab" ? "Use “" + t.tip + "”" : t.tip;
+      Array.prototype.forEach.call(rows, function (li, i) {
+        li.className = look[i][0];
+        li.querySelector("[data-say]").textContent = look[i][1];
+      });
+      if (pick.kind.key === "vocab") {
+        bubble.querySelector("[data-wrong]").textContent = t.wrong;
+        highlight(bubble.querySelector("[data-right]"), t.right, t.tip);
+      } else {
+        underline(bubble.querySelector("[data-wrong]"), t.wrong, t.right);
+        underline(bubble.querySelector("[data-right]"), t.right, t.wrong);
+      }
       var go = bubble.querySelector(".bubble-go a");
       go.href = t.href;
       go.textContent = "Practise this: " + t.where;
+      back.hidden = at === day;
     }
 
     // one control for keyboards and screen readers; the fox is the same button for fingers
@@ -89,6 +135,14 @@
     more.className = "btn-quiet";
     more.textContent = "Another tip";
     bubble.querySelector(".bubble-go").appendChild(more);
+    // after a few taps, one step back to today's tip
+    var back = document.createElement("button");
+    back.type = "button";
+    back.className = "link-btn";
+    back.textContent = "Today’s tip";
+    back.hidden = true;
+    back.addEventListener("click", function () { at = day; draw(); replay(bubble, "swap"); more.focus(); });
+    bubble.querySelector(".bubble-go").appendChild(back);
 
     // a hop that is still in the air is left to land, and the words only slide in when they are not
     // still sliding: a student tapping fast sees each new tip at once, not a stutter of restarts
@@ -107,6 +161,10 @@
     more.addEventListener("click", next);
     if (!store("cly:fox")) hint.hidden = false;
     draw();
+    // today's tip is in place before anything is announced: only a tip the student asks for is read out
+    var body = bubble.querySelector(".bubble-body");
+    body.classList.add("drawn");
+    body.setAttribute("aria-live", "polite");
   }
 
   /* ---------- Level up: the student climbs one level at a time; the new words are highlighted ---------- */
