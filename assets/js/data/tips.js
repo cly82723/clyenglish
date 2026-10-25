@@ -24,7 +24,9 @@ window.CLY_TIPS = {
     { tip: "In a proposal, \"would\" sounds reasonable; \"must\" sounds pushy.", wrong: "You must approve this plan now.", right: "This plan would give students a quiet place to read at lunchtime.", href: "part-b.html#patterns-proposal", where: "Proposal patterns" },
     { tip: "Start a story in the middle of the action.", wrong: "One day, I went to the theme park with my sister.", right: "\"Brother, brother,\" my sister pulled on my sleeve. \"I want to ride that.\"", href: "part-b.html#patterns-story", where: "Story patterns" },
     { tip: "Keep \"I think\" out of a report's findings.", wrong: "I think the canteen food is too oily.", right: "It was found that most respondents considered the food too oily.", href: "part-b.html#patterns-report", where: "Report patterns" },
-    { tip: "Tick off every part of the question before you finish.", wrong: "Two reasons explained; the impact forgotten.", right: "Two reasons, the impact on schools, the impact on children: all covered.", href: "part-b.html#task-article", where: "Article · 2015" }
+    { tip: "Tick off every part of the question before you finish.", wrong: "Two reasons explained; the impact forgotten.", right: "Two reasons, the impact on schools, the impact on children: all covered.", href: "part-b.html#task-article", where: "Article · 2015" },
+    { tip: "Let the first sentence of a paragraph announce its job.", wrong: "Students also have many other problems.", right: "A second, less visible problem is the lack of sleep.", href: "part-b.html#crei", where: "CREI paragraphs" },
+    { tip: "In a letter, say why you are writing in the first line.", wrong: "I am writing this letter because I have something to say.", right: "I am writing to complain about the noise from the building site opposite our school.", href: "part-b.html#letter", where: "Letter features" }
   ],
   grammar: [
     { tip: "Find the time words first. They choose the tense for you.", wrong: "I have finished the paper yesterday.", right: "I finished the paper yesterday.", href: "grammar.html#tenses", where: "Tenses" },
@@ -51,7 +53,9 @@ window.CLY_TIPS = {
     { tip: "Things are expensive; prices are high.", wrong: "The price is very expensive.", right: "The price is very high.", href: "final.html#errors", where: "Common errors" },
     { tip: "\"Every\" is followed by a singular noun.", wrong: "Every students has a locker.", right: "Every student has a locker.", href: "final.html#errors", where: "Common errors" },
     { tip: "\"Lack\" as a verb has no \"of\".", wrong: "Students are lack of sleep.", right: "Students lack sleep.", href: "final.html#errors", where: "Common errors" },
-    { tip: "Wrong word form? Ask which part of speech the gap needs.", wrong: "He showed real generous.", right: "He showed real generosity.", href: "vocab.html#s1", where: "Vocab revision" }
+    { tip: "Wrong word form? Ask which part of speech the gap needs.", wrong: "He showed real generous.", right: "He showed real generosity.", href: "vocab.html#s1", where: "Vocab revision" },
+    { tip: "Fewer for things you can count; less for things you cannot.", wrong: "There are less students in the library today.", right: "There are fewer students in the library today.", href: "final.html#errors", where: "Common errors" },
+    { tip: "No \"the\" when you talk about something in general.", wrong: "The life in Hong Kong is very busy.", right: "Life in Hong Kong is very busy.", href: "final.html#errors", where: "Common errors" }
   ],
   vocab: [
     { tip: "alleviate + pressure / a burden / anxiety", wrong: "Cancelling a test would reduce stress.", right: "Cancelling one test would alleviate the pressure on S6 students.", href: "part-b.html#vocab-education", where: "Education words" },
@@ -74,6 +78,8 @@ window.CLY_TIPS = {
     { tip: "boost + tourism / the economy", wrong: "Big events help the economy.", right: "Mega events can boost tourism, but only if visitors come back.", href: "part-b.html#vocab-culture", where: "Culture & tourism words" },
     { tip: "develop + transferable skills", wrong: "Part-time jobs teach useful skills.", right: "Part-time jobs help students develop transferable skills.", href: "part-b.html#vocab-work", where: "Work & career words" },
     { tip: "hinder / boost + productivity", wrong: "Long meetings make people work slower.", right: "Endless meetings hinder productivity.", href: "part-b.html#vocab-work", where: "Work & career words" },
-    { tip: "find + job satisfaction", wrong: "People want a nice job.", right: "Many people find job satisfaction in meaningful work rather than a higher salary.", href: "part-b.html#vocab-work", where: "Work & career words" }
+    { tip: "find + job satisfaction", wrong: "People want a nice job.", right: "Many people find job satisfaction in meaningful work rather than a higher salary.", href: "part-b.html#vocab-work", where: "Work & career words" },
+    { tip: "raise + awareness of / about an issue", wrong: "The campaign told people about recycling.", right: "The campaign raised awareness of recycling among residents of Sham Shui Po.", href: "part-b.html#vocab-environment", where: "Environment words" },
+    { tip: "foster + a sense of belonging / teamwork", wrong: "Joining a school team makes students feel that they belong.", right: "Joining a school team fosters a sense of belonging.", href: "part-b.html#vocab-youth", where: "Youth & society words" }
   ]
 };
