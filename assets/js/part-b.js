@@ -172,6 +172,38 @@
     });
   }
 
+  /* ---------- Drill sets: one set of paragraphs at a time ---------- */
+  // "Try another set" moves on; the page remembers which set this browser was on. Answers in a set
+  // are kept, so a student who comes back to it sees where they left off.
+  function initDrillSets(box) {
+    var sets = Array.prototype.slice.call(box.querySelectorAll(":scope > .drill-set"));
+    if (sets.length < 2) return;
+    var key = "cly:crei-set", n = 0;
+    try { n = Math.min(Number(localStorage.getItem(key)) || 0, sets.length - 1); } catch (e) { n = 0; }
+    var count = document.createElement("p");
+    count.className = "count";
+    count.setAttribute("aria-live", "polite");
+    var next = document.createElement("button");
+    next.type = "button";
+    next.className = "btn-quiet";
+    next.textContent = "Try another set";
+    var bar = document.createElement("div");
+    bar.className = "passage-switch";
+    bar.appendChild(count);
+    bar.appendChild(next);
+    box.insertBefore(bar, sets[0]);
+
+    function show(i) {
+      n = i;
+      try { localStorage.setItem(key, String(n)); } catch (e) { /* storage blocked: just don't remember it */ }
+      sets.forEach(function (set, j) { set.hidden = j !== i; });
+      count.textContent = "Set " + (n + 1) + " of " + sets.length + ": " + sets[n].getAttribute("data-title");
+    }
+    next.addEventListener("click", function () { show((n + 1) % sets.length); });
+    show(n);
+  }
+
   document.querySelectorAll("[data-picker]").forEach(initPicker);
+  document.querySelectorAll("[data-sets]").forEach(initDrillSets);
   document.querySelectorAll("[data-drill]").forEach(function (box, n) { if (!box.id) box.id = "drill" + (n + 1); initDrill(box); });
 })();

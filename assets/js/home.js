@@ -52,16 +52,29 @@
     });
   }
 
+  // Three kinds of tip take turns day by day. Day n shows kind n mod 3, and the next tip of that kind,
+  // so each kind runs through its whole list before repeating. Nothing to update: the date does it.
+  var KINDS = [
+    { key: "writing", today: "Writing tip of the day", more: "Writing tip" },
+    { key: "grammar", today: "Grammar tip of the day", more: "Grammar tip" },
+    { key: "vocab", today: "Word of the day", more: "Word to use" }
+  ];
+  function tipAt(tips, n) {
+    var kind = KINDS[n % KINDS.length], list = tips[kind.key] || [];
+    return { kind: kind, tip: list[Math.floor(n / KINDS.length) % list.length] };
+  }
+
   function initFox(hello, tips) {
-    if (!tips || !tips.length) return;
+    if (!tips || !KINDS.every(function (k) { return tips[k.key] && tips[k.key].length; })) return;
     var fox = hello.querySelector(".fox"), bubble = hello.querySelector(".bubble");
     var hint = fox.querySelector(".fox-hint");
     var day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
-    var at = day % tips.length;
+    var at = day;
 
     function draw() {
-      var t = tips[at];
-      bubble.querySelector(".bubble-label").textContent = at === day % tips.length ? "Tip of the day" : "Another tip";
+      var pick = tipAt(tips, at), t = pick.tip;
+      bubble.querySelector(".bubble-label").textContent = at === day ? pick.kind.today : pick.kind.more;
+      bubble.setAttribute("data-kind", pick.kind.key);
       bubble.querySelector(".bubble-tip").textContent = t.tip;
       underline(bubble.querySelector("[data-wrong]"), t.wrong, t.right);
       underline(bubble.querySelector("[data-right]"), t.right, t.wrong);
@@ -82,7 +95,7 @@
     var hopping = false, swapped = 0;
     fox.addEventListener("animationend", function () { hopping = false; });
     function next() {
-      at = (at + 1) % tips.length;
+      at += 1;
       draw();
       if (!hopping) { hopping = true; replay(fox, "hop"); }
       var now = Date.now();

@@ -415,7 +415,7 @@ const defaultCondMatch = {
     ]
 };
 
-window.CLY_GRAMMAR = { normalise, TIMES, ASPECTS, tenseMatrix, tenseTimelines, practiceQuestions, GENERIC_TENSE_HINT, defaultCloze, PASSIVE_EXAMPLES, PASSIVE_TENSES, NOUN_SLOTS, MEANING_PAIRS, VERB_PATTERNS, LESSONS, FOCUS_TABS, applyMark, defaultProofreading, CORRECTION_KIND, CONDITIONALS, conditionalMatrix, REALITY, COND_TIMES, COND_CELLS, COND_IDEAS, GENERIC_COND_HINT, condQuizQuestions, defaultCondMatch };
+window.CLY_GRAMMAR = { normalise, TIMES, ASPECTS, tenseMatrix, tenseTimelines, practiceQuestions, GENERIC_TENSE_HINT, defaultCloze, PASSIVE_EXAMPLES, PASSIVE_TENSES, NOUN_SLOTS, MEANING_PAIRS, VERB_PATTERNS, LESSONS, FOCUS_TABS, applyMark, parseProofLine, defaultProofreading, CORRECTION_KIND, CONDITIONALS, conditionalMatrix, REALITY, COND_TIMES, COND_CELLS, COND_IDEAS, GENERIC_COND_HINT, condQuizQuestions, defaultCondMatch };
 
 })();
 
