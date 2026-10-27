@@ -35,17 +35,17 @@ A personal, single-voice guide (CLY) rather than a generic past-paper dump: orig
 - Core content: Part A and Part B guides. Part B is a step-by-step guide built on the three marking domains: Step 0 Choose & plan, Step 1 Content, Step 2 Organisation (CREI paragraphs for argumentative text types; own patterns for reports and stories), Step 3 Language, Step 4 Sample writings.
 - Sources: any resource that helps students may be used: real past-paper tasks (cited by year and question), examiner reports, textbooks and dictionaries for tasks, ideas and further reading. Model writing on the site is written for the site. Level labels on samples are CLY's estimates, never official marks.
 - Vocabulary is taught through context and collocation, with no Chinese translations.
-- Open: whether CLY is a tutor, centre, or free resource was not answered. Do not add lesson sales, pricing, or booking flows.
+- CLY English is a free resource (confirmed 2026-10-27). Do not add lesson sales, pricing, or booking flows.
 
 ## Brand Commitments
 
 - Name: CLY English.
-- Logo: `images/image_1792159441498114.png` — a fox seated within the letters C-L-Y inside a copper ring. The site must use the image. Since 2026-10-24 the user chose a lively "picnic day" palette (sky blue, leaf green, mint, navy) over the logo's copper; the logo's fox orange stays as the one warm accent.
+- Logo: the fox mark in `images/brand/` (since 2026-10-27): `cly-mark-152.png` in the header, `cly-mark-320.png` on the home page, and the fox head alone as the favicon (`cly-icon-16.png`, `cly-icon-32.png`). It has no drawn ring; the site's white disc frames it. The site must use it. The old ringed logo (`images/image_1792159441498114.png`) is retired. Since 2026-10-24 the user chose a lively "picnic day" palette (sky blue, leaf green, mint, navy) over the logo's copper; the logo's fox orange stays as the one warm accent.
 - Tone: professional, encouraging toward learners of every level.
 
 ## Evidence on Hand
 
-- Logo image only.
+- Logo images only (re-confirmed 2026-10-27).
 - No testimonials, results statistics, student counts, contact details, or sample scripts exist. Do not fabricate them.
 
 ## Product Principles
