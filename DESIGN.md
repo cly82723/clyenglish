@@ -257,7 +257,7 @@ Picnic day: sky blue, leaf green and mint on white paper, deep navy ink, the log
 - **Pale Sky** (cover): The cover behind its picture, shown while the picture loads.
 
 ### Neutral
-- **Deep Navy** (ink): All text on paper; the 2px outlines of panels, ladders, tables, task boxes and scripts; the current contents item; the ladder head bar; the "Real exam script" tag; the main button.
+- **Deep Navy** (ink): All text on paper; the 1px rules above lists, tables and question sets; the outline of real exam scripts; the current contents item; the ladder head bar; the "Real exam script" tag; the main button.
 - **Slate** (ink-soft): Secondary text, struck-through weaker versions, the small grey page title on tabbed pages, unreached ladder levels.
 - **Writing Paper** (paper): The sheet itself, value cells of the label panel, tab labels.
 - **Mint** (chest): The S.5/S.6 strip, label-panel field column, task boxes, table headers, tip bubble, para notes, analysis "next step" boxes, hover fill.
@@ -267,7 +267,7 @@ The cool greys are a ladder from faintest to firmest; each has one job:
 - **Faint Ruling** (rule): Row dividers and the ladder axis line.
 - **Panel Ruling** (rule-strong): Row lines inside the label panel, and the outlines of contents chips, directory links and strip links.
 - **Dashed Ruling** (rule-dash): Under phrase-bank and word-list items, and above CLY's note in a versions box.
-- **Pencil Edge** (edge): The 1px outline of answer choices, matrix cells, picker chips and small buttons.
+- **Pencil Edge** (edge): The 1px outline of boxes (label panel, ladders, task boxes, tables, versions box, cards), answer choices, matrix cells and picker chips.
 - **Resting Ring** (ring): The ring of an unreached level mark (about 3.4:1 on paper).
 
 ### Marking colours
@@ -348,13 +348,13 @@ Mostly flat paper. Depth exists only where the book is physically layered: the s
 Each page's cover carries a picture like an illustrated exercise-book cover (steps, meadow, great tree, hillside, garden). It keeps its colours under a soft white veil, and any part darker than a relative luminance of 0.42 is lifted, so navy cover text keeps AA after compression. The picture is fixed to the window, so the sheet slides over it like a page over a desk. Prints live in `assets/img/cover/` at 2400px and 1200px.
 
 ### Named Rules
-**The Flat Paper Rule.** Nothing on the paper casts a shadow. Separate things with a 2px ink outline, a 1px ruled line, a tint or mint.
+**The Flat Paper Rule.** Nothing on the paper casts a shadow. Separate things with a 1px pencil-edge outline, a 1px ink or grey rule, a tint or mint. Lines stay hairline: 2px is kept for focus rings and the picked answer only.
 
 **The Print Stays on the Cover Rule.** Pictures belong to the cover. The paper, where students read, is always plain white.
 
 ## Shapes
 
-Soft stationery shapes. Outlined boxes (label panel, versions box, task box, level cards, scripts, table wrapper) use a 2px navy outline with 12px corners; ladders use 14px. Tabs are rounded on top only (10px) so they hang from the cover. Contents links use 6px. Anything that is a level is a full circle or pill: level marks, numbered skeleton steps (36px circles), the logo disc, chips and buttons. A form (S.1–S.6) is a square 8px-cornered label, so it never reads as a level. CREI badges and highlighted collocations use 3–4px corners. CLY's rewrites alone use a dashed outline. Lines are part of the language: the 5px double margin rule, 1px ruling between rows, dashed rules under word lists.
+Soft stationery shapes. Outlined boxes (label panel, versions box, task box, level cards, table wrapper) use a 1px pencil-edge outline with 12px corners; ladders use 14px; real exam scripts keep a 1px navy outline. Numbered step circles use a 1.5px ink ring. Tabs are rounded on top only (10px) so they hang from the cover. Contents links use 6px. Anything that is a level is a full circle or pill: level marks, numbered skeleton steps (36px circles), the logo disc, chips and buttons. A form (S.1–S.6) is a square 8px-cornered label, so it never reads as a level. CREI badges and highlighted collocations use 3–4px corners. CLY's rewrites alone use a dashed outline. Lines are part of the language: the 5px double margin rule, 1px ruling between rows, dashed rules under word lists.
 
 ## Components
 
@@ -368,7 +368,7 @@ A mint band across the top of the sheet on S.5 and S.6 pages: a square form mark
 A sky-ink heading over Bricolage links, grouped under sentence-case step names on long pages (Part B: Step 0 · Choose & plan … Step 4 · Put it together). Hover fills mint; the current item is reversed. Opening a section turns it in from the side the reader moved towards (0.24s, 16px); from the keyboard it changes at once; with reduced motion it fades. On phones, long contents collapse to one bordered button naming the step and section, with a chevron that turns when the list opens.
 
 ### Label panel (signature)
-Each guide's title block: a two-column grid with a 2px ink outline and 12px corners, sky-ink field names on mint and bold values on paper. Max width 560px. On phones it becomes one quiet line.
+Each guide's title block: a two-column grid with a 1px pencil-edge outline and 12px corners, sky-ink field names on mint and bold values on paper. Max width 560px. On phones it becomes one quiet line.
 
 ### Level mark and level ladder (signature)
 A circled level number like a teacher's grade: 2px ring, Bricolage 800, tabular numerals, sky ink at rest; the selected one fills fox orange with a navy number. The ladder rewrites one line, or one whole script, at each level: an ink head bar, then an axis of circled marks on a faint line.
@@ -378,7 +378,7 @@ A circled level number like a teacher's grade: 2px ring, Bricolage 800, tabular 
 - Links to a level (part-b.html#sample-story-5) open it directly.
 
 ### Versions box
-Every section ends with one: a 2px-outlined box titled in sky ink, three lines (Level 3 struck through, Level 5, Level 5**) each led by a level mark, then one line of CLY's advice under a dashed rule.
+Every section ends with one: a 1px pencil-edge box titled in sky ink, three lines (Level 3 struck through, Level 5, Level 5**) each led by a level mark, then one line of CLY's advice under a dashed rule.
 
 ### Pickers (chips)
 A row of 44px pill chips choosing one panel at a time (task, topic, text type). The selected chip reverses to ink. A tap fades the new panel up (0.22s); a key press or a link changes it at once.
@@ -387,14 +387,14 @@ A row of 44px pill chips choosing one panel at a time (task, topic, text type). 
 A sentence in its CREI tint, led by a square letter badge (C, R, E, I). Used in the CREI key, colour-coded paragraphs, plans and the drill's rebuilt paragraph, which appears move by move, Claim to Impact, 0.12s apart.
 
 ### Scripts and rewrites
-- **Real exam script:** a 2px ink outline on paper, opened by a dark "Real exam script · HKEAA exemplar" tag. Candidates' mistakes are kept; errors that block meaning take a red wavy underline.
+- **Real exam script:** a 1px ink outline on paper, opened by a dark "Real exam script · HKEAA exemplar" tag. Candidates' mistakes are kept; errors that block meaning take a red wavy underline.
 - **CLY's rewrite:** a dashed sky outline on rewrite paper, opened by a highlighter "CLY's rewrite · not an exam script" tag.
 - **Analysis:** a ruled list (Content / Organisation / Language) under a 2px ink rule, then a mint "To reach Level N" box.
 - **Quoted lines:** quote paper with a level mark, and the source in small slate type.
 
 ### Home: fox, continue, directory
 - **Fox and tip:** the logo fox (tap to hop, 0.38s; it tilts slightly under a mouse) speaks a tip in a mint bubble: the tip, the wrong line with a cross and the right line with a tick (the changed words underlined in red and green), and "Practise this" plus an "Another tip" button.
-- **Continue:** a 2px-outlined card naming the last page ("Part B › Story").
+- **Continue:** a 1px pencil-edge card naming the last page ("Part B › Story").
 - **Directory:** Senior then Junior, each form as a square mark followed by 44px pill links.
 - **Climbing sentence:** one sentence stepped Level 2 → 5** by the student, the changed words drawn with the highlighter.
 
@@ -402,7 +402,7 @@ A sentence in its CREI tint, led by a square letter badge (C, R, E, I). Used in 
 Built from the same parts. Choices are 1px pencil-edge options; the picked one gets a 2px ink outline. A new tick or cross draws itself like a pen stroke (clip-path, 0.3s); hint notes slide up 4px (0.22s). Proofreading lines are numbered like the exam paper. Matrices are tables of 10px-cornered cells that reverse to ink; on phones they become chip pickers.
 
 ### Buttons and press feedback
-The main action is an ink pill; the rest are outlined ink pills that fill mint on hover. Every pressable control scales to 0.97 on press (0.98 for wide rows; 160ms, cubic-bezier(0.23, 1, 0.32, 1)). Hover effects apply only under (hover: hover). With reduced motion, presses do not scale.
+The main action is an ink pill; the rest are 1px outlined ink pills that fill mint on hover. Every pressable control scales to 0.97 on press (0.98 for wide rows; 160ms, cubic-bezier(0.23, 1, 0.32, 1)). Hover effects apply only under (hover: hover). With reduced motion, presses do not scale.
 
 ### Focus
 A 3px ink outline with 3px offset and 4px corners; navy on the cover too.
