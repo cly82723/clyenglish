@@ -42,48 +42,7 @@ const tenseTimelines = {
     "Future Perfect Continuous": [{ type: "span", from: 10, to: 84, label: "will have been learning English (12 years)" }, { type: "ref", at: 84, label: "by next year" }]
 };
 
-const practiceQuestions = [
-    { q: "By the time the police arrived, the thief ______ (escape).", options: ["escaped", "has escaped", "had escaped", "was escaping"], answer: 2, tense: "Past Perfect", explanation: "The escape was complete before another past event (the police arriving), so use Past Perfect.", hint: "Which happened first: the escape or the police arriving? How do we show the earlier of two past actions?" },
-    { q: "I ______ (be) to the UK three times in my life.", options: ["went", "have been", "had been", "am going"], answer: 1, tense: "Present Perfect", explanation: "Life experiences up to now ('in my life') take the Present Perfect.", hint: "'In my life' means up to now. Which tense talks about experiences without saying exactly when they happened?" },
-    { q: "Look at those dark clouds! It ______ (rain).", options: ["will rain", "rains", "is going to rain", "has rained"], answer: 2, tense: "Future Simple", explanation: "'Be going to' is used for predictions based on present evidence (the dark clouds).", hint: "Can you already see evidence that it will rain? Which future form do we use for a prediction based on what we can see now?" },
-    { q: "While I ______ (type) the report, my computer suddenly crashed.", options: ["typed", "was typing", "had typed", "am typing"], answer: 1, tense: "Past Continuous", explanation: "Past Continuous gives the background action, interrupted by the Past Simple 'crashed'.", hint: "Was the typing finished, or was it still going on when the computer crashed?" },
-    { q: "By the time the examiner arrived, the candidates ______ (wait) outside the hall for over an hour.", options: ["waited", "have been waiting", "had been waiting", "were waiting"], answer: 2, tense: "Past Perfect Continuous", explanation: "Past Perfect Continuous shows the duration of an action leading up to another past event ('arrived').", hint: "The waiting went on 'for over an hour' and stopped when the examiner arrived, all in the past. How do we show how long an action lasted before another past event?" },
-    { q: "Since the new policy was introduced, the number of plastic bags used ______ (drop) significantly.", options: ["dropped", "has dropped", "had dropped", "is dropping"], answer: 1, tense: "Present Perfect", explanation: "'Since' + a past starting point with a present result calls for the Present Perfect.", hint: "'Since' links a past starting point to now. Which tense connects the past with the present?" },
-    { q: "Don't call me at 8 pm tonight. I ______ (attend) my online English class.", options: ["will attend", "attend", "will be attending", "will have attended"], answer: 2, tense: "Future Continuous", explanation: "Future Continuous describes an action in progress at a specific future time.", hint: "At 8 pm tonight, will the class be over, or will you be in the middle of it?" },
-    { q: "The school bus ______ (leave) at 7:15 am every weekday.", options: ["leaves", "is leaving", "will leave", "has left"], answer: 0, tense: "Present Simple", explanation: "Present Simple is used for timetables and regular schedules.", hint: "'Every weekday': is this a one-off event, or a regular timetable?" },
-    { q: "While I ______ (scroll) through social media, I came across an article about youth unemployment.", options: ["scrolled", "had scrolled", "was scrolling", "have scrolled"], answer: 2, tense: "Past Continuous", explanation: "Past Continuous gives the background action, interrupted by the Past Simple 'came across'.", hint: "Were you in the middle of scrolling when you came across the article?" },
-    { q: "By the end of this term, our class ______ (finish) all five mock papers.", options: ["will finish", "will have finished", "finishes", "has finished"], answer: 1, tense: "Future Perfect", explanation: "Future Perfect describes an action completed before a future deadline ('by the end of this term').", hint: "'By the end of this term': will the papers be finished before that point in the future?" },
-    { q: "\"The phone is ringing!\" \"Don't worry, I ______ (get) it.\"", options: ["am getting", "get", "will get", "am going to get"], answer: 2, tense: "Future Simple", explanation: "'Will' is used for a spontaneous decision made at the moment of speaking.", hint: "Did the speaker plan this earlier, or decide at the moment of speaking?" },
-    { q: "When the fire engines finally arrived, the fire ______ (already / spread) to the second floor.", options: ["already spread", "has already spread", "had already spread", "was already spreading"], answer: 2, tense: "Past Perfect", explanation: "Past Perfect shows that the spreading was complete before the fire engines arrived.", hint: "Which happened first: the spreading or the fire engines arriving? Notice the word 'already'." },
-    { q: "Hong Kong ______ (host) many international events over the past decade.", options: ["hosted", "has hosted", "had hosted", "hosts"], answer: 1, tense: "Present Perfect", explanation: "'Over the past decade' is an unfinished time period that continues to the present, so Present Perfect fits.", hint: "Is 'the past decade' a finished period, or does it continue up to now?" },
-    { q: "My little brother ______ (play) video games all afternoon, and his eyes are red now.", options: ["played", "has been playing", "had played", "is playing"], answer: 1, tense: "Present Perfect Continuous", explanation: "The action has continued up to now and has a visible present result, stressing duration ('all afternoon').", hint: "The playing lasted 'all afternoon' and you can see the result now. Which tense stresses how long something has been going on up to now?" },
-    { q: "By next September, Ms Chan ______ (teach) at our school for 20 years.", options: ["will teach", "will be teaching", "will have taught", "will have been teaching"], answer: 3, tense: "Future Perfect Continuous", explanation: "A future point ('by next September') plus a duration ('for 20 years') needs the Future Perfect Continuous.", hint: "There is a future point ('by next September') and a length of time ('for 20 years'). Which tense combines both?" }
-];
-
 const GENERIC_TENSE_HINT = "Find the time signal in the sentence. When does the action happen, and is it finished, in progress or repeated?";
-
-const clozeBlanks = {
-    1: { answers: ["arrives"], verb: "arrive", tense: "Present Simple", why: "'Every weekday' signals a routine.", hint: "'Every weekday': is this a single event or a routine? Remember who the subject is." },
-    2: { answers: ["is writing"], verb: "write", tense: "Present Continuous", why: "'At the moment' signals an action in progress now.", hint: "'At the moment': is the action happening right now?" },
-    3: { answers: ["has interviewed"], verb: "interview", tense: "Present Perfect", why: "'So far' connects past actions to the present.", hint: "'So far': does this connect actions in the past with the present?" },
-    4: { answers: ["has been researching"], verb: "research", tense: "Present Perfect Continuous", why: "'Non-stop for the past three weeks' stresses an ongoing duration up to now.", hint: "'Non-stop for the past three weeks': is she still doing it? Which tense stresses how long?" },
-    5: { answers: ["was waiting"], verb: "wait", tense: "Past Continuous", why: "'While' introduces a background action in progress in the past.", hint: "'While': was this action in progress when something else happened?" },
-    6: { answers: ["rang"], verb: "ring", tense: "Past Simple", why: "A sudden, completed action that interrupted the waiting. 'Ring' is irregular: ring – rang – rung.", hint: "Was this a short, sudden action that interrupted the waiting? Check the past form of this irregular verb." },
-    7: { answers: ["had cancelled", "had canceled"], verb: "cancel", tense: "Past Perfect", why: "The cancellation happened 'an hour earlier': before the phone call, so it is the past of the past.", hint: "The cancellation happened 'an hour earlier' than the phone call. How do we show the earlier of two past events?" },
-    8: { answers: ["had been standing"], verb: "stand", tense: "Past Perfect Continuous", why: "'For almost two hours' shows duration up to a past point ('by the time she got back').", hint: "She stood there 'for almost two hours' up to the moment she got back. How do we show how long something lasted up to a point in the past?" },
-    9: { answers: ["will become", "is going to become"], verb: "become", tense: "Future Simple", why: "'Believes … one day' is a prediction about the future.", hint: "'One day': is Mr Lau making a prediction about the future?" },
-    10: { answers: ["will be presenting"], verb: "present", tense: "Future Continuous", why: "'This time next week' signals an action in progress at a specific future time.", hint: "'This time next week': will she be in the middle of doing something at that future moment?" },
-    11: { answers: ["will have published"], verb: "publish", tense: "Future Perfect", why: "'By the end of August' signals an action completed before a future point.", hint: "'By the end of August': will the articles be finished before that future point?" },
-    12: { answers: ["will have been working"], verb: "work", tense: "Future Perfect Continuous", why: "A future point ('by then') plus a duration ('for exactly ten weeks').", hint: "There's a future point ('by then') and a length of time ('for exactly ten weeks'). Which tense combines both?" }
-};
-
-const clozeParagraphs = [
-    ["Mei is a summer intern at the Harbour Daily, one of Hong Kong's busiest newsrooms. Every weekday, she ", 1, " at the office at 8 am sharp and reads through the overnight headlines. At the moment, she ", 2, " her first feature article on the city's housing crisis. So far, she ", 3, " five families who live in subdivided flats, and she ", 4, " the topic non-stop for the past three weeks."],
-    ["Her first week, however, did not go smoothly. Last Monday, while she ", 5, " outside an old building in Sham Shui Po for an interviewee, her phone suddenly ", 6, ". It was her editor, Mr Lau, with bad news: the interviewee ", 7, " the meeting an hour earlier, but nobody had told Mei. By the time she got back to the office, she ", 8, " in the rain for almost two hours, and she was soaked."],
-    ["Despite that rocky start, Mr Lau believes that Mei ", 9, " an excellent journalist one day. This time next week, she ", 10, " her article to the whole editorial team. By the end of August, she ", 11, " three articles, and by then she ", 12, " at the newspaper for exactly ten weeks."]
-];
-
-const defaultCloze = { title: "The Summer Intern", blanks: clozeBlanks, paragraphs: clozeParagraphs, distractors: ["finish", "leave", "teach"] };
 
 const PASSIVE_EXAMPLES = [
     { doer: "The government", action: "built", passive: "was built", receiver: "the new MTR line", tail: "in 2022", tense: "Past Simple" },
@@ -251,31 +210,6 @@ const parseProofLine = (text) => {
     return { words, fixed: applyMark(words, { ...error, word: m[2] }), error };
 };
 
-const defaultProofreading = {
-    title: "Our Beach Clean-up Day",
-    textType: "Article for the school magazine",
-    lines: [
-        ["Last November, a beach clean-up was [[organise>organised]] by our", "Passive Voice", "A passive needs be + past participle: was organised.", "After \"was\", which form of the verb does a passive need?"],
-        ["school's Environment Club. More than forty students"],
-        ["volunteered [[>to]] help, and we were asked to meet at Cheung Sha Beach at", "To-infinitives", "\"Volunteer\" is followed by a to-infinitive: volunteered to help.", "Which verb pattern follows \"volunteer\"?"],
-        ["eight in the morning. When we arrived, we [[>were]] shocked by how", "Passive Voice", "We didn't shock anyone; the rubbish shocked us, so we need the passive: were shocked.", "Did \"we\" do the shocking, or did something shock us? What does a passive need before V3?"],
-        ["much rubbish had been washed up by the waves. Our teacher, Ms"],
-        ["Wong, reminded us [[>to]] wear gloves and suggested working in pairs", "To-infinitives", "\"Remind someone\" is followed by a to-infinitive: reminded us to wear.", "What pattern follows \"remind + someone\"?"],
-        ["so that nobody would get lost. [[Pick>Picking]] up plastic in the hot", "Gerunds", "The subject of a sentence must be a noun, so use the gerund: Picking up plastic … was harder.", "What is the subject of the new sentence? Can a bare verb be a subject?"],
-        ["sun was harder than I had expected, but we all kept [[go>going]].", "Gerunds", "\"Keep\" is followed by V-ing: kept going.", "Which form of the verb follows \"keep\"?"],
-        ["By noon, more than two hundred kilograms of waste had been"],
-        ["collected. Most of it was bottles and food boxes, which [[>are]] used", "Passive Voice", "Bottles don't use anything; they are used by people, so we need the passive: are used.", "Do the boxes use something, or are they used by someone? What's missing?"],
-        ["only once and then thrown away. I could not help [[think>thinking]] about", "Gerunds", "\"Can't help\" is followed by V-ing: could not help thinking.", "Which form of the verb follows \"can't help\"?"],
-        ["how long they would stay in the sea. After lunch, we managed to [[sorted>sort]]", "To-infinitives", "After the \"to\" of a to-infinitive, use the base form: managed to sort.", "Look at the verb right after \"to\". What form should it be in?"],
-        ["the rubbish into bags so that most of it could [[>be]] recycled. Some", "Passive Voice", "The modal passive is modal + be + V3: could be recycled.", "Can the rubbish recycle itself? What does a modal passive need?"],
-        ["residents even let us [[to>]] use their tables, and they thanked us for", "To-infinitives", "\"Let\" is followed by object + bare infinitive, without \"to\": let us use.", "Does \"let someone\" take \"to\" before the next verb?"],
-        ["[[keep>keeping]] their beach clean. I am looking forward to the next one!", "Gerunds", "\"For\" (at the end of line 14) is a preposition, so it is followed by V-ing: thanked us for keeping.", "What's the last word of line 14? Which verb form comes after a preposition?"]
-    ].map(([text, focus, why, hint]) => {
-        const { words, fixed, error } = parseProofLine(text);
-        return { words, fixed, error: error && { ...error, focus, why, hint } };
-    })
-};
-
 const CORRECTION_KIND = { replace: "change one word", insert: "add a missing word", delete: "delete an unnecessary word" };
 
 const CONDITIONALS = ["Zero Conditional", "First Conditional", "Second Conditional", "Third Conditional"];
@@ -415,7 +349,7 @@ const defaultCondMatch = {
     ]
 };
 
-window.CLY_GRAMMAR = { normalise, TIMES, ASPECTS, tenseMatrix, tenseTimelines, practiceQuestions, GENERIC_TENSE_HINT, defaultCloze, PASSIVE_EXAMPLES, PASSIVE_TENSES, NOUN_SLOTS, MEANING_PAIRS, VERB_PATTERNS, LESSONS, FOCUS_TABS, applyMark, parseProofLine, defaultProofreading, CORRECTION_KIND, CONDITIONALS, conditionalMatrix, REALITY, COND_TIMES, COND_CELLS, COND_IDEAS, GENERIC_COND_HINT, condQuizQuestions, defaultCondMatch };
+window.CLY_GRAMMAR = { normalise, TIMES, ASPECTS, tenseMatrix, tenseTimelines, GENERIC_TENSE_HINT, PASSIVE_EXAMPLES, PASSIVE_TENSES, NOUN_SLOTS, MEANING_PAIRS, VERB_PATTERNS, LESSONS, FOCUS_TABS, applyMark, parseProofLine, CORRECTION_KIND, CONDITIONALS, conditionalMatrix, REALITY, COND_TIMES, COND_CELLS, COND_IDEAS, GENERIC_COND_HINT, condQuizQuestions, defaultCondMatch };
 
 })();
 

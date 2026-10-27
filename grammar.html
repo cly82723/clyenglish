@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>S.4 Grammar · CLY English</title>
-<meta name="description" content="S.4 grammar practice in five topics: tenses, the passive voice, gerunds and to-infinitives, conditionals, and proofreading.">
+<meta name="description" content="S.4 grammar practice: tenses, the passive voice, gerunds and to-infinitives, conditionals, and mixed cloze and proofreading practice.">
 <script>document.documentElement.className = "js preload";</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,7 @@
       <li><a href="#passive">Passive voice</a></li>
       <li><a href="#gerunds-infinitives">Gerunds &amp; infinitives</a></li>
       <li><a href="#conditionals">Conditionals</a></li>
-      <li><a href="#proofreading">Proofreading</a></li>
+      <li><a href="#practice">Practice</a></li>
     </ol>
   </nav>
 
@@ -51,15 +51,15 @@
         <p>Every tense is a <strong>time</strong> plus an <strong>aspect</strong>. <mark class="swipe">Choose a tense to see its formula and examples.</mark></p>
         <div data-grammar="matrix"></div>
       </div>
-      <div class="part" id="practice">
+      <div class="part" id="tensequiz">
         <h3>Quick quiz</h3>
-        <p>Find the time words first. Wrong answers get a hint and another try. There are five sets.</p>
-        <div data-grammar="practice"></div>
+        <p>Read the whole sentence before you choose: some time words point the wrong way. Wrong answers get a hint and another try. There are five sets.</p>
+        <div data-grammar="tensequiz"></div>
       </div>
-      <div class="part" id="cloze">
-        <h3>Cloze</h3>
-        <p>Pick a verb from the bank and type it in the right tense. Each verb is used once at most.</p>
-        <div data-grammar="cloze"></div>
+      <div class="part" id="tensecloze">
+        <h3>Tense cloze</h3>
+        <p>Pick a verb from the bank and type it in the right tense. Each verb is used once at most, and the tenses come in any order.</p>
+        <div data-grammar="tensecloze"></div>
       </div>
       <aside class="versions" aria-label="Two versions">
         <p class="versions-title">Two versions</p>
@@ -131,18 +131,26 @@
       </aside>
     </section>
 
-    <section id="proofreading">
-      <h2>Proofreading</h2>
-      <p class="covers">Covers: passive voice, gerunds &amp; to-infinitives</p>
-      <p>Most lines have one mistake. A few lines are correct.</p>
-      <div data-grammar="proofreading"></div>
+    <section id="practice">
+      <h2>Practice</h2>
+      <p>Mixed practice for everything above, and more. Each set lists what to look out for.</p>
+      <div class="part" id="verbcloze">
+        <h3>Cloze</h3>
+        <p>Put the verb in brackets into the right form. You may need any tense, the passive, a gerund or an infinitive, and sometimes “not”.</p>
+        <div data-grammar="verbcloze"></div>
+      </div>
+      <div class="part" id="proofreading">
+        <h3>Proofreading</h3>
+        <p>Grammar, phrasal verbs, collocations, prepositions and word form. Most lines have one mistake; a few are correct.</p>
+        <div data-grammar="proofreading"></div>
+      </div>
       <aside class="versions" aria-label="Two versions">
         <p class="versions-title">Two versions</p>
         <div class="pair">
-          <p><span class="lv">3</span><s>Students are not allow to use phones in class.</s></p>
-          <p><span class="lv">4</span>Students are not allowed to use phones in class.</p>
+          <p><span class="lv">3</span><s>I did a lot of mistakes, so the teacher told me to calm off.</s></p>
+          <p><span class="lv">4</span>I made a lot of mistakes, so the teacher told me to calm down.</p>
         </div>
-        <p class="cly"><b>CLY:</b> Some lines have no mistake, so don't change a correct line just to be safe.</p>
+        <p class="cly"><b>CLY:</b> Grammar can be perfect and still sound wrong. Learn words in pairs: <em>make a mistake</em>, <em>heavy rain</em>, <em>calm down</em>.</p>
       </aside>
     </section>
   </main>
@@ -157,6 +165,10 @@
 <script src="assets/js/practice-core.js"></script>
 <script src="assets/js/data/grammar-data.js"></script>
 <script src="assets/js/data/grammar-sets.js"></script>
+<script src="assets/js/data/grammar-tense-quiz.js"></script>
+<script src="assets/js/data/grammar-tense-cloze.js"></script>
+<script src="assets/js/data/grammar-verb-cloze.js"></script>
+<script src="assets/js/data/grammar-proofreading.js"></script>
 <script src="assets/js/sets.js"></script>
 <script src="assets/js/grammar.js"></script>
 <script src="assets/js/site.js"></script>

@@ -140,7 +140,7 @@
     bigClue: "ask two questions. When does it happen: past, present or future? Is the action finished, still in progress, or going on up to a certain time? Then find that tense in the Tense Matrix.",
     review: reviewTense,
     reviewHeading: "Tenses to review in the Tense Matrix:",
-    fullMarks: "Full marks! Now try the tenses cloze to use these tenses in a story."
+    fullMarks: "Full marks! Now try the tense cloze to use these tenses in a story."
   };
   var COND_KIT = {
     topicOf: function (q) { return q.conditional; },
@@ -156,6 +156,45 @@
 
   function reviewLink(topic, where, review) {
     return h("button", { type: "button", class: "link-btn", onclick: function () { review(topic); } }, "Review " + topic + " in " + where);
+  }
+
+  // ---------- Practice topics: what each set tests, with one tiny example of the mistake ----------
+
+  // review: the part of the page that teaches it (none for topics this page doesn't teach).
+  // ex uses the proofreading mark: [[wrong>right]].
+  var TOPICS = {
+    "Tenses": { review: "matrix", ex: "I [[have finished>finished]] it yesterday." },
+    "Passive voice": { review: "passive", ex: "The library was [[build>built]] in 2020." },
+    "Gerunds": { review: "gerunds", ex: "I look forward to [[see>seeing]] you." },
+    "To-infinitives": { review: "infinitives", ex: "She decided [[joining>to join]] the club." },
+    "Bare infinitives": { review: "infinitives", ex: "Mum made me [[to tidy>tidy]] my room." },
+    "Conditionals": { review: "condmatrix", ex: "If it [[will rain>rains]], we'll stay home." },
+    "Subject–verb agreement": { ex: "Each of the students [[have>has]] a locker." },
+    "Modal verbs": { ex: "You should have [[went>gone]] earlier." },
+    "Phrasal verbs": { ex: "Take a deep breath and calm [[off>down]]." },
+    "Collocations": { ex: "Everyone [[does>makes]] mistakes." },
+    "Prepositions": { ex: "She is good [[in>at]] maths." },
+    "Word form": { ex: "The concert was a great [[successful>success]]." }
+  };
+  var topicTab = function (focus) { return (TOPICS[focus] && TOPICS[focus].review) || G.FOCUS_TABS[focus]; };
+  // A chip for a topic: it opens the lesson when this page has one, and is plain text when it doesn't.
+  function topicChip(focus) {
+    var tab = topicTab(focus);
+    return h("li", null, tab ? h("button", { type: "button", class: "chip", onclick: function () { CLY.go(tab); } }, focus) : h("span", { class: "chip-plain" }, focus));
+  }
+  function marked(text) {
+    var m = text.match(/^(.*)\[\[([^\]>]*)>([^\]]*)\]\](.*)$/);
+    return m ? [m[1], h("s", null, m[2]), " ", h("strong", null, m[3]), m[4]] : text;
+  }
+  // "Look out for": the topics in this set, never how many of each.
+  function lookout(keys, note) {
+    return h("div", { class: "tip lookout" },
+      h("p", { class: "field-label" }, "Look out for"),
+      h("ul", null, keys.map(function (k) {
+        var t = TOPICS[k] || {};
+        return h("li", null, h("strong", null, k), t.ex ? h("span", null, marked(t.ex)) : null);
+      })),
+      note ? h("p", null, note) : null);
   }
 
   function McQuiz(root, questions, kit) {
@@ -233,15 +272,29 @@
     drawProgress();
   }
 
-  // ---------- Cloze passage (tenses) ----------
+  // ---------- Cloze passages ----------
 
+  // A negative counts in either spelling: "hadn't been told" or "had not been told".
+  var NOT_FORMS = { "won't": "will not", "can't": "cannot", "shan't": "shall not" };
+  function bothNegatives(answer) {
+    var full = answer.replace(/\b(\w+)n't\b/g, function (w, stem) { return NOT_FORMS[w] || stem + " not"; });
+    var forms = [answer, full];
+    if (/\bcannot\b/.test(full)) forms.push(full.replace(/\bcannot\b/, "can not"));
+    return forms;
+  }
+
+  // The tense cloze has a verb bank. A Practice cloze (it has a lookFor list) puts the base verb
+  // beside each blank instead, and the form it needs can be any verb topic, negative or passive.
   function Cloze(root, passage) {
     var blanks = passage.blanks, ids = Object.keys(blanks).map(Number);
+    var practice = !!passage.lookFor;
     var inputs = {}, crossed = {}, showTenses = false;
-    var bank = ids.map(function (id) { return blanks[id].verb; }).concat(passage.distractors)
+    var bank = practice ? [] : ids.map(function (id) { return blanks[id].verb; }).concat(passage.distractors)
       .filter(function (v, i, a) { return a.indexOf(v) === i; }).sort();
+    var accepted = {};
+    ids.forEach(function (id) { accepted[id] = [].concat.apply([], blanks[id].answers.map(bothNegatives)).map(normalise); });
     var tried = function (id) { return !!(inputs[id] || "").trim(); };
-    var checks = new CLY.Checks(ids, function (id) { return blanks[id].answers.indexOf(normalise(inputs[id] || "")) >= 0; }, tried);
+    var checks = new CLY.Checks(ids, function (id) { return accepted[id].indexOf(normalise(inputs[id] || "")) >= 0; }, tried);
     var fields = {}, tags = {}, notes = [];
     var results = h("div", { "aria-live": "polite" });
 
@@ -258,10 +311,11 @@
     var paras = passage.paragraphs.map(function (parts, pi) {
       var p = h("p", null, parts.map(function (part) {
         if (typeof part !== "number") return part;
-        var f = CLY.blank(part, { label: "Blank " + part, oninput: function (e) {
+        var f = CLY.blank(part, { label: "Blank " + part + (practice ? ", verb: " + blanks[part].verb : ""), oninput: function (e) {
           inputs[part] = e.target.value; checks.clearMark(part); f.mark(null); if (checks.checked) drawResults();
         } });
-        tags[part] = h("span", { class: "pos", hidden: true }, "(" + blanks[part].tense + ")");
+        if (practice) f.appendChild(h("span", { class: "base", "aria-hidden": "true" }, "(" + blanks[part].verb + ")"));
+        tags[part] = h("span", { class: "pos", hidden: true }, "(" + (practice ? blanks[part].focus : blanks[part].tense) + ")");
         f.appendChild(tags[part]);
         fields[part] = f;
         return f;
@@ -270,12 +324,13 @@
       return [p, notes[pi].el];
     });
 
+    var hintWord = practice ? "topic" : "tense";
     var tenseBtn = h("button", { type: "button", class: "btn-quiet", "aria-pressed": "false", onclick: function () {
       showTenses = !showTenses;
       tenseBtn.setAttribute("aria-pressed", String(showTenses));
-      tenseBtn.textContent = showTenses ? "Hide tense hints" : "Show tense hints";
+      tenseBtn.textContent = (showTenses ? "Hide " : "Show ") + hintWord + " hints";
       ids.forEach(function (id) { tags[id].hidden = !showTenses; });
-    } }, "Show tense hints");
+    } }, "Show " + hintWord + " hints");
     var checkBtn = h("button", { type: "button", class: "btn", onclick: function () {
       checks.check();
       ids.forEach(function (id) { fields[id].mark(checks.marks[id]); });
@@ -284,6 +339,12 @@
       CLY.scrollTo(results);
     } }, "Check answers");
 
+    function biggerClue(b) {
+      if (!practice) return G.tenseMatrix[b.tense] ? h("span", { class: "more" }, "Bigger clue: you need the ", h("strong", null, b.tense), " (" + G.tenseMatrix[b.tense].formula + "). ", reviewLink(b.tense, "the Tense Matrix", reviewTense)) : null;
+      var tab = topicTab(b.focus);
+      return h("span", { class: "more" }, "Bigger clue: you need the ", h("strong", null, b.form), ". ",
+        tab ? h("button", { type: "button", class: "link-btn", onclick: function () { CLY.go(tab); } }, "Review " + b.focus) : null);
+    }
     function note(id) {
       var b = blanks[id], typed = (inputs[id] || "").trim();
       if (!checks.checked || !typed || checks.marks[id] === true) return null;
@@ -291,7 +352,7 @@
       return h("li", { class: "hint" },
         h("strong", null, id + ". You wrote: ", h("em", null, typed)),
         h("span", { class: "more" }, b.hint || G.GENERIC_TENSE_HINT),
-        checks.tries[id] > 1 && G.tenseMatrix[b.tense] ? h("span", { class: "more" }, "Bigger clue: you need the ", h("strong", null, b.tense), " (" + G.tenseMatrix[b.tense].formula + "). ", reviewLink(b.tense, "the Tense Matrix", reviewTense)) : null);
+        checks.tries[id] > 1 ? biggerClue(b) : null);
     }
     function drawResults() {
       notes.forEach(function (n) { clear(n.el); n.ids.forEach(function (id) { var li = note(id); if (li) n.el.appendChild(li); }); });
@@ -301,13 +362,13 @@
       results.appendChild(CLY.scoreboard({
         fixes: checks.toFix(), untried: checks.untried(),
         label: function (id) { return "blank " + id; },
-        done: "Perfect! You used all " + ids.length + " tenses correctly.",
+        done: practice ? "Perfect! Every verb is in the right form." : "Perfect! Every tense is right.",
         scoreText: "Score: " + right.length + " / " + ids.length,
         next: function () { var id = checks.toFix()[0]; if (id) { CLY.scrollTo(fields[id]); fields[id].input.focus({ preventScroll: true }); } },
         extra: right.length ? h("details", { class: "got-right" }, h("summary", null, "Explanations for the blanks you got right (" + right.length + ")"),
           h("ul", { class: "marks" }, right.map(function (id) {
             var b = blanks[id];
-            return h("li", { class: "do" }, h("strong", null, id + ". " + (inputs[id] || "").trim()), h("span", { class: "meta" }, " (" + b.verb + " → " + b.tense + ")"), h("span", { class: "more" }, b.why));
+            return h("li", { class: "do" }, h("strong", null, id + ". " + (inputs[id] || "").trim()), h("span", { class: "meta" }, " (" + b.verb + " → " + (practice ? b.form : b.tense) + ")"), h("span", { class: "more" }, b.why));
           }))) : null
       }));
     }
@@ -320,7 +381,10 @@
       CLY.scrollTo(root);
     }
 
-    root.appendChild(h("div", { class: "tip" },
+    if (practice) {
+      root.appendChild(h("p", { class: "tagline" }, passage.textType));
+      root.appendChild(lookout(passage.lookFor, "Some verbs need “not” to fit the meaning: (go) → didn't go."));
+    } else root.appendChild(h("div", { class: "tip" },
       h("p", { class: "field-label" }, "Verb bank"),
       chips,
       h("p", null, "Tap a verb to cross it off once you've used it.")));
@@ -497,12 +561,11 @@
 
   function Proofreading(root, passage) {
     var lines = passage.lines, ids = lines.map(function (_, i) { return i; });
-    var answers = {}, editing = null, draft = "", showRef = false, fresh = new CLY.Fresh();
+    var answers = {}, editing = null, draft = "", fresh = new CLY.Fresh();
     var checks = new CLY.Checks(ids, function (i) { return isRightLine(lines[i], answers[i]); }, function (i) { return i in answers; });
     var list = h("ol", { class: "proof" });
     var count = h("p", { class: "count", "aria-live": "polite" });
     var results = h("div", { "aria-live": "polite" });
-    var refBox = h("div", { hidden: true });
     var focusEditor = false;
 
     function setAnswer(i, a) {
@@ -590,8 +653,9 @@
     // What a teacher would say about a line that isn't right yet. The correct word itself is never given.
     function guidance(i) {
       var e = lines[i].error, a = answers[i];
+      var tab = e && topicTab(e.focus);
       var bigger = checks.tries[i] > 1 && e ? h("span", { class: "more" }, "Bigger clue: this line tests ", h("strong", null, e.focus), ", and you need to ", h("strong", null, G.CORRECTION_KIND[e.type]), ". ",
-        h("button", { type: "button", class: "link-btn", onclick: function () { CLY.go(G.FOCUS_TABS[e.focus]); } }, "Review " + e.focus)) : null;
+        tab ? h("button", { type: "button", class: "link-btn", onclick: function () { CLY.go(tab); } }, "Review " + e.focus) : null) : null;
       if (!a) return ["You haven't marked this line yet. Is there a mistake, or is the line correct?", bigger];
       if (!e) return checks.tries[i] > 1 ? ["This line has ", h("strong", null, "no mistake"), ". Tap “No mistake” to mark it as correct."] : "Are you sure? Read the words around your change again. Was the original really wrong?";
       if (a.type === "ok") return ["Look again: there ", h("strong", null, "is"), " a mistake in this line. " + e.hint, bigger];
@@ -611,9 +675,7 @@
         scoreText: "Score: " + right.length + " / " + lines.length,
         next: function () { var i = checks.toFix()[0]; if (i == null) return; var li = list.children[i]; CLY.scrollTo(li); var w = li.querySelector(".word"); if (w) w.focus({ preventScroll: true }); },
         extra: [
-          toReview.length ? [h("p", { class: "field-label" }, "Worth reviewing"), h("ul", { class: "chips" }, toReview.map(function (f) {
-            return h("li", null, h("button", { type: "button", class: "chip", onclick: function () { CLY.go(G.FOCUS_TABS[f]); } }, f));
-          }))] : null,
+          toReview.length ? [h("p", { class: "field-label" }, "Worth reviewing"), h("ul", { class: "chips" }, toReview.map(topicChip))] : null,
           right.length ? h("details", { class: "got-right" }, h("summary", null, "Explanations for the lines you got right (" + right.length + ")"),
             h("ul", { class: "marks" }, right.map(function (i) {
               var e = lines[i].error;
@@ -624,20 +686,6 @@
         ]
       }));
     }
-
-    var refBtn = h("button", { type: "button", class: "btn-quiet", "aria-expanded": "false", onclick: function () {
-      showRef = !showRef; refBox.hidden = !showRef;
-      refBtn.setAttribute("aria-expanded", String(showRef));
-      refBtn.textContent = showRef ? "Hide quick reference" : "Show quick reference";
-    } }, "Show quick reference");
-    refBox.appendChild(h("div", { class: "compare" }, [
-      ["Passive Voice", "passive", ["be + V3 in the right tense", "modal + be + V3", "no passive for happen, occur, arrive, die"]],
-      ["Gerunds", "gerunds", ["V-ing as the subject", "after prepositions (in, at, for, by…)", "after enjoy, avoid, keep, mind, suggest", "look forward to / be used to + V-ing"]],
-      ["To-infinitives", "infinitives", ["to + V1 (never to + V-ing / V2)", "after decide, hope, manage, want", "remind / tell / ask sb + to V1", "make / let sb + V1 (no “to”)"]]
-    ].map(function (r) {
-      return h("div", null, h("p", { class: "field-label" }, r[0]), h("ul", null, r[2].map(function (x) { return h("li", null, x); })),
-        h("p", null, h("button", { type: "button", class: "link-btn", onclick: function () { CLY.go(r[1]); } }, "Open the lesson")));
-    })));
 
     var checkBtn = h("button", { type: "button", class: "btn", onclick: function () {
       editing = null; checks.check(); checkBtn.textContent = "Check again";
@@ -657,8 +705,9 @@
         h("li", null, h("span", { class: "word-wrap" }, h("span", { class: "above" }, "built"), h("span", { class: "word changed" }, "build")), " change a word"),
         h("li", null, "look forward ", h("span", { class: "caret" }, h("b", null, "to"), h("i", null, "^")), " seeing: add a word"),
         h("li", null, "let him ", h("span", { class: "word deleted" }, "to"), " go: delete a word")),
-      h("p", null, "Tap a word to change it, delete it or add a missing word next to it. If a line has no mistake, tap “No mistake”."),
-      refBtn, refBox));
+      h("p", null, "Tap a word to change it, delete it or add a missing word next to it. If a line has no mistake, tap “No mistake”.")));
+    if (passage.textType) root.appendChild(h("p", { class: "tagline" }, passage.textType));
+    if (passage.lookFor) root.appendChild(lookout(passage.lookFor, "Each line has one mistake at most, and some lines are correct."));
     root.appendChild(count);
     root.appendChild(list);
     root.appendChild(h("div", { class: "actions" }, checkBtn, h("button", { type: "button", class: "btn-quiet", onclick: reset }, "Start again")));
@@ -1019,11 +1068,11 @@
     });
   }
 
-  // extra sets are written plainly in grammar-sets.js; proofreading lines are parsed the same way as set 1
+  // extra sets are written plainly in grammar-sets.js and the grammar-*.js data files; proofreading lines are parsed with the [[wrong>right]] mark
   var S = window.CLY_GRAMMAR_SETS || {};
   var more = function (k) { return S[k] || []; };
   var proofPassage = function (p) {
-    return { title: p.title, textType: p.textType, lines: p.lines.map(function (l) {
+    return { title: p.title, textType: p.textType, lookFor: p.lookFor, lines: p.lines.map(function (l) {
       var r = G.parseProofLine(l[0]);
       return { words: r.words, fixed: r.fixed, error: r.error && Object.assign({}, r.error, { focus: l[1], why: l[2], hint: l[3] }) };
     }) };
@@ -1035,12 +1084,13 @@
 
   var mount = {
     matrix: function (el) { widgets.matrix = TenseMatrix(el); },
-    practice: function (el) { Sets(el, "practice", [G.practiceQuestions].concat(more("practice")), howMany, function (b, q) { McQuiz(b, q, TENSE_KIT); }); },
-    cloze: function (el) { Sets(el, "cloze", [G.defaultCloze].concat(more("cloze")), titled, Cloze); },
+    tensequiz: function (el) { Sets(el, "tensequiz", window.CLY_TENSE_QUIZ, howMany, function (b, q) { McQuiz(b, q, TENSE_KIT); }); },
+    tensecloze: function (el) { Sets(el, "tensecloze", window.CLY_TENSE_CLOZE, titled, Cloze); },
+    verbcloze: function (el) { Sets(el, "verbcloze", window.CLY_VERB_CLOZE, titled, Cloze); },
     passive: function (el) { Lesson(el, G.LESSONS.passive); },
     gerunds: function (el) { Lesson(el, G.LESSONS.gerunds); },
     infinitives: function (el) { Lesson(el, G.LESSONS.infinitives); },
-    proofreading: function (el) { Sets(el, "proofreading", [G.defaultProofreading].concat(more("proofreading").map(proofPassage)), titled, Proofreading); },
+    proofreading: function (el) { Sets(el, "proofmix", window.CLY_PROOFREADING.map(proofPassage), titled, Proofreading); },
     condmatrix: function (el) { widgets.condmatrix = ConditionalsMatrix(el); },
     condquiz: function (el) { Sets(el, "condquiz", [G.condQuizQuestions].concat(more("condquiz")), howMany, function (b, q) { McQuiz(b, q, COND_KIT); }); },
     condmatch: function (el) { Sets(el, "condmatch", [G.defaultCondMatch].concat(more("condmatch")), titled, ConditionalMatch); }

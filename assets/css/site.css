@@ -652,6 +652,17 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .blank.right::after { width: 18px; --icon: var(--i-tick); color: var(--do); }
 .blank.wrong::after { width: 18px; --icon: var(--i-cross); color: var(--avoid); }
 .blank .pos { font: italic 0.875rem var(--font-body); color: var(--ink-soft); margin-left: 4px; }
+/* Practice cloze: the base verb sits after the blank, as on the exam paper */
+.blank .base { font: 600 1rem var(--font-body); color: var(--ink-soft); margin-left: 4px; }
+
+/* Practice sets: what to look out for, each topic with one tiny mistake crossed out */
+.lookout ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 10px 24px; margin: 4px 0 12px; padding: 0; list-style: none; }
+.lookout li { display: flex; flex-direction: column; gap: 2px; font-size: 1rem; line-height: 1.4; }
+.lookout li strong { font-family: var(--font-display); }
+.lookout li span { color: var(--ink-soft); }
+.lookout li span strong { font-family: var(--font-body); color: var(--do); }
+.lookout li s { color: var(--avoid); }
+.chip-plain { display: inline-block; font: 600 1rem/1.2 var(--font-display); color: var(--ink); border: 1px solid var(--rule); border-radius: 999px; padding: 7px 14px; }
 
 /* word lists */
 .wordlist { columns: 2 220px; column-gap: 28px; padding: 0; margin: 8px 0 18px; list-style: none; counter-reset: w; }
