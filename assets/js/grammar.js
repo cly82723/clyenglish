@@ -197,9 +197,10 @@
       note ? h("p", null, note) : null);
   }
 
-  function McQuiz(root, questions, kit) {
+  function McQuiz(root, questions, kit, store) {
     // Each answer is marked the moment it's chosen, the way a teacher ticks down the page.
-    var answers = {}, wrong = {}, fresh = new CLY.Fresh();
+    var saved = store && store.get();
+    var answers = (saved && saved.answers) || {}, wrong = (saved && saved.wrong) || {}, fresh = new CLY.Fresh();
     var solved = function (i) { return answers[i] === questions[i].answer; };
     var count = h("p", { class: "count", "aria-live": "polite" });
     var summary = h("div", { "aria-live": "polite" });
@@ -209,6 +210,7 @@
     function choose(i, j) {
       answers[i] = j;
       if (j !== questions[i].answer) (wrong[i] = wrong[i] || []).push(j);
+      if (store) store.set({ answers: answers, wrong: wrong });
       drawQuestion(i); drawProgress(); drawSummary();
     }
     function drawQuestion(i) {
@@ -259,6 +261,7 @@
     }
     function reset() {
       answers = {}; wrong = {}; fresh = new CLY.Fresh();
+      if (store) store.clear();
       questions.forEach(function (q, i) { drawQuestion(i); });
       drawProgress(); drawSummary();
       CLY.scrollTo(root);
@@ -269,23 +272,24 @@
     root.appendChild(summary);
     root.appendChild(actions);
     questions.forEach(function (q, i) { drawQuestion(i); });
-    drawProgress();
+    drawProgress(); drawSummary();
   }
 
   // ---------- Cloze passages ----------
 
-  // A negative counts in either spelling: "hadn't been told" or "had not been told".
+  // A negative counts in any spelling: "hadn't been told", "had not been told", or "hadnt been told",
+  // so a student who knows the tense isn't marked wrong for a missing apostrophe.
   var NOT_FORMS = { "won't": "will not", "can't": "cannot", "shan't": "shall not" };
   function bothNegatives(answer) {
     var full = answer.replace(/\b(\w+)n't\b/g, function (w, stem) { return NOT_FORMS[w] || stem + " not"; });
-    var forms = [answer, full];
+    var forms = [answer, full, answer.replace(/n't\b/g, "nt")];
     if (/\bcannot\b/.test(full)) forms.push(full.replace(/\bcannot\b/, "can not"));
     return forms;
   }
 
   // The tense cloze has a verb bank. A Practice cloze (it has a lookFor list) puts the base verb
   // beside each blank instead, and the form it needs can be any verb topic, negative or passive.
-  function Cloze(root, passage) {
+  function Cloze(root, passage, store) {
     var blanks = passage.blanks, ids = Object.keys(blanks).map(Number);
     var practice = !!passage.lookFor;
     var inputs = {}, crossed = {}, showTenses = false;
@@ -313,6 +317,7 @@
         if (typeof part !== "number") return part;
         var f = CLY.blank(part, { label: "Blank " + part + (practice ? ", verb: " + blanks[part].verb : ""), oninput: function (e) {
           inputs[part] = e.target.value; checks.clearMark(part); f.mark(null); if (checks.checked) drawResults();
+          if (store) store.set(inputs);
         } });
         if (practice) f.appendChild(h("span", { class: "base", "aria-hidden": "true" }, "(" + blanks[part].verb + ")"));
         tags[part] = h("span", { class: "pos", hidden: true }, "(" + (practice ? blanks[part].focus : blanks[part].tense) + ")");
@@ -323,6 +328,8 @@
       notes[pi] = { ids: parts.filter(function (x) { return typeof x === "number"; }), el: h("ul", { class: "marks para-notes", "aria-live": "polite" }) };
       return [p, notes[pi].el];
     });
+    var saved = store && store.get();
+    if (saved) ids.forEach(function (id) { if (saved[id]) { inputs[id] = saved[id]; fields[id].input.value = saved[id]; } });
 
     var hintWord = practice ? "topic" : "tense";
     var tenseBtn = h("button", { type: "button", class: "btn-quiet", "aria-pressed": "false", onclick: function () {
@@ -374,6 +381,7 @@
     }
     function reset() {
       inputs = {}; crossed = {}; checks.reset();
+      if (store) store.clear();
       ids.forEach(function (id) { fields[id].input.value = ""; fields[id].mark(null); });
       chips.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("used"); c.setAttribute("aria-pressed", "false"); });
       checkBtn.textContent = "Check answers";
@@ -559,9 +567,27 @@
   // A line is right when the student's one mark turns it into the corrected line, so an equally good fix also counts.
   var isRightLine = function (line, a) { return !!a && sameWords(G.applyMark(line.words, a), line.fixed); };
 
-  function Proofreading(root, passage) {
+  function Proofreading(root, passage, store) {
     var lines = passage.lines, ids = lines.map(function (_, i) { return i; });
-    var answers = {}, editing = null, draft = "", fresh = new CLY.Fresh();
+    var answers = (store && store.get()) || {}, editing = null, draft = "", fresh = new CLY.Fresh();
+    // Keyboard: each line is one Tab stop; arrow keys move between its words (← →) and between lines (↑ ↓).
+    var cursor = {}, focusKey = null;
+    var cursorAt = function (i) { return Math.min(cursor[i] || 0, lines[i].words.length - 1); };
+    function moveTo(i, at) {
+      if (i < 0 || i >= lines.length) return;
+      at = Math.max(0, Math.min(at, lines[i].words.length - 1));
+      var b = list.querySelector("[data-key='" + i + "-" + at + "']");
+      if (!b || b.disabled) return;
+      var old = list.querySelector("[data-key='" + i + "-" + cursorAt(i) + "']");
+      if (old) old.setAttribute("tabindex", "-1");
+      cursor[i] = at; b.setAttribute("tabindex", "0"); b.focus();
+    }
+    function wordKeys(e, i, at) {
+      var to = { ArrowRight: [i, at + 1], ArrowLeft: [i, at - 1], ArrowDown: [i + 1, at], ArrowUp: [i - 1, at], Home: [i, 0], End: [i, Infinity] }[e.key];
+      if (!to) return;
+      e.preventDefault();
+      moveTo(to[0], to[1]);
+    }
     var checks = new CLY.Checks(ids, function (i) { return isRightLine(lines[i], answers[i]); }, function (i) { return i in answers; });
     var list = h("ol", { class: "proof" });
     var count = h("p", { class: "count", "aria-live": "polite" });
@@ -570,7 +596,10 @@
 
     function setAnswer(i, a) {
       if (a) answers[i] = a; else delete answers[i];
+      if (store) store.set(answers);
       checks.clearMark(i);
+      // after a fix from the editor, keyboard focus goes back to the word that was fixed
+      if (editing && editing.line === i) { cursor[i] = Math.min(editing.at, lines[i].words.length - 1); focusKey = i + "-" + cursor[i]; }
       editing = null; draft = "";
       drawLines(); if (checks.checked) drawResults();
     }
@@ -596,13 +625,14 @@
         words.push(h("span", { class: "word-wrap" },
           mine && a.type === "replace" ? h("span", { class: "above" }, a.word) : null,
           h("button", { type: "button", class: "word" + (selected ? " editing" : "") + (mine ? (a.type === "delete" ? " deleted" : " changed") : ""), "data-key": i + "-" + at, disabled: locked,
+            tabindex: at === cursorAt(i) ? "0" : "-1", onkeydown: function (e) { wordKeys(e, i, at); },
             "aria-label": "Line " + (i + 1) + ", word " + (at + 1) + ": " + w + (mine ? (a.type === "delete" ? " (deleted)" : " (changed to " + a.word + ")") : ""),
             onclick: function () { openWord(i, at); } }, w)), " ");
       });
       words.push(caret(line.words.length));
       var ok = a && a.type === "ok";
       var mark = i in checks.marks ? (checks.marks[i] ? "right" : "wrong") : "";
-      var li = h("li", { class: mark + (fresh.is(i, mark) ? " fresh" : "") },
+      var li = h("li", { class: mark + (fresh.is(i, mark) ? " fresh" : ""), role: "group", "aria-label": "Line " + (i + 1) },
         h("div", { class: "proof-row" },
           h("div", { class: "proof-text" }, words),
           h("button", { type: "button", class: "ok-btn", "data-key": "ok" + i, disabled: locked, "aria-pressed": String(!!ok), onclick: function () { setAnswer(i, ok ? null : { type: "ok" }); } }, "No mistake")));
@@ -628,7 +658,7 @@
         oninput: function (e) { draft = e.target.value; sync(); },
         onkeydown: function (e) {
           if (e.key === "Enter" && valid()) setAnswer(i, { type: "replace", at: at, word: typed() });
-          if (e.key === "Escape") { editing = null; drawLines(); }
+          if (e.key === "Escape") { focusKey = i + "-" + at; editing = null; drawLines(); }
         } });
       var box = h("div", { class: "editor" },
         h("p", null, "Fix a mistake near ", h("strong", null, "“" + plain + "”"), ". To change it or add a word, type the word first, then choose. To remove “" + plain + "”, just tap Delete."),
@@ -648,6 +678,11 @@
       redraw(list, function (el) { ids.forEach(function (i) { el.appendChild(drawLine(i)); }); });
       count.textContent = "Lines marked: " + Object.keys(answers).length + " / " + lines.length;
       if (focusEditor) { var inp = list.querySelector(".editor input"); if (inp) inp.focus(); focusEditor = false; }
+      else if (focusKey) {
+        var back = list.querySelector("[data-key='" + focusKey + "']") || list.querySelector("[data-key='ok" + focusKey.split("-")[0] + "']");
+        if (back && !back.disabled) back.focus();
+        focusKey = null;
+      }
     }
 
     // What a teacher would say about a line that isn't right yet. The correct word itself is never given.
@@ -693,6 +728,7 @@
     } }, "Check answers");
     function reset() {
       answers = {}; editing = null; draft = ""; checks.reset(); fresh = new CLY.Fresh(); checkBtn.textContent = "Check answers";
+      if (store) store.clear();
       drawLines(); drawResults(); CLY.scrollTo(root);
     }
 
@@ -1043,8 +1079,19 @@
 
   // Five squares above the exercise, one per set (sets.js). Each set is drawn the first time it opens
   // and then kept, so a student can switch between sets without losing any answers.
+  // Each set keeps its own answers in this browser, so a phone that reloads the tab between classes
+  // gives the student back what they typed. "Start again" clears them.
+  function answerStore(name, i) {
+    var key = "cly:answers:grammar:" + name + ":" + i;
+    return {
+      get: function () { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } },
+      set: function (v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* storage blocked: answers last until the tab closes */ } },
+      clear: function () { try { localStorage.removeItem(key); } catch (e) { /* nothing stored */ } }
+    };
+  }
+
   function Sets(root, name, sets, titleOf, render) {
-    if (sets.length < 2 || !window.CLYSets) { render(root, sets[0]); return; }
+    if (sets.length < 2 || !window.CLYSets) { render(root, sets[0], answerStore(name, 0)); return; }
     var bodies = [];
     var started = function (body) {
       var typed = Array.prototype.some.call(body.querySelectorAll("input"), function (i) { return !!i.value.trim(); });
@@ -1058,7 +1105,7 @@
       panels: function (i) {
         var body = bodies[i] = h("div", { class: "set-panel" });
         root.appendChild(body);
-        render(body, sets[i]);
+        render(body, sets[i], answerStore(name, i));
         return body;
       },
       state: function (i) {
@@ -1084,7 +1131,7 @@
 
   var mount = {
     matrix: function (el) { widgets.matrix = TenseMatrix(el); },
-    tensequiz: function (el) { Sets(el, "tensequiz", window.CLY_TENSE_QUIZ, howMany, function (b, q) { McQuiz(b, q, TENSE_KIT); }); },
+    tensequiz: function (el) { Sets(el, "tensequiz", window.CLY_TENSE_QUIZ, howMany, function (b, q, store) { McQuiz(b, q, TENSE_KIT, store); }); },
     tensecloze: function (el) { Sets(el, "tensecloze", window.CLY_TENSE_CLOZE, titled, Cloze); },
     verbcloze: function (el) { Sets(el, "verbcloze", window.CLY_VERB_CLOZE, titled, Cloze); },
     passive: function (el) { Lesson(el, G.LESSONS.passive); },
@@ -1092,7 +1139,7 @@
     infinitives: function (el) { Lesson(el, G.LESSONS.infinitives); },
     proofreading: function (el) { Sets(el, "proofmix", window.CLY_PROOFREADING.map(proofPassage), titled, Proofreading); },
     condmatrix: function (el) { widgets.condmatrix = ConditionalsMatrix(el); },
-    condquiz: function (el) { Sets(el, "condquiz", [G.condQuizQuestions].concat(more("condquiz")), howMany, function (b, q) { McQuiz(b, q, COND_KIT); }); },
+    condquiz: function (el) { Sets(el, "condquiz", [G.condQuizQuestions].concat(more("condquiz")), howMany, function (b, q, store) { McQuiz(b, q, COND_KIT, store); }); },
     condmatch: function (el) { Sets(el, "condmatch", [G.defaultCondMatch].concat(more("condmatch")), titled, ConditionalMatch); }
   };
   document.querySelectorAll("[data-grammar]").forEach(function (el) {

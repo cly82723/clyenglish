@@ -116,10 +116,14 @@
       });
       var active = links.filter(function (a) { return a.getAttribute("aria-current"); })[0];
       nameToggle(active);
-      // the label panel is the page's cover: on a phone it shows on the first section only
+      // the label panel is the page's cover: it shows on the first section only
       sheet.toggleAttribute("data-later", target !== sections[0]);
       if (active && active.scrollIntoView && window.innerWidth <= 760) {
         active.scrollIntoView({ block: "nearest", inline: "center", behavior: reduceMotion ? "auto" : "smooth" });
+      } else if (active) {
+        // a contents list taller than the window scrolls inside itself, so keep the open item in view there
+        var list = active.closest("ol, ul");
+        if (list && list.scrollHeight > list.clientHeight) list.scrollTop = Math.max(0, active.offsetTop - list.clientHeight / 2);
       }
       if (scroll && part) {
         var at = part.getBoundingClientRect().top + window.scrollY - 80;

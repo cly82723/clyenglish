@@ -182,7 +182,7 @@ a.ext::after {
   color: var(--sky);
   margin: 0 0 14px;
 }
-.index ol, .index ul { list-style: none; margin: 0; padding: 0; position: sticky; top: 20px; }
+.index ol, .index ul { list-style: none; margin: 0; padding: 0; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain; }
 .index li + li { margin-top: 2px; }
 .index a {
   display: block;
@@ -1255,7 +1255,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   }
   .index-title { display: none; }
   .index ol, .index ul {
-    position: static; display: flex; gap: 6px; overflow-x: auto; padding: 0 var(--gutter);
+    position: static; max-height: none; display: flex; gap: 6px; overflow-x: auto; padding: 0 var(--gutter);
     scrollbar-width: none;
   }
   .index ol::-webkit-scrollbar, .index ul::-webkit-scrollbar { display: none; }
@@ -1533,7 +1533,6 @@ body:has(.hub) .back-cover { max-width: 1040px; }
   .js .index[data-collapse]:not(.open) ol { display: none; }
   .js .index[data-collapse] ol { padding: 10px 0 2px; }
   .index[data-collapse].open ol { animation: rise 0.2s var(--ease-out); }
-  .js [data-tabs][data-later] .column > .label { display: none; }
 }
 @media (max-width: 760px) and (prefers-reduced-motion: reduce) {
   .index[data-collapse].open ol { animation: none; }
@@ -1664,3 +1663,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 
 /* a paragraph's notes sit on the passage itself, under a dashed rule, not in a box of their own */
 .passage .para-notes { background: none; border-radius: 0; padding: 10px 0 2px; border-top: 1px dashed var(--rule-dash); }
+
+/* ---------- The page's cover (label panel, and the toolkit's note) shows on the first section only ---------- */
+.js [data-tabs][data-later] .column > .label,
+.js [data-tabs][data-later] .column > p.tip { display: none; }

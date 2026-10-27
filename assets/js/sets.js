@@ -98,6 +98,8 @@
     root.addEventListener("click", soon);
     if (window.MutationObserver) new MutationObserver(soon).observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "aria-pressed"] });
 
+    // sets that are already on the page (not made on first opening) are all taken in now, so the closed ones hide
+    if (Array.isArray(o.panels)) o.panels.forEach(function (p, i) { panel(i); });
     open(at, false);
     return { refresh: refresh };
   };

@@ -13,7 +13,7 @@
   var an = function (word) { return (/^[aeiou]/i.test(word) ? "an " : "a ") + word; };
   var samePos = function (a, b) { return baseTypes(a).some(function (t) { return baseTypes(b).indexOf(t) >= 0; }); };
 
-  function VocabCloze(root, grade, passage) {
+  function VocabCloze(root, grade, passage, store) {
     var g = V.GRADES.filter(function (x) { return x.id === grade; })[0];
     var units = V.vocabLists[grade].units;
     var allWords = Object.keys(units).reduce(function (a, k) { return a.concat(units[k]); }, []);
@@ -49,6 +49,11 @@
         .filter(function (f) { return f.pos && normalise(f.form).split(" ").length === v.split(" ").length && v.indexOf(stem(f.form)) === 0; })
         .sort(function (x, y) { return stem(y.form).length - stem(x.form).length; })[0] || null;
     };
+    // What the student typed, quoted back as typed: the given letter is only shown as context, never glued on.
+    var asTyped = function (id) {
+      var v = (inputs[id] || "").trim(), b = blanks[id];
+      return v[0] && v[0].toLowerCase() !== b.letter ? [v, h("span", { class: "meta" }, " (after the given “" + b.letter + "”)")] : v;
+    };
     var tried = function (id) { return !!(inputs[id] || "").trim(); };
     var checks = new CLY.Checks(ids, isCorrect, tried);
 
@@ -60,7 +65,10 @@
         var b = blanks[part];
         var f = CLY.blank(part, {
           given: b.letter, label: "Blank " + part + ", starts with " + b.letter,
-          oninput: function (e) { inputs[part] = e.target.value; checks.clearMark(part); f.mark(null); if (checks.checked) renderResults(); }
+          oninput: function (e) {
+            inputs[part] = e.target.value; checks.clearMark(part); f.mark(null); if (checks.checked) renderResults();
+            if (store) store.set(inputs);
+          }
         });
         posTags[part] = h("span", { class: "pos", hidden: !showPos }, info(b).pos ? "(" + info(b).pos + ")" : "");
         f.appendChild(posTags[part]);
@@ -70,6 +78,8 @@
       notes[pi] = { ids: parts.filter(function (x) { return typeof x === "number"; }), el: h("ul", { class: "marks para-notes", "aria-live": "polite" }) };
       return [p, notes[pi].el];
     });
+    var saved = store && store.get();
+    if (saved) ids.forEach(function (id) { if (saved[id]) { inputs[id] = saved[id]; fields[id].input.value = saved[id]; } });
 
     var hintBtn = showPos ? null : h("button", { type: "button", class: "btn-quiet", "aria-pressed": "false", onclick: function () {
       showHints = !showHints;
@@ -109,13 +119,13 @@
       if (!(id in checks.marks)) return h("li", { class: "pending" }, "(" + id + ") Changed. Press “Check again” to mark it.");
       var form = wordForm(id);
       if (form) return h("li", { class: "hint" },
-        h("strong", null, "(" + id + ") You wrote: ", h("em", null, fullAnswer(id))),
+        h("strong", null, "(" + id + ") You wrote: ", h("em", null, asTyped(id))),
         b.pos && !samePos(form.pos, b.pos)
           ? h("span", { class: "more" }, "You've chosen the right word, but you need to ", h("strong", null, "change the part of speech"), ". You've written " + an(form.pos) + ", but the words around this blank need " + an(b.pos).split(" ")[0] + " ", h("strong", null, b.pos), ".", b.formNote ? h("span", { class: "more" }, b.formNote) : null)
           : h("span", { class: "more" }, "You've chosen the right word and the right part of speech. Now check its form: does it need a different tense, a plural, or an -ing ending?")
       );
       return h("li", { class: "hint" },
-        h("strong", null, "(" + id + ") You wrote: ", h("em", null, fullAnswer(id))),
+        h("strong", null, "(" + id + ") You wrote: ", h("em", null, asTyped(id))),
         b.clue ? h("span", { class: "more" }, "Read the passage again: " + b.clue) : null,
         checks.tries[id] > 1 ? h("span", { class: "more" },
           "Bigger clue: you need ", b.pos ? [an(b.pos).split(" ")[0] + " ", h("strong", null, b.pos)] : "a word", " from the list",
@@ -154,6 +164,7 @@
 
     function reset() {
       inputs = {}; checks.reset();
+      if (store) store.clear();
       ids.forEach(function (id) { fields[id].input.value = ""; fields[id].mark(null); });
       checkBtn.textContent = "Check answers";
       renderResults();
@@ -163,7 +174,9 @@
     root.appendChild(h("div", { class: "tip" },
       h("p", { class: "field-label" }, "Instructions"),
       h("p", null, "Fill in each blank using ", h("strong", null, "one"), " appropriate word or phrase from the ", h("strong", null, g.source), ". Change the form if necessary. The first letter of the word or phrase is given."),
-      changedCount ? h("p", null, h("strong", null, changedCount), " of the blanks need a ", h("strong", null, "different part of speech"), " from the one on the list (check the Parts of Speech tables on your worksheet). Look at the words around each blank to decide.") : null
+      changedCount ? h("details", null,
+        h("summary", null, changedCount + " blanks need a different part of speech"),
+        h("p", null, "The word is on the list, but in a different form (check the Parts of Speech tables on your worksheet). Look at the words around each blank to decide.")) : null
     ));
     root.appendChild(h("div", { class: "passage" }, h("h3", null, passage.title), para));
     root.appendChild(h("div", { class: "actions" }, checkBtn, hintBtn, listBtn, h("button", { type: "button", class: "btn-quiet", onclick: reset }, "Start again")));
@@ -182,16 +195,26 @@
     var count = h("p", { class: "count", "aria-live": "polite" });
     var nextBtn = h("button", { type: "button", class: "btn-quiet", onclick: function () {
       if (current && current.unfinished() && !window.confirm("Start another passage? Your answers in this one will be cleared.")) return;
+      store(n).clear();
       show((n + 1) % passages.length, true);
     } }, "Try another passage");
     var body = h("div");
+    // Typed answers stay in this browser until the student starts again or moves on, so a reloaded tab keeps them.
+    function store(i) {
+      var k = "cly:answers:vocab:" + grade + ":" + i;
+      return {
+        get: function () { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+        set: function (v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage blocked: answers last until the tab closes */ } },
+        clear: function () { try { localStorage.removeItem(k); } catch (e) { /* nothing stored */ } }
+      };
+    }
 
     function show(i, focus) {
       n = i;
       try { localStorage.setItem(key, String(n)); } catch (e) { /* storage blocked: just don't remember it */ }
       count.textContent = "Passage " + (n + 1) + " of " + passages.length + ": " + passages[n].title;
       clear(body);
-      current = VocabCloze(body, grade, passages[n]);
+      current = VocabCloze(body, grade, passages[n], store(n));
       if (focus) { CLY.scrollTo(root); var first = body.querySelector(".blank input"); if (first) first.focus({ preventScroll: true }); }
     }
 
