@@ -23,6 +23,7 @@
       return h("p", null, parts.map(function (part) {
         if (typeof part !== "number") return part;
         var f = CLY.blank(part, { label: "Blank " + part, oninput: function (e) { answers[part] = e.target.value; changed(); } });
+        f.input.id = f.input.name = "blank-" + part;
         if (answers[part]) f.input.value = answers[part];
         return f;
       }));
@@ -31,8 +32,8 @@
       el: [h("div", { class: "tip" },
         h("p", { class: "field-label" }, "Verb box"), bank,
         h("p", null, "Tap a verb to cross it off once you've used it.")), passage],
-      empty: empty,
-      progress: function () { return (blanks - empty()) + " / " + blanks + " filled"; }
+      progress: function () { return (blanks - empty()) + " / " + blanks + " filled"; },
+      handInNote: function () { var n = empty(); return n ? n + (n === 1 ? " blank is" : " blanks are") + " still empty." : "Every blank is filled."; }
     };
     function empty() {
       return ch.paragraphs.reduce(function (n, parts) {
@@ -47,7 +48,6 @@
   function proofSheet(ch, answers, changed) {
     var lines = ch.lines, editing = null, draft = "", cursor = {};
     var list = h("ol", { class: "proof" });
-    var count = h("p", { class: "count", "aria-live": "polite" });
     var cursorAt = function (i) { return Math.min(cursor[i] || 0, lines[i].length - 1); };
     var wordButton = function (i, at) { return list.querySelector("[data-key='" + i + "-" + at + "']"); };
 
@@ -111,12 +111,19 @@
 
     function editor(i) {
       var at = editing.at, plain = lines[i][at].replace(/[.,!?;:"]/g, "");
-      var buttons = [];
-      var mk = function (text, act) { var b = h("button", { type: "button", class: "chip", onclick: act }, text); buttons.push(b); return b; };
-      var warn = h("p", { class: "warn", hidden: true }, "Type just one word. A correction is always a single word.");
+      var mk = function (text, act) { return h("button", { type: "button", class: "chip", onclick: act }, text); };
+      var warn = h("p", { class: "warn", role: "alert" });
       var typed = function () { return draft.trim(); };
       var valid = function () { return !!typed() && !/\s/.test(typed()); };
-      var sync = function () { buttons.slice(0, 3).forEach(function (b) { b.disabled = !valid(); }); warn.hidden = !/\s/.test(typed()); };
+      var sync = function () { warn.textContent = /\s/.test(typed()) ? "Type just one word. A correction is always a single word." : ""; };
+      // Change and Add always respond: with no word typed yet, they say so and put the cursor in the box.
+      var withWord = function (make) {
+        return function () {
+          if (valid()) return setAnswer(i, make(typed()));
+          warn.textContent = typed() ? "Type just one word. A correction is always a single word." : "Type the word first, then choose.";
+          input.focus();
+        };
+      };
       var close = function () { editing = null; draw(i); moveTo(i, at); };
       var input = h("input", { "aria-label": "Correction", autocomplete: "off", autocapitalize: "off", spellcheck: "false", placeholder: "one word", value: draft,
         oninput: function (e) { draft = e.target.value; sync(); },
@@ -125,11 +132,11 @@
           if (e.key === "Escape") close();
         } });
       var box = h("div", { class: "editor" },
-        h("p", null, "Fix a mistake near ", h("strong", null, "“" + plain + "”"), ". To change it or add a word, type the word first, then choose. To remove “" + plain + "”, just tap Delete."),
+        h("p", null, "Type a word, then choose what to do. To remove ", h("strong", null, "“" + plain + "”"), ", tap Delete."),
         h("div", { class: "row" }, input,
-          mk("Change “" + plain + "” to my word", function () { setAnswer(i, { type: "replace", at: at, word: typed() }); }),
-          mk("Add before “" + plain + "”", function () { setAnswer(i, { type: "insert", at: at, word: typed() }); }),
-          mk("Add after “" + plain + "”", function () { setAnswer(i, { type: "insert", at: at + 1, word: typed() }); }),
+          mk("Change “" + plain + "” to my word", withWord(function (w) { return { type: "replace", at: at, word: w }; })),
+          mk("Add before “" + plain + "”", withWord(function (w) { return { type: "insert", at: at, word: w }; })),
+          mk("Add after “" + plain + "”", withWord(function (w) { return { type: "insert", at: at + 1, word: w }; })),
           mk("Delete “" + plain + "”", function () { setAnswer(i, { type: "delete", at: at }); }),
           mk("Cancel", close)),
         warn);
@@ -140,21 +147,25 @@
     function draw(i) {
       var li = lineEl(i);
       if (list.children[i]) list.replaceChild(li, list.children[i]); else list.appendChild(li);
-      count.textContent = "Lines marked: " + Object.keys(answers).length + " / " + lines.length;
     }
     lines.forEach(function (_, i) { draw(i); });
+    var marked = function () { return Object.keys(answers).length; };
+
+    // The key is open until a student has seen it once here or in the practice proofreading, which shares the note.
+    var seenKey = false;
+    try { seenKey = !!localStorage.getItem("cly:proof-key"); localStorage.setItem("cly:proof-key", "1"); } catch (e) { seenKey = false; }
 
     return {
-      el: [h("details", { class: "tip proof-help", open: true },
+      el: [h("details", { class: "tip proof-help", open: !seenKey },
         h("summary", { class: "field-label" }, "How to mark a line"),
         h("ul", { class: "proof-key" },
           h("li", null, h("span", { class: "word-wrap" }, h("span", { class: "above" }, "built"), h("span", { class: "word changed" }, "build")), " change a word"),
           h("li", null, "look forward ", h("span", { class: "caret" }, h("b", null, "to"), h("i", null, "^")), " seeing: add a word"),
           h("li", null, "let him ", h("span", { class: "word deleted" }, "to"), " go: delete a word")),
         h("p", null, "Tap a word to change it, delete it or add a missing word next to it. Leave a correct line as it is.")),
-        count, list],
-      empty: function () { return 0; },
-      progress: function () { return plural(Object.keys(answers).length, "line") + " marked"; }
+        list],
+      progress: function () { return plural(marked(), "line") + " marked"; },
+      handInNote: function () { return "You've marked " + marked() + " of " + lines.length + " lines. Lines you leave alone count as correct."; }
     };
   }
 
@@ -162,9 +173,11 @@
 
   var tick = function (ok) { return h("span", { class: "visually-hidden" }, ok ? "Right: " : "Wrong: "); };
 
+  // Each paragraph is followed by why its own blanks are right, so the reason sits next to the mark.
   function clozeReview(ch, answers, right) {
-    var passage = h("div", { class: "passage review" }, ch.paragraphs.map(function (parts) {
-      return h("p", null, parts.map(function (part) {
+    return h("div", { class: "passage review" }, ch.paragraphs.map(function (parts) {
+      var ids = parts.filter(function (p) { return typeof p === "number"; });
+      var p = h("p", null, parts.map(function (part) {
         if (typeof part !== "number") return part;
         var ok = right[part], typed = String(answers[part] || "").trim();
         return h("span", { class: "answer " + (ok ? "right" : "wrong") },
@@ -172,14 +185,21 @@
           typed ? (ok ? h("span", null, typed) : h("s", null, typed)) : h("span", { class: "none" }, "(empty)"),
           ok ? null : h("strong", { class: "fix" }, ch.blanks[part].answers[0]));
       }));
+      var notes = ids.length ? h("ul", { class: "marks para-notes" }, ids.map(function (id) {
+        var b = ch.blanks[id];
+        return h("li", { class: right[id] ? "do" : "avoid" },
+          h("strong", null, id + ". " + b.answers[0]), h("span", { class: "meta" }, " (" + b.verb + ")"),
+          b.why ? h("span", { class: "more" }, b.why) : null);
+      })) : null;
+      return [p, notes];
     }));
-    var notes = h("ul", { class: "marks" }, Object.keys(ch.blanks).map(function (id) {
-      var b = ch.blanks[id];
-      return h("li", { class: right[id] ? "do" : "avoid" },
-        h("strong", null, id + ". " + b.answers[0]), h("span", { class: "meta" }, " (" + b.verb + ")"),
-        b.why ? h("span", { class: "more" }, b.why) : null);
-    }));
-    return [passage, h("h3", null, "Why each answer is right"), notes];
+  }
+
+  // The grammar topics of the proofreading lines a student got wrong (cloze blanks carry no topic).
+  function missedTopics(ch, right) {
+    if (ch.format === "cloze") return [];
+    return ch.lines.filter(function (l, i) { return !right[i] && l[1]; }).map(function (l) { return l[1]; })
+      .filter(function (t, i, all) { return all.indexOf(t) === i; });
   }
 
   function fixText(line) {
@@ -211,6 +231,7 @@
 
   window.CLY_PAPERS = {
     sheet: function (ch, answers, changed) { return ch.format === "cloze" ? clozeSheet(ch, answers, changed) : proofSheet(ch, answers, changed); },
-    review: function (ch, answers, right) { return ch.format === "cloze" ? clozeReview(ch, answers, right) : proofReview(ch, answers, right); }
+    review: function (ch, answers, right) { return ch.format === "cloze" ? clozeReview(ch, answers, right) : proofReview(ch, answers, right); },
+    missedTopics: missedTopics
   };
 })();

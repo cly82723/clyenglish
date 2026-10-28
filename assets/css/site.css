@@ -582,6 +582,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 @media (hover: hover) { .chip:hover { background: var(--chest); } }
 .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .chip.used { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--avoid); text-decoration-thickness: 2px; background: var(--paper); }
+.chip:disabled { cursor: not-allowed; opacity: 0.45; } /* a chip that can't be pressed yet must look it */
 
 /* multiple choice */
 .question { padding: 22px 0; border-bottom: 1px solid var(--rule); }

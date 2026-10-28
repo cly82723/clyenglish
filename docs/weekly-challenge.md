@@ -26,8 +26,8 @@ Agreed with the user on 2026-10-28. This is the spec for the S.4 weekly grammar 
 
 ## What students see
 
-- A live weekly board showing class-number (e.g. "4C-12"), score and time.
-- The season league table.
+- A live weekly board showing the top three places by class-number (e.g. "4C-12"), score and time, plus the student's own row, and how many took part. Other students' scores are never shown (changed 2026-10-28, so weaker students aren't exposed).
+- The season league table: everyone with points, plus the student's own row.
 - Their own personal best and weekly rank, visible only to them.
 - During the week they see only their score. Answers and explanations appear after the week closes.
 

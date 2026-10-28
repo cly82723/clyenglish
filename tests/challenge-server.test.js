@@ -221,6 +221,12 @@ test("weekly board ranks by score then time, and shows labels not emails", () =>
   const b = s.call("a@kings.edu.hk", "board").data.thisWeek.rows;
   assert.deepStrictEqual(b.map(r => [r.label, r.place, r.points, r.you]), [["4B-2", 1, 3, false], ["4A-1", 2, 2, true], ["4C-3", 3, 1, false]]);
   assert.ok(!JSON.stringify(b).includes("@"));
+  // A fourth student's score is shown only to them; classmates just see that four took part.
+  play("d@kings.edu.hk", "4D", 4, {}, 50);
+  const seenByA = s.call("a@kings.edu.hk", "board").data.thisWeek;
+  assert.deepStrictEqual([seenByA.entrants, seenByA.rows.map(r => r.label)], [4, ["4B-2", "4A-1", "4C-3"]]);
+  assert.deepStrictEqual(s.call("d@kings.edu.hk", "board").data.thisWeek.rows.map(r => [r.label, r.you]),
+    [["4B-2", false], ["4A-1", false], ["4C-3", false], ["4D-4", true]]);
 });
 
 test("league counts closed weeks only; disqualified attempts drop out", () => {

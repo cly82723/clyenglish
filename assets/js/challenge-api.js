@@ -63,7 +63,7 @@
       if (!r.ok) throw new Error(r.status);
       return r.text();
     }).then(function (src) {
-      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs };")();
+      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows };")();
     }).catch(function () { throw { message: "Test mode couldn't load the marking rules. Open the page from the website or a local server, not as a file." }; });
   }
 
@@ -158,12 +158,14 @@
       },
       board: function () {
         finishIfExpired();
-        var rows = ranked().map(boardRow);
-        return st.closed ? { thisWeek: { id: week(), rows: [] }, lastWeek: { id: week(), rows: rows } } : { thisWeek: { id: week(), rows: rows }, lastWeek: { id: "", rows: [] } };
+        var all = ranked();
+        var shown = { id: week(), entrants: all.length, rows: rules.visibleRows(all, ME.key).map(boardRow) };
+        var none = { id: week(), entrants: 0, rows: [] };
+        return st.closed ? { thisWeek: none, lastWeek: shown } : { thisWeek: shown, lastWeek: none };
       },
       league: function () {
-        if (!st.closed) return { weeks: 0, rows: [] };
-        return { weeks: 1, rows: ranked().map(function (r) {
+        if (!st.closed) return { weeks: 0, entrants: 0, rows: [] };
+        return { weeks: 1, entrants: ranked().length, rows: rules.visibleRows(ranked(), ME.key).map(function (r) {
           return { label: r.key, points: r.points, played: 1, firsts: r.place === 1 ? 1 : 0, seconds: r.place === 2 ? 1 : 0, thirds: r.place === 3 ? 1 : 0, place: r.place, you: r.key === ME.key };
         }) };
       },

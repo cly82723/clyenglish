@@ -158,8 +158,14 @@ function leagueTable(weeks) {
 // Time taken counts from the server's start time and never beyond the limit.
 function timeTaken(startedMs, submittedMs, limitMs) { return Math.max(0, Math.min(submittedMs - startedMs, limitMs)); }
 
+// What a student may see of a ranked list: the places that earn points, and their own row.
+// Everyone else only counts towards "N took part", so a low score is never shown to classmates.
+function visibleRows(ranked, myKey) {
+  return ranked.filter(function (r) { return r.points > 0 || r.key === myKey; });
+}
+
 if (typeof module !== "undefined") {
   module.exports = { weekId: weekId, weekStartMs: weekStartMs, weekEndMs: weekEndMs, isClosed: isClosed, formatDue: formatDue,
     normalise: normalise, markCloze: markCloze, markProofreading: markProofreading, mark: mark, publicChallenge: publicChallenge,
-    rankWeek: rankWeek, leagueTable: leagueTable, timeTaken: timeTaken, parseProofLine: parseProofLine };
+    rankWeek: rankWeek, leagueTable: leagueTable, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows };
 }

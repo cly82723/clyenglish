@@ -91,21 +91,23 @@ function submit(user, body, nowMs) {
   return { score: Number(done.Score), outOf: 15, timeSec: Number(done["Time (s)"]) };
 }
 
-// This week's board so far, and last week's final one.
+// This week's board so far, and last week's final one: the top three places and the student's own row.
 function board(user, body, nowMs) {
   var sn = season(nowMs), week = weekId(nowMs), last = weekId(weekStartMs(week) - 1);
   var byEmail = labels();
   var show = function (w) {
-    return inSeason(sn, w) ? rankingFor(w, sn, nowMs, byEmail).map(function (r) { return publicRow(r, byEmail, user.email); }) : [];
+    var ranked = inSeason(sn, w) ? rankingFor(w, sn, nowMs, byEmail) : [];
+    return { id: w, entrants: ranked.length, rows: visibleRows(ranked, user.email).map(function (r) { return publicRow(r, byEmail, user.email); }) };
   };
-  return { thisWeek: { id: week, rows: show(week) }, lastWeek: { id: last, rows: show(last) } };
+  return { thisWeek: show(week), lastWeek: show(last) };
 }
 
-// The season table: points from closed weeks only.
+// The season table: points from closed weeks only, for students with points and the student asking.
 function league(user, body, nowMs) {
   var sn = season(nowMs), byEmail = labels(), weeks = {};
   closedSeasonWeeks(sn, nowMs).forEach(function (w) { weeks[w] = rankingFor(w, sn, nowMs, byEmail); });
-  return { weeks: Object.keys(weeks).length, rows: leagueTable(weeks).map(function (r) {
+  var table = leagueTable(weeks);
+  return { weeks: Object.keys(weeks).length, entrants: table.length, rows: visibleRows(table, user.email).map(function (r) {
     return { label: byEmail[r.key], points: r.points, played: r.played, firsts: r.firsts, seconds: r.seconds, thirds: r.thirds, place: r.place, you: r.key === user.email };
   }) };
 }

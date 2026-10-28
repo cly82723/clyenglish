@@ -29,6 +29,8 @@
     cleanups.splice(0).forEach(function (stop) { stop(); });
     playing = !!keepPlaying;
     saveNow = null;
+    // While the clock runs the page steps back to the paper: the big page title goes, like an exam room.
+    document.body.classList.toggle("playing", playing);
     clear(root);
     build(root);
   }
@@ -73,7 +75,7 @@
     var fact = function (n, what) { return h("li", null, h("strong", null, n), h("span", null, what)); };
     return [
       h("p", { class: "lead" }, "One grammar challenge every week for S.4. Do your best, beat the clock and climb the league."),
-      h("ul", { class: "facts", "aria-label": "The challenge at a glance" }, fact("15", "marks"), fact("20", "minutes"), fact("1", "go each week"))
+      h("ul", { class: "facts", "aria-label": "The challenge at a glance" }, fact("15", "marks"), fact("20", "minutes"), fact("1", "go a week"))
     ];
   }
 
@@ -131,10 +133,10 @@
       var left;
       function wait() {
         left = RESEND_WAIT_S;
-        resend.textContent = "Send a new code (" + left + ")";
+        resend.textContent = "Send a new code in " + left + "s";
         every(1000, function () {
           left -= 1;
-          resend.textContent = left > 0 ? "Send a new code (" + left + ")" : "Send a new code";
+          resend.textContent = left > 0 ? "Send a new code in " + left + "s" : "Send a new code";
           if (left === 0) resend.disabled = false;
         });
       }
@@ -158,7 +160,8 @@
 
   // ---------- Home: this week, then the boards ----------
 
-  function home(tab) {
+  // toBoards: open at the league (from the result screen) instead of the top of the page.
+  function home(tab, toBoards) {
     if (!league.signedIn()) return signIn();
     loading();
     league.call("me").then(function (me) {
@@ -167,7 +170,9 @@
           h("p", null, "Signed in as ", h("strong", null, me.student.label)),
           h("button", { type: "button", class: "link-btn", onclick: signOut }, "Sign out")));
         el.appendChild(thisWeek(me));
-        el.appendChild(boards(me, tab || "board"));
+        // The board loads after the page draws, so the scroll waits until there is a board to scroll to.
+        var lg = boards(me, tab || "board", toBoards ? function () { lg.scrollIntoView({ block: "start" }); } : null);
+        el.appendChild(lg);
       });
     }, function (err) { problem(err, function () { home(tab); }); });
   }
@@ -216,8 +221,9 @@
     var spot = h("div");
     function ask() {
       clear(spot);
-      spot.appendChild(h("div", { class: "tip confirm" },
-        h("p", null, h("strong", null, "Ready?"), " The clock starts now and doesn't stop."),
+      spot.appendChild(h("div", { class: "confirm" },
+        h("p", null, h("strong", null, "Ready?"), " The clock starts when you press Start now, and it doesn't stop."),
+        h("p", null, "Stay on this page until you hand in: switching to another app or tab is recorded."),
         h("div", { class: "actions" },
           h("button", { type: "button", class: "btn", onclick: start }, "Start now"),
           h("button", { type: "button", class: "btn-quiet", onclick: show }, "Not yet"))));
@@ -232,7 +238,7 @@
     return spot;
   }
 
-  function boards(me, tab) {
+  function boards(me, tab, loaded) {
     var tabs = [["board", "Weekly board"], ["league", "League table"], ["mine", "My results"]];
     var panel = h("div", { class: "board-panel", "aria-live": "polite" });
     var chips = h("ul", { class: "chips" }, tabs.map(function (t) {
@@ -243,7 +249,11 @@
       clear(panel);
       if (name === "mine") return panel.appendChild(myResults(me));
       panel.appendChild(h("p", { class: "meta loading" }, "Loading…"));
-      league.call(name).then(function (d) { clear(panel); panel.appendChild(name === "board" ? weekBoards(d) : leagueTable(d)); },
+      league.call(name).then(function (d) {
+        clear(panel);
+        panel.appendChild(name === "board" ? weekBoards(d) : leagueTable(d));
+        if (loaded) { loaded(); loaded = null; }
+      },
         function (err) { if (err.signIn) return signIn(err.message); clear(panel); panel.appendChild(h("p", { class: "warn" }, err.message)); });
     }
     pick(tab);
@@ -266,22 +276,23 @@
           h("td", null, duration(r.timeSec)), h("td", null, String(r.points || "")));
       }));
     };
+    var tookPart = function (n) { return h("p", { class: "took-part" }, n === 1 ? "1 student has taken part." : n + " students have taken part."); };
     var out = [h("h3", null, "This week · " + weekName(d.thisWeek.id))];
-    out.push(d.thisWeek.rows.length ? board(d.thisWeek.rows, "This week's board") : h("p", null, "Nobody has finished this week's challenge yet."));
-    if (d.lastWeek.rows.length) out.push(h("h3", null, "Final board · " + weekName(d.lastWeek.id)), board(d.lastWeek.rows, "Final board for " + weekName(d.lastWeek.id)));
-    out.push(h("p", { class: "meta" }, "Best score first; level scores go to the faster time. Points: 3 for 1st, 2 for 2nd, 1 for 3rd."));
+    out.push(d.thisWeek.rows.length ? [board(d.thisWeek.rows, "This week's board"), tookPart(d.thisWeek.entrants)] : h("p", null, "Nobody has finished this week's challenge yet. Be the first!"));
+    if (d.lastWeek.rows.length) out.push(h("h3", null, "Final board · " + weekName(d.lastWeek.id)), board(d.lastWeek.rows, "Final board for " + weekName(d.lastWeek.id)), tookPart(d.lastWeek.entrants));
+    out.push(h("p", { class: "meta" }, "Best score first. Same score? The faster time wins. Points: 3 for 1st, 2 for 2nd, 1 for 3rd. You see the top three and your own score; nobody else sees yours."));
     return h("div", null, out);
   }
 
   function leagueTable(d) {
     if (!d.weeks) return h("p", null, "The table starts once the first week of the season closes.");
-    return h("div", null,
+    return h("div", { class: "season-table" },
       table("Season league table", ["Place", "Student", "Points", "1st", "2nd", "3rd", "Weeks"], d.rows.map(function (r) {
         return h("tr", { class: r.you ? "you" : null },
           h("td", null, ordinal(r.place)), h("td", null, you(r, r.label)), h("td", null, h("strong", null, String(r.points))),
           h("td", null, String(r.firsts)), h("td", null, String(r.seconds)), h("td", null, String(r.thirds)), h("td", null, String(r.played)));
       })),
-      h("p", { class: "meta" }, "After " + d.weeks + (d.weeks === 1 ? " week" : " weeks") + ". Students level on points share their place, so there can be joint winners."));
+      h("p", { class: "meta" }, "After " + d.weeks + (d.weeks === 1 ? " week" : " weeks") + ". Students with the same points share a place, so there can be joint winners. You see everyone with points, and your own row."));
   }
 
   function myResults(me) {
@@ -310,15 +321,18 @@
     view(function (el) {
       var left = h("span", { class: "left" }, clock(d.remainingMs));
       var status = h("span", { class: "save-state" }, "Saved");
-      var shout = h("p", { class: "visually-hidden", "aria-live": "assertive" });
-      var confirmSpot = h("div");
+      // Seen and heard: "5 minutes left", then "Last minute!".
+      var timeNote = h("span", { class: "time-note", "aria-live": "assertive" });
+      // The confirm opens beside the Hand in that was pressed: in the clock bar, or under the paper.
+      var topSpot = h("div", { class: "confirm-spot" }), bottomSpot = h("div", { class: "confirm-spot" });
       var sheet = P.sheet(ch, answers, changed);
       var done15 = h("span", { class: "progress-count" });
       var drain = h("i");
       var bar = h("div", { class: "clock-bar", role: "region", "aria-label": "Time and handing in" },
         h("p", { class: "time" }, h("span", { class: "visually-hidden" }, "Time left: "), left),
-        h("p", { class: "clock-meta" }, done15, status),
-        h("button", { type: "button", class: "btn", onclick: confirmHandIn }, "Hand in"),
+        h("p", { class: "clock-meta" }, timeNote, done15, status),
+        h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(topSpot); } }, "Hand in"),
+        topSpot,
         h("span", { class: "time-drain", "aria-hidden": "true" }, drain));
       var countDone = function () { done15.textContent = sheet.progress(); };
 
@@ -348,24 +362,26 @@
         left.textContent = clock(ms);
         drain.style.transform = "scaleX(" + Math.max(0, Math.min(1, ms / LIMIT_MS)) + ")";
         bar.classList.toggle("short", ms <= 60000);
-        WARN_AT_MS.forEach(function (at) { if (ms <= at && !warned[at]) { warned[at] = true; shout.textContent = minutes(at) + " left."; } });
+        WARN_AT_MS.forEach(function (at) {
+          if (ms <= at && !warned[at]) { warned[at] = true; timeNote.textContent = at <= 60000 ? "Last minute!" : minutes(at) + " left"; }
+        });
         if (ms <= 0) handIn(true);
       }
-      function confirmHandIn() {
-        clear(confirmSpot);
-        var empty = sheet.empty();
-        confirmSpot.appendChild(h("div", { class: "tip confirm", role: "alertdialog", "aria-label": "Hand in now?" },
-          h("p", null, h("strong", null, "Hand in now?"), " You can't change your answers afterwards." + (empty ? " " + empty + (empty === 1 ? " blank is" : " blanks are") + " still empty." : "")),
+      function confirmHandIn(spot) {
+        clear(topSpot); clear(bottomSpot);
+        spot.appendChild(h("div", { class: "confirm", role: "alertdialog", "aria-label": "Hand in now?" },
+          h("p", null, h("strong", null, "Hand in now?"), " You can't change your answers afterwards. " + sheet.handInNote()),
           h("div", { class: "actions" },
             h("button", { type: "button", class: "btn", onclick: function () { handIn(false); } }, "Hand in"),
-            h("button", { type: "button", class: "btn-quiet", onclick: function () { clear(confirmSpot); } }, "Keep working"))));
-        confirmSpot.querySelector(".btn").focus();
+            h("button", { type: "button", class: "btn-quiet", onclick: function () { clear(spot); } }, "Keep working"))));
+        spot.querySelector(".btn").focus({ preventScroll: true });
+        spot.scrollIntoView({ block: "nearest", behavior: CLY.reduceMotion ? "auto" : "smooth" });
       }
       function handIn(timeUp) {
         if (done) return;
         done = true;
         view(function (v) { v.appendChild(h("p", { class: "meta loading" }, timeUp ? "Time's up! Handing in your answers…" : "Handing in…")); });
-        league.call("submit", { answers: answers }).then(result, function (err) {
+        league.call("submit", { answers: answers }).then(function (r) { result(r, timeUp); }, function (err) {
           if (err.signIn) return signIn(err.message);
           view(function (v) {
             v.appendChild(h("div", { class: "tip problem", role: "alert" },
@@ -388,18 +404,24 @@
         hiddenAt = null;
         league.call("away", { ms: ms }).catch(function () { /* the server still has the time from the clock */ });
       });
+      // Leaving mid-challenge (a cover tab, the footer, closing the tab) asks first. The clock would keep running.
+      listen(window, "beforeunload", function (e) {
+        if (done) return;
+        if (savedState === "changed") save();
+        e.preventDefault();
+        e.returnValue = "";
+      });
 
       el.appendChild(bar);
-      el.appendChild(shout);
-      el.appendChild(confirmSpot);
       el.appendChild(h("section", { class: "paper", "aria-labelledby": "paper-title" },
         h("h2", { id: "paper-title" }, ch.title),
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
-          ? "Choose a verb from the box for each blank and type it in the right form. Use each verb once at most; some verbs in the box are not needed. You may need any tense, the passive, or “not”."
-          : "Most lines have one mistake, and some lines are correct. Mark each mistake you find. One mark per line."),
+          ? "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb."
+          : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: leave those as they are."),
         sheet.el,
-        h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: confirmHandIn }, "Hand in"))));
+        h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(bottomSpot); } }, "Hand in")),
+        bottomSpot));
       every(250, tickClock);
       tickClock();
       countDone();
@@ -412,7 +434,7 @@
     if (score === 15) return "Full marks! That's hard to beat.";
     if (score >= 12) return "Excellent work!";
     if (score >= 8) return "Good effort. Check the answers on Monday to find the last few marks.";
-    return "Well done for taking part. Every week is a fresh chance.";
+    return "Thanks for taking part. Read the answers on Monday, and next week will feel easier.";
   }
 
   // Seen once a week, so the score earns a short count-up; with reduced motion it simply appears.
@@ -426,16 +448,25 @@
     });
   }
 
-  function result(r) {
+  // One thing to do next, as every page on the site ends with.
+  function nextStep(text) {
+    return h("div", { class: "tip next-step" },
+      h("p", { class: "field-label" }, "Next step"),
+      h("p", null, text, " ", h("a", { href: "grammar.html#practice" }, "Go to S.4 grammar practice")));
+  }
+
+  function result(r, timeUp) {
     view(function (el) {
       var score = h("strong", null, "0");
       el.appendChild(h("section", { class: "handed-in" },
         h("h2", null, "Handed in"),
+        timeUp ? h("p", { class: "time-up" }, "Time ran out, so your answers were handed in for you.") : null,
         h("p", { class: "big-score", "aria-label": r.score + " out of " + r.outOf }, score, h("span", { "aria-hidden": "true" }, " / " + r.outOf)),
         h("p", { class: "result-line" }, cheer(r.score)),
         h("p", null, "Time taken: " + duration(r.timeSec) + "."),
-        h("p", { class: "meta" }, "Answers come out on Monday. Until then, keep your answers to yourself so the league stays fair."),
-        h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { home("board"); } }, "See the weekly board"))));
+        h("p", { class: "meta" }, "Answers come out on Monday. Please don't share yours before then, so it's fair for everyone."),
+        nextStep("While you wait, practise the same kind of paper with hints and instant marking."),
+        h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { home("board", true); } }, "See the weekly board"))));
       el.querySelector("h2").setAttribute("tabindex", "-1");
       el.querySelector("h2").focus();
       countUp(score, r.score);
@@ -443,6 +474,12 @@
   }
 
   // ---------- Answers for a closed week ----------
+
+  function reviewAdvice(topics, perfect) {
+    if (perfect) return "Full marks! Keep your skills sharp with a harder practice set.";
+    if (topics.length) return "The grammar you missed: " + topics.join(", ") + ". Read the explanations above, then practise " + (topics.length === 1 ? "it." : "them.");
+    return "Read the explanation under each cross, then try the practice cloze for the same tenses.";
+  }
 
   function review(week) {
     loading();
@@ -456,7 +493,8 @@
           h("h2", null, "Answers · " + weekName(week)),
           h("p", { class: "tagline" }, FORMAT[d.challenge.format] + " · " + d.challenge.title),
           h("p", { class: "result-line" }, "You scored ", h("strong", null, score + " / " + total), "."),
-          P.review(d.challenge, d.answers, right)));
+          P.review(d.challenge, d.answers, right),
+          nextStep(reviewAdvice(P.missedTopics(d.challenge, right), score === total))));
         window.scrollTo(0, 0);
       });
     }, function (err) { problem(err, function () { home("mine"); }); });
