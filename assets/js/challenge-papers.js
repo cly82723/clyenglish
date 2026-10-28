@@ -4,11 +4,13 @@
 (function () {
   "use strict";
   var h = CLY.h, G = window.CLY_GRAMMAR;
+  var plural = function (n, word) { return n + " " + word + (n === 1 ? "" : "s"); };
 
   // ---------- Cloze ----------
 
   function clozeSheet(ch, answers, changed) {
     var crossed = {};
+    var blanks = ch.paragraphs.reduce(function (n, parts) { return n + parts.filter(function (p) { return typeof p === "number"; }).length; }, 0);
     var bank = h("ul", { class: "chips" }, ch.bank.map(function (v) {
       var b = h("button", { type: "button", class: "chip", "aria-pressed": "false", onclick: function () {
         crossed[v] = !crossed[v];
@@ -29,11 +31,14 @@
       el: [h("div", { class: "tip" },
         h("p", { class: "field-label" }, "Verb box"), bank,
         h("p", null, "Tap a verb to cross it off once you've used it.")), passage],
-      empty: function () { return Object.keys(ch.paragraphs.reduce(function (all, parts) {
-        parts.forEach(function (p) { if (typeof p === "number" && !String(answers[p] || "").trim()) all[p] = 1; });
-        return all;
-      }, {})).length; }
+      empty: empty,
+      progress: function () { return (blanks - empty()) + " / " + blanks + " filled"; }
     };
+    function empty() {
+      return ch.paragraphs.reduce(function (n, parts) {
+        return n + parts.filter(function (p) { return typeof p === "number" && !String(answers[p] || "").trim(); }).length;
+      }, 0);
+    }
   }
 
   // ---------- Proofreading ----------
@@ -148,7 +153,8 @@
           h("li", null, "let him ", h("span", { class: "word deleted" }, "to"), " go: delete a word")),
         h("p", null, "Tap a word to change it, delete it or add a missing word next to it. Leave a correct line as it is.")),
         count, list],
-      empty: function () { return 0; }
+      empty: function () { return 0; },
+      progress: function () { return plural(Object.keys(answers).length, "line") + " marked"; }
     };
   }
 

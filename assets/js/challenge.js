@@ -10,12 +10,15 @@
   root.parentNode.insertBefore(testBar, root);
 
   var SAVE_AFTER_MS = 2500;    // answers are saved this long after the last change
+  var LIMIT_MS = 20 * 60 * 1000;
+  var COUNT_UP_MS = 700;       // the score counting up after handing in
   var RESEND_WAIT_S = 60;
   var WARN_AT_MS = [5 * 60 * 1000, 60 * 1000];
   var FORMAT = { cloze: "Cloze", proofreading: "Proofreading" };
 
   var league = null;
   var playing = false;
+  var saveNow = null;          // while playing: saves the answers at once (the test bar uses it before reloading)
   // Timers and listeners belong to one view and stop when the next view is drawn.
   var cleanups = [];
   function every(ms, fn) { var t = setInterval(fn, ms); cleanups.push(function () { clearInterval(t); }); }
@@ -25,6 +28,7 @@
   function view(build, keepPlaying) {
     cleanups.splice(0).forEach(function (stop) { stop(); });
     playing = !!keepPlaying;
+    saveNow = null;
     clear(root);
     build(root);
   }
@@ -54,19 +58,35 @@
   }
   var ordinal = function (n) { var s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
   var minutes = function (ms) { var m = Math.ceil(ms / 60000); return m + (m === 1 ? " minute" : " minutes"); };
+  var plural = function (n, word) { return n + " " + word + (n === 1 ? "" : "s"); };
+  // "3 days", "5 hours", "12 minutes": how long until the week closes, in its biggest unit.
+  function closesIn(ms) {
+    var hours = Math.floor(ms / 36e5);
+    if (hours >= 48) return plural(Math.floor(hours / 24), "day");
+    if (hours >= 1) return plural(hours, "hour");
+    return minutes(Math.max(ms, 60000));
+  }
 
   // ---------- Sign in ----------
 
-  function rules() {
+  function intro() {
+    var fact = function (n, what) { return h("li", null, h("strong", null, n), h("span", null, what)); };
     return [
-      h("p", { class: "lead" }, "One grammar challenge a week for S.4: a cloze one week, proofreading the next. ", h("strong", null, "15 marks, 20 minutes, one go.")),
-      h("ul", { class: "rules" },
-        h("li", null, "A week runs from ", h("strong", null, "Monday 00:00 to Sunday 23:59"), ", Hong Kong time, holidays included."),
-        h("li", null, "The 20-minute clock starts when you press Start. It doesn't stop, even if you close the page, and your answers are handed in when it runs out."),
-        h("li", null, "The best score wins the week; if scores are level, the faster time wins. 1st place gets 3 league points, 2nd gets 2 and 3rd gets 1."),
-        h("li", null, "Leaving the page for more than 3 seconds is recorded for your teacher."),
-        h("li", null, "Answers and explanations appear after the week closes."))
+      h("p", { class: "lead" }, "One grammar challenge every week for S.4. Do your best, beat the clock and climb the league."),
+      h("ul", { class: "facts", "aria-label": "The challenge at a glance" }, fact("15", "marks"), fact("20", "minutes"), fact("1", "go each week"))
     ];
+  }
+
+  function howItWorks() {
+    var step = function (what, detail) { return h("li", null, h("strong", null, what), h("span", null, detail)); };
+    return h("section", { class: "how", "aria-labelledby": "how" },
+      h("h2", { id: "how" }, "How it works"),
+      h("ol", { class: "skeleton" },
+        step("Sign in", "Type your school email. We'll email you a code."),
+        step("Do this week's challenge", "A cloze one week, proofreading the next. Each week runs Monday to Sunday."),
+        step("Beat the clock", "You have 20 minutes. The clock keeps going if you leave, and your answers hand in by themselves."),
+        step("Climb the league", "The top three each week get 3, 2 and 1 points. Same score? The faster time wins.")),
+      h("p", { class: "meta" }, "Play fair: switching to another app or tab is recorded. Answers come out every Monday."));
   }
 
   function privacy() {
@@ -92,7 +112,9 @@
           send.disabled = false; send.textContent = "Email me a code"; msg.textContent = err.message;
         });
       } }, h("h2", null, "Sign in"), field("league-email", "Your school email", email, send, "Just the part before the @ is enough."), msg);
-      el.appendChild(h("section", null, rules(), form, privacy()));
+      el.appendChild(h("section", null, intro(), form));
+      el.appendChild(howItWorks());
+      el.appendChild(privacy());
       email.focus({ preventScroll: true });
     });
   }
@@ -162,7 +184,7 @@
       h("dl", { class: "label" },
         h("dt", null, "Week"), h("dd", null, weekName(w.id)),
         h("dt", null, "Challenge"), h("dd", null, w.format ? FORMAT[w.format] + " · " + w.title : "Not ready yet"),
-        h("dt", null, "Closes"), h("dd", null, "Sunday 23:59")));
+        h("dt", null, "Closes"), h("dd", null, "Sunday 23:59", s.active ? countdown(w.closesAt) : null)));
     if (!s.active) {
       var starts = s.start && s.start > w.id;
       box.appendChild(h("p", null, starts ? "The league starts on Monday " + day(Date.parse(s.start + "T00:00:00Z")) + ". See you then!"
@@ -181,12 +203,21 @@
     return box;
   }
 
+  // Kept up to date while the page is open, so it never says "1 day" on Sunday night.
+  function countdown(closesAt) {
+    var span = h("span", { class: "countdown" });
+    var draw = function () { span.textContent = " · closes in " + closesIn(closesAt - Date.now()); };
+    draw();
+    every(30000, draw);
+    return span;
+  }
+
   function ready(me) {
     var spot = h("div");
     function ask() {
       clear(spot);
       spot.appendChild(h("div", { class: "tip confirm" },
-        h("p", null, h("strong", null, "Ready?"), " The 20-minute clock starts now and keeps running, even if you leave the page."),
+        h("p", null, h("strong", null, "Ready?"), " The clock starts now and doesn't stop."),
         h("div", { class: "actions" },
           h("button", { type: "button", class: "btn", onclick: start }, "Start now"),
           h("button", { type: "button", class: "btn-quiet", onclick: show }, "Not yet"))));
@@ -194,7 +225,7 @@
     }
     function show() {
       clear(spot);
-      spot.appendChild(h("p", null, "One go, 20 minutes, " + (me.week.format === "cloze" ? "15 blanks." : "15 lines.") + " Leaving the page is recorded."));
+      spot.appendChild(h("p", { class: "ready-line" }, (me.week.format === "cloze" ? "15 blanks" : "15 lines") + " · 20 minutes · one go"));
       spot.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: ask }, "Start the challenge")));
     }
     show();
@@ -282,12 +313,17 @@
       var shout = h("p", { class: "visually-hidden", "aria-live": "assertive" });
       var confirmSpot = h("div");
       var sheet = P.sheet(ch, answers, changed);
+      var done15 = h("span", { class: "progress-count" });
+      var drain = h("i");
       var bar = h("div", { class: "clock-bar", role: "region", "aria-label": "Time and handing in" },
         h("p", { class: "time" }, h("span", { class: "visually-hidden" }, "Time left: "), left),
-        status,
-        h("button", { type: "button", class: "btn", onclick: confirmHandIn }, "Hand in"));
+        h("p", { class: "clock-meta" }, done15, status),
+        h("button", { type: "button", class: "btn", onclick: confirmHandIn }, "Hand in"),
+        h("span", { class: "time-drain", "aria-hidden": "true" }, drain));
+      var countDone = function () { done15.textContent = sheet.progress(); };
 
       function changed() {
+        countDone();
         savedState = "changed"; status.textContent = "Saving soon…";
         clearTimeout(pending);
         pending = after(SAVE_AFTER_MS, save);
@@ -310,6 +346,7 @@
       function tickClock() {
         var ms = deadline - Date.now();
         left.textContent = clock(ms);
+        drain.style.transform = "scaleX(" + Math.max(0, Math.min(1, ms / LIMIT_MS)) + ")";
         bar.classList.toggle("short", ms <= 60000);
         WARN_AT_MS.forEach(function (at) { if (ms <= at && !warned[at]) { warned[at] = true; shout.textContent = minutes(at) + " left."; } });
         if (ms <= 0) handIn(true);
@@ -365,19 +402,43 @@
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: confirmHandIn }, "Hand in"))));
       every(250, tickClock);
       tickClock();
+      countDone();
+      saveNow = function () { return league.call("save", { answers: answers }); };
     }, true);
+  }
+
+  // Said with the score: encouraging at every level, never a telling-off.
+  function cheer(score) {
+    if (score === 15) return "Full marks! That's hard to beat.";
+    if (score >= 12) return "Excellent work!";
+    if (score >= 8) return "Good effort. Check the answers on Monday to find the last few marks.";
+    return "Well done for taking part. Every week is a fresh chance.";
+  }
+
+  // Seen once a week, so the score earns a short count-up; with reduced motion it simply appears.
+  function countUp(el, to) {
+    if (CLY.reduceMotion || !to) { el.textContent = to; return; }
+    var start = performance.now();
+    requestAnimationFrame(function frame(t) {
+      var p = Math.min(1, (t - start) / COUNT_UP_MS);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(frame);
+    });
   }
 
   function result(r) {
     view(function (el) {
+      var score = h("strong", null, "0");
       el.appendChild(h("section", { class: "handed-in" },
         h("h2", null, "Handed in"),
-        h("p", { class: "big-score" }, h("strong", null, r.score), " / " + r.outOf),
+        h("p", { class: "big-score", "aria-label": r.score + " out of " + r.outOf }, score, h("span", { "aria-hidden": "true" }, " / " + r.outOf)),
+        h("p", { class: "result-line" }, cheer(r.score)),
         h("p", null, "Time taken: " + duration(r.timeSec) + "."),
-        h("p", null, "Answers and explanations appear after the week closes on Sunday night. Until then, keep your answers to yourself, so the league stays fair."),
+        h("p", { class: "meta" }, "Answers come out on Monday. Until then, keep your answers to yourself so the league stays fair."),
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { home("board"); } }, "See the weekly board"))));
       el.querySelector("h2").setAttribute("tabindex", "-1");
       el.querySelector("h2").focus();
+      countUp(score, r.score);
     });
   }
 
@@ -407,7 +468,11 @@
     var t = league.test;
     clear(testBar);
     if (!t) return;
-    var again = function (fn) { return function () { fn(); playing ? start() : home(); drawTestBar(); }; };
+    var again = function (fn) {
+      return function () {
+        (saveNow ? saveNow() : Promise.resolve()).then(function () { fn(); playing ? start() : home(); drawTestBar(); });
+      };
+    };
     testBar.appendChild(h("aside", { class: "test-bar", "aria-label": "Test mode" },
       h("p", null, h("strong", null, "Test mode."), " Nothing is saved and nobody else sees this. Sign in with any email; the code is ", h("strong", null, t.code), "."),
       h("div", { class: "row" },

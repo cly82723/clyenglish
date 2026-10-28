@@ -11,8 +11,14 @@
 
 /* ---------- Sign in ---------- */
 
-.rules { padding-left: 1.2em; margin: 0 0 32px; }
-.rules li { margin: 0 0 6px; text-wrap: pretty; }
+/* The challenge at a glance: three numbers a student can take in before reading a word. */
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; list-style: none; padding: 0; margin: 4px 0 28px; }
+.facts li { padding: 14px 16px 12px; border: 1px solid var(--edge); border-radius: 12px; }
+.facts strong { display: block; font: 800 var(--step-3)/1 var(--font-display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.facts span { display: block; margin-top: 6px; font: 600 1rem/1.25 var(--font-display); color: var(--ink-soft); }
+#challenge .how h2 { font-size: var(--step-2); margin: 0 0 4px; }
+.how .skeleton { margin-bottom: 14px; }
+.how .skeleton span { display: block; }
 .signin { padding: 22px 24px; border: 1px solid var(--edge); border-radius: 12px; margin: 0 0 18px; }
 #challenge .signin h2 { font-size: var(--step-2); margin-bottom: 12px; }
 .signin .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 8px 0 6px; }
@@ -24,7 +30,7 @@
 .signin input:focus-visible { outline: 2px solid var(--sky); outline-offset: 2px; }
 .signin .meta { margin: 4px 0 0; font-size: 1rem; }
 .actions-line { margin: 18px 0 0; color: var(--ink-soft); }
-.privacy { font-size: 1rem; }
+.privacy { font-size: 1rem; max-width: 68ch; }
 
 /* ---------- Home ---------- */
 
@@ -32,6 +38,8 @@
 .who p { margin: 0; font-family: var(--font-display); }
 .this-week .label { max-width: 560px; }
 .result-line { font: 600 var(--step-1)/1.4 var(--font-display); font-variant-numeric: tabular-nums; }
+.countdown { color: var(--ink-soft); font-weight: 500; }
+.ready-line { font: 600 var(--step-1)/1.4 var(--font-display); margin: 20px 0 0; }
 .confirm .actions { margin: 14px 0 0; }
 .problem { background: var(--paper); border: 1px solid var(--avoid); }
 tr.you > td { background: var(--chest); }
@@ -45,14 +53,24 @@ tr.you > td { background: var(--chest); }
 /* The clock stays in view while the student scrolls through the passage. */
 .clock-bar {
   position: sticky; top: 0; z-index: 5;
+  isolation: isolate;
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px;
   margin: 0 0 24px; padding: 10px 0;
   background: var(--paper); border-bottom: 1px solid var(--ink);
 }
 .clock-bar .time { margin: 0; font: 800 var(--step-2)/1 var(--font-display); font-variant-numeric: tabular-nums; min-width: 4ch; }
 .clock-bar.short .time { color: var(--avoid); }
-.save-state { flex: 1; color: var(--ink-soft); font: 600 1rem/1.3 var(--font-display); }
+.clock-meta { flex: 1; display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; font: 600 1rem/1.3 var(--font-display); }
+.progress-count { color: var(--ink); font-variant-numeric: tabular-nums; }
+.save-state { color: var(--ink-soft); }
+/* The time left, draining from right to left along the bar's bottom rule. Constant motion, so linear. */
+.time-drain { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; overflow: hidden; }
+.time-drain i { display: block; height: 100%; background: var(--leaf); transform-origin: left; transition: transform 250ms linear; }
+.clock-bar.short .time-drain i { background: var(--avoid); }
+@media (prefers-reduced-motion: reduce) { .time-drain i { transition: none; } }
 #challenge .paper h2 { font-size: var(--step-2); }
+/* Focus moves to this heading so screen readers announce the result; it isn't a control, so no ring. */
+.handed-in h2:focus { outline: none; }
 .big-score { font: 800 var(--step-4)/1 var(--font-display); margin: 0 0 12px; font-variant-numeric: tabular-nums; }
 .big-score strong { color: var(--leaf); }
 
