@@ -1,5 +1,5 @@
 /* CLY English Weekly Challenge: talking to the league's web app (apps-script/).
-   With ?test in the address, a stand-in league runs in the browser instead: it marks with the web app's own
+   With ?test in the address on a local preview (localhost), a stand-in league runs in the browser instead: it marks with the web app's own
    rules (apps-script/Logic.gs), plays a practice passage, and saves nothing anywhere.
    Every call resolves to the data, or rejects with { message, signIn } for the page to show as it is. */
 (function () {
@@ -204,7 +204,8 @@
     };
   }
 
-  var testing = /[?&]test\b/.test(location.search);
+  // Test mode is for the teacher's own computer only (tools/serve.js); on the published site ?test does nothing.
+  var testing = /[?&]test\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   window.CLY_LEAGUE = testing
     ? Promise.all([loadRules(), loadScript("assets/js/data/grammar-tense-cloze.js"), loadScript("assets/js/data/grammar-proofreading.js")]).then(function (r) { return testLeague(r[0]); })
     : Promise.resolve(league);
