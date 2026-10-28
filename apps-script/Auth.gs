@@ -7,6 +7,7 @@ function UserError(message, signIn) { this.message = message; this.signIn = !!si
 
 function sendCode(user, body, nowMs) {
   var email = rosterEmail(body.email);
+  checkTester(findStudent(email), body); // no code is emailed to a student who opens the trial page
   var cache = CacheService.getScriptCache();
   if (cache.get("wait:" + email)) throw new UserError("A code was sent less than a minute ago. Please check your inbox and spam folder.");
   var sentThisHour = Number(cache.get("hour:" + email) || 0);

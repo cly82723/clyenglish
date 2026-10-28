@@ -34,6 +34,7 @@ function doPost(e) {
     var action = actionFor(body.action);
     if (!action) throw new UserError("Unknown request.");
     var user = NO_SIGN_IN.indexOf(body.action) >= 0 ? null : verifiedUser(body.token);
+    if (user) checkTester(user.student, body);
     // Reading the boards needs no lock, so a class checking at once doesn't queue behind itself.
     if (WRITES.indexOf(body.action) >= 0) lock.waitLock(20000);
     return json({ ok: true, data: action(user, body, Date.now()) });
@@ -61,10 +62,29 @@ function season(nowMs) {
 
 function inSeason(sn, week) { return !!sn.startWeek && week >= sn.startWeek && weekStartMs(week) <= sn.endMs; }
 
+// The teachers' trial page (challenge-trial.html) plays a set with Status "trial" in its own week,
+// "trial-cloze" or "trial-proofreading", which no board or league ever counts.
+function trialWeek(body) {
+  var f = body && body.trial;
+  return f === "cloze" || f === "proofreading" ? "trial-" + f : "";
+}
+function isTrialWeek(week) { return /^trial-/.test(week); }
+
+// Only students marked as testers (Tester column: yes) may use the trial page.
+function checkTester(student, body) {
+  if (body && body.trial && !isTrue(student.Tester)) {
+    throw new UserError("This trial page is only for the teachers testing the challenge. Students: please use the Weekly challenge page.");
+  }
+}
+
 // The approved challenge for the week; if the current week has none, the first backup in the format due becomes it.
 // A backup that has gone live stays live, even if a set for that week is approved later, so nobody is marked against a different passage.
 function challengeFor(week, sn) {
   var rows = readRows("Challenges");
+  if (isTrialWeek(week)) {
+    var trial = rows.filter(function (r) { return /^trial$/i.test(r.Status) && "trial-" + String(r.Format).toLowerCase() === week; })[0];
+    return trial ? Object.assign(JSON.parse(trial.Data), { format: String(trial.Format).toLowerCase(), title: trial.Title }) : null;
+  }
   var forWeek = function (status) { return rows.filter(function (r) { return dayString(r.Week) === week && String(r.Status).toLowerCase() === status; })[0]; };
   var live = forWeek("used") || forWeek("approved");
   if (!live && week === weekId(Date.now()) && inSeason(sn, week)) {

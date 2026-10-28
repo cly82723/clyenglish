@@ -3,7 +3,7 @@
 
 var TABS = {
   Season: ["Setting", "Value", "Notes"],
-  Students: ["Email", "Class", "Number"],
+  Students: ["Email", "Class", "Number", "Tester"],
   Attempts: ["Week", "Email", "Class", "Number", "Started", "Submitted", "Score", "Time (s)", "Switches", "Away (s)", "Reopened", "Late", "Disqualified", "Answers"],
   Challenges: ["Week", "Format", "Status", "Title", "Data"],
   Sessions: ["Token hash", "Email", "Created"]

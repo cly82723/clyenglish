@@ -20,9 +20,12 @@
     try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch (e) { /* kept in memory only */ }
   }
 
+  // On the teachers' trial page (challenge-trial.html) every request names the trial set being played.
+  var trialFormat = window.CLY_TRIAL ? "cloze" : null;
+
   function call(action, extra) {
     // A plain string body is sent as text/plain, so the browser skips the CORS preflight Apps Script can't answer.
-    var body = JSON.stringify(Object.assign({ action: action, token: token }, extra));
+    var body = JSON.stringify(Object.assign({ action: action, token: token, trial: trialFormat || undefined }, extra));
     return fetch(WEB_APP, { method: "POST", body: body })
       .then(function (res) { return res.json().catch(function () { throw { message: GARBLED }; }); }, function () { throw { message: OFFLINE, offline: true }; })
       .then(function (r) {
@@ -39,6 +42,10 @@
 
   var league = {
     test: null,
+    trial: trialFormat && {
+      format: function () { return trialFormat; },
+      use: function (f) { trialFormat = f; }
+    },
     signedIn: function () { return !!token; },
     call: function (action, extra) {
       // Signing out works even when the league can't be reached: the device simply forgets the sign-in.
