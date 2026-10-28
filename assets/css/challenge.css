@@ -1,0 +1,88 @@
+/* CLY English Weekly Challenge (challenge.html). Builds on site.css: the passage, blanks, proofreading lines,
+   tables, chips and buttons all come from there. This file adds only what the league needs. */
+
+#challenge > section, #challenge > .who, #challenge > .tip { max-width: 68ch; }
+#challenge h2 { font-size: var(--step-3); margin: 0 0 18px; }
+#challenge section + section { margin-top: 56px; }
+.loading { margin: 24px 0; }
+.meta { color: var(--ink-soft); }
+.warn { color: var(--avoid); margin: 10px 0 0; }
+.warn:empty, .meta:empty { display: none; }
+
+/* ---------- Sign in ---------- */
+
+.rules { padding-left: 1.2em; margin: 0 0 32px; }
+.rules li { margin: 0 0 6px; text-wrap: pretty; }
+.signin { padding: 22px 24px; border: 1px solid var(--edge); border-radius: 12px; margin: 0 0 18px; }
+#challenge .signin h2 { font-size: var(--step-2); margin-bottom: 12px; }
+.signin .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 8px 0 6px; }
+.signin input {
+  font: inherit; font-size: 1.0625rem; min-height: 44px; width: min(100%, 22em); padding: 8px 12px;
+  border: 1px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink);
+}
+.signin input.code { width: 8em; letter-spacing: 0.2em; font-variant-numeric: tabular-nums; }
+.signin input:focus-visible { outline: 2px solid var(--sky); outline-offset: 2px; }
+.signin .meta { margin: 4px 0 0; font-size: 1rem; }
+.actions-line { margin: 18px 0 0; color: var(--ink-soft); }
+.privacy { font-size: 1rem; }
+
+/* ---------- Home ---------- */
+
+.who { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; margin: 0 0 28px; padding: 0 0 12px; border-bottom: 1px solid var(--rule); }
+.who p { margin: 0; font-family: var(--font-display); }
+.this-week .label { max-width: 560px; }
+.result-line { font: 600 var(--step-1)/1.4 var(--font-display); font-variant-numeric: tabular-nums; }
+.confirm .actions { margin: 14px 0 0; }
+.problem { background: var(--paper); border: 1px solid var(--avoid); }
+tr.you > td { background: var(--chest); }
+.you-tag {
+  display: inline-block; font: 700 0.875rem/1.4 var(--font-display); padding: 0 8px;
+  border-radius: 999px; background: var(--ink); color: var(--paper); vertical-align: 1px;
+}
+
+/* ---------- The challenge ---------- */
+
+/* The clock stays in view while the student scrolls through the passage. */
+.clock-bar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px;
+  margin: 0 0 24px; padding: 10px 0;
+  background: var(--paper); border-bottom: 1px solid var(--ink);
+}
+.clock-bar .time { margin: 0; font: 800 var(--step-2)/1 var(--font-display); font-variant-numeric: tabular-nums; min-width: 4ch; }
+.clock-bar.short .time { color: var(--avoid); }
+.save-state { flex: 1; color: var(--ink-soft); font: 600 1rem/1.3 var(--font-display); }
+#challenge .paper h2 { font-size: var(--step-2); }
+.big-score { font: 800 var(--step-4)/1 var(--font-display); margin: 0 0 12px; font-variant-numeric: tabular-nums; }
+.big-score strong { color: var(--leaf); }
+
+/* ---------- Review: the marked paper ---------- */
+
+.review .answer { white-space: nowrap; margin: 0 2px; padding: 1px 6px; border-radius: 4px; border-bottom: 2px solid; }
+.review .answer.right { border-color: var(--do); }
+.review .answer.wrong { border-color: var(--avoid); }
+.review .answer sup { font: 700 0.875rem/1 var(--font-display); color: var(--sky); margin-right: 3px; }
+.review .answer s { text-decoration-color: var(--avoid); text-decoration-thickness: 2px; color: var(--ink-soft); }
+.review .answer .none { color: var(--ink-soft); font-style: italic; }
+.review .answer .fix { color: var(--do); margin-left: 6px; }
+.review .answer::after {
+  content: ""; display: inline-block; width: 16px; height: 16px; margin-left: 4px; vertical-align: -2px;
+  background: currentColor; -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+}
+.review .answer.right::after { --icon: var(--i-tick); color: var(--do); }
+.review .answer.wrong::after { --icon: var(--i-cross); color: var(--avoid); }
+.proof.review .word { cursor: default; }
+.fix-note { margin: 2px 0 6px; line-height: 1.55; }
+.fix-note s { text-decoration-color: var(--avoid); text-decoration-thickness: 2px; color: var(--ink-soft); }
+
+/* ---------- Test mode ---------- */
+
+.test-bar { max-width: 68ch; margin: 0 0 28px; padding: 14px 18px; border: 2px dashed var(--fox); border-radius: 12px; }
+.test-bar p { margin: 0 0 10px; }
+.test-bar .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.test-bar .chip { font-size: 0.875rem; }
+
+@media (max-width: 760px) {
+  .signin { padding: 18px 16px; }
+  .clock-bar { margin-left: calc(-1 * var(--gutter)); margin-right: calc(-1 * var(--gutter)); padding-left: var(--gutter); padding-right: var(--gutter); }
+}
