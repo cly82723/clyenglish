@@ -76,12 +76,14 @@ function markCloze(challenge, answers) {
 }
 
 // answers: { "3": { type, at, word } } keyed by line index. A line the student left alone means "no mistake".
+// challenge.alsoRight: { "3": ["the whole line, fixed another way"] } lists other single fixes that are equally right.
 function markProofreading(challenge, answers) {
   var right = {};
   challenge.lines.forEach(function (l, i) {
     var line = parseProofLine(l[0]);
     var a = validMark((answers && answers[i]), line.words.length);
-    right[i] = normalise(applyMark(line.words, a).join(" ")) === normalise(line.fixed.join(" "));
+    var accepted = [line.fixed.join(" ")].concat((challenge.alsoRight && challenge.alsoRight[i]) || []).map(normalise);
+    right[i] = accepted.indexOf(normalise(applyMark(line.words, a).join(" "))) >= 0;
   });
   return { score: countTrue(right), right: right };
 }

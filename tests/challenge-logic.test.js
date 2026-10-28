@@ -50,6 +50,13 @@ test("proofreading: changing a correct line loses its mark, junk counts as untou
   assert.strictEqual(L.markProofreading(proof, { 1: { type: "replace", at: 99, word: "x" } }).right[1], true);
 });
 
+test("proofreading accepts a line's other listed fixes, and nothing else", () => {
+  const p = Object.assign({}, proof, { alsoRight: { 3: ["She is in charge for the club."] } });
+  const add = word => L.markProofreading(p, { 3: { type: "insert", at: 4, word } }).right[3];
+  assert.deepStrictEqual([add("of"), add("for"), add("with")], [true, true, false]);
+  assert.strictEqual(L.markProofreading(proof, { 3: { type: "insert", at: 4, word: "for" } }).right[3], false);
+});
+
 test("public challenge holds no answers", () => {
   const c = JSON.stringify(L.publicChallenge(cloze));
   assert.ok(!c.includes("are held"));
