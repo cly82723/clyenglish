@@ -53,7 +53,6 @@
   var day = function (ms) { return new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }); };
   // "2–8 Nov" for the week starting Monday 2026-11-02.
   function weekName(id) {
-    if (/^trial-/.test(id)) return "Trial " + id.slice(6);
     var mon = Date.parse(id + "T00:00:00Z");
     if (isNaN(mon)) return id;
     var sun = mon + 6 * 864e5, a = day(mon), b = day(sun);
@@ -75,9 +74,7 @@
   function intro() {
     var fact = function (n, what) { return h("li", null, h("strong", null, n), h("span", null, what)); };
     return [
-      league.trial
-        ? h("p", { class: "lead" }, "Teacher trial: everything works exactly as students will see it, but nothing here counts towards their league. Only invited testers can sign in.")
-        : h("p", { class: "lead" }, "One grammar challenge every week for S.4. Do your best, beat the clock and climb the league."),
+      h("p", { class: "lead" }, "One grammar challenge every week for S.4. Do your best, beat the clock and climb the league."),
       h("ul", { class: "facts", "aria-label": "The challenge at a glance" }, fact("15", "marks"), fact("20", "minutes"), fact("1", "go a week"))
     ];
   }
@@ -172,7 +169,6 @@
         el.appendChild(h("div", { class: "who" },
           h("p", null, "Signed in as ", h("strong", null, me.student.label)),
           h("button", { type: "button", class: "link-btn", onclick: signOut }, "Sign out")));
-        if (league.trial) el.appendChild(trialPicker());
         el.appendChild(thisWeek(me));
         // The board loads after the page draws, so the scroll waits until there is a board to scroll to.
         var lg = boards(me, tab || "board", toBoards ? function () { lg.scrollIntoView({ block: "start" }); } : null);
@@ -193,7 +189,7 @@
       h("dl", { class: "label" },
         h("dt", null, "Week"), h("dd", null, weekName(w.id)),
         h("dt", null, "Challenge"), h("dd", null, w.format ? FORMAT[w.format] + " · " + w.title : "Not ready yet"),
-        h("dt", null, "Closes"), w.closesAt ? h("dd", null, "Sunday 23:59", s.active ? countdown(w.closesAt) : null) : h("dd", null, "No deadline in the trial")));
+        h("dt", null, "Closes"), h("dd", null, "Sunday 23:59", s.active ? countdown(w.closesAt) : null)));
     if (!s.active) {
       var starts = s.start && s.start > w.id;
       box.appendChild(h("p", null, starts ? "The league starts on Monday " + day(Date.parse(s.start + "T00:00:00Z")) + ". See you then!"
@@ -202,9 +198,7 @@
       box.appendChild(h("p", null, "This week's challenge isn't ready yet. Please check back soon."));
     } else if (a.status === "done") {
       box.appendChild(h("p", { class: "result-line" }, "Your score: ", h("strong", null, a.score + " / 15"), " in " + duration(a.timeSec) + "."));
-      box.appendChild(league.trial
-        ? h("div", { class: "actions" }, h("button", { type: "button", class: "btn-quiet", onclick: function () { review(w.id); } }, "See the answers"))
-        : h("p", { class: "meta" }, "Answers and explanations appear after the week closes on Sunday night."));
+      box.appendChild(h("p", { class: "meta" }, "Answers and explanations appear after the week closes on Sunday night."));
     } else if (a.status === "open") {
       box.appendChild(h("p", null, "You've started. ", h("strong", null, minutes(a.remainingMs) + " left"), " on your clock."));
       box.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: start }, "Carry on")));
@@ -212,17 +206,6 @@
       box.appendChild(ready(me));
     }
     return box;
-  }
-
-  // Trial page only: testers can try both papers, one go each. Students never get this choice.
-  function trialPicker() {
-    var current = league.trial.format();
-    return h("section", { class: "trial-pick", "aria-labelledby": "trial-pick" },
-      h("h2", { id: "trial-pick" }, "Teacher trial"),
-      h("p", null, "Try each paper once, exactly as students will. Nothing here counts towards their league."),
-      h("ul", { class: "chips" }, ["cloze", "proofreading"].map(function (f) {
-        return h("li", null, h("button", { type: "button", class: "chip", "aria-pressed": String(f === current), onclick: function () { league.trial.use(f); home(); } }, FORMAT[f]));
-      })));
   }
 
   // Kept up to date while the page is open, so it never says "1 day" on Sunday night.
@@ -435,7 +418,7 @@
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
           ? "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb."
-          : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those."),
+          : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those. A line with no mark scores nothing."),
         sheet.el,
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(bottomSpot); } }, "Hand in")),
         bottomSpot));
@@ -481,13 +464,10 @@
         h("p", { class: "big-score", "aria-label": r.score + " out of " + r.outOf }, score, h("span", { "aria-hidden": "true" }, " / " + r.outOf)),
         h("p", { class: "result-line" }, cheer(r.score)),
         h("p", null, "Time taken: " + duration(r.timeSec) + "."),
-        h("p", { class: "meta" }, league.trial
-          ? "Students will see this screen and wait until Monday for answers. In the trial you can see them now."
-          : "Answers come out on Monday. Please don't share yours before then, so it's fair for everyone."),
+        h("p", { class: "meta" }, "Answers come out on Monday. Please don't share yours before then, so it's fair for everyone."),
         nextStep("While you wait, practise the same kind of paper with hints and instant marking."),
         h("div", { class: "actions" },
-          h("button", { type: "button", class: "btn", onclick: function () { home("board", true); } }, "See the weekly board"),
-          league.trial ? h("button", { type: "button", class: "btn-quiet", onclick: function () { review("trial-" + league.trial.format()); } }, "See the answers") : null)));
+          h("button", { type: "button", class: "btn", onclick: function () { home("board", true); } }, "See the weekly board"))));
       el.querySelector("h2").setAttribute("tabindex", "-1");
       el.querySelector("h2").focus();
       countUp(score, r.score);

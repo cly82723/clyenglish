@@ -172,12 +172,12 @@
           h("li", null, h("span", { class: "word-wrap" }, h("span", { class: "above" }, "built"), h("span", { class: "word changed" }, "build")), " change a word"),
           h("li", null, "look forward ", h("span", { class: "caret" }, h("b", null, "to"), h("i", null, "^")), " seeing: add a word"),
           h("li", null, "let him ", h("span", { class: "word deleted" }, "to"), " go: delete a word")),
-        h("p", null, "Tap a word to change it, delete it or add a missing word next to it. If a line has no mistake, tap “No mistake”.")),
+        h("p", null, "Tap a word to change it, delete it or add a missing word next to it. If a line has no mistake, tap “No mistake”. Every line needs a mark: a line you leave blank scores nothing.")),
         list],
       progress: function () { return plural(marked(), "line") + " marked"; },
       handInNote: function () {
         var left = lines.length - marked();
-        return "You've marked " + marked() + " of " + lines.length + " lines." + (left ? " " + plural(left, "line") + " without a mark will count as “No mistake”." : "");
+        return "You've marked " + marked() + " of " + lines.length + " lines." + (left ? " " + plural(left, "line") + " without a mark: " + (left === 1 ? "it scores" : "they score") + " nothing, even if correct. Tap “No mistake” for a correct line." : "");
       }
     };
   }
@@ -238,7 +238,8 @@
       if (mine && mine.type === "insert" && mine.at === line.words.length) words.push(h("span", { class: "caret" }, h("b", null, mine.word), h("i", { "aria-hidden": "true" }, "^")));
       return h("li", { class: ok ? "right" : "wrong", "aria-label": "Line " + (i + 1) + (ok ? ", right" : ", wrong") },
         h("div", { class: "proof-text" }, words),
-        h("p", { class: "fix-note" }, tick(ok), fixText(line), l[2] ? h("span", { class: "meta" }, " " + l[2]) : null));
+        h("p", { class: "fix-note" }, tick(ok), fixText(line), l[2] ? h("span", { class: "meta" }, " " + l[2]) : null,
+          a ? null : h("span", { class: "meta" }, " You didn't mark this line.")));
     }));
   }
 

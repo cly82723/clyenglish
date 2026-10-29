@@ -133,8 +133,3 @@ tr.you > td { background: var(--chest); }
   #challenge th, #challenge td { padding: 10px 8px; }
   .season-table th:nth-child(n+4):nth-child(-n+6), .season-table td:nth-child(n+4):nth-child(-n+6) { display: none; }
 }
-
-/* ---------- Teacher trial page (challenge-trial.html) ---------- */
-
-#challenge .trial-pick h2 { font-size: var(--step-2); margin-bottom: 6px; }
-.trial-pick { padding-bottom: 8px; margin-bottom: 36px; border-bottom: 1px solid var(--rule); }

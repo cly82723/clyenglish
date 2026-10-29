@@ -1,11 +1,10 @@
-/* CLY English Weekly Challenge: one function per request from challenge.html (and the teachers' challenge-trial.html).
-   Each takes (user, body, nowMs) and returns what the page shows; a UserError is shown to the student as it is.
-   A trial request plays in its own week (trialWeek in Code.gs), which is always open and never counted. */
+/* CLY English Weekly Challenge: one function per request from challenge.html.
+   Each takes (user, body, nowMs) and returns what the page shows; a UserError is shown to the student as it is. */
 
 // The week a request plays in, and whether it is open.
 function playing(body, nowMs) {
-  var trial = trialWeek(body), sn = season(nowMs);
-  return { sn: sn, week: trial || weekId(nowMs), trial: !!trial, active: !!trial || sn.active };
+  var sn = season(nowMs);
+  return { sn: sn, week: weekId(nowMs), active: sn.active };
 }
 
 // Who the student is, this week's challenge and their own record.
@@ -19,18 +18,11 @@ function me(user, body, nowMs) {
     email: user.email,
     student: { cls: student.Class, number: student.Number, label: studentKey(student) },
     season: { start: sn.start, end: sn.end, active: p.active },
-    week: { id: week, closesAt: p.trial ? null : weekEndMs(week), format: challenge ? challenge.format : null, title: challenge ? challenge.title : null },
+    week: { id: week, closesAt: weekEndMs(week), format: challenge ? challenge.format : null, title: challenge ? challenge.title : null },
     attempt: attemptSummary(attempt, nowMs),
     limitMs: CONFIG.TIME_LIMIT_MS,
-    history: p.trial ? trialHistory(user.email, week, sn, nowMs) : history(user.email, sn, nowMs)
+    history: history(user.email, sn, nowMs)
   };
-}
-
-// The trial's own result, as soon as it is handed in.
-function trialHistory(email, week, sn, nowMs) {
-  var ranked = rankingFor(week, sn, nowMs, labels());
-  var mine = ranked.filter(function (r) { return r.key === email; })[0];
-  return mine ? [{ week: week, score: mine.score, place: mine.place, points: mine.points, entrants: ranked.length }] : [];
 }
 
 function attemptSummary(a, nowMs) {
@@ -54,7 +46,7 @@ function start(user, body, nowMs) {
   var p = playing(body, nowMs), sn = p.sn, week = p.week, student = user.student;
   if (!p.active) throw new UserError("The league is not running this week.");
   var challenge = challengeFor(week, sn);
-  if (!challenge) throw new UserError(p.trial ? "There is no trial set in this format yet. Ask the teacher who set up the trial." : "This week's challenge is not ready yet. Please check back soon.");
+  if (!challenge) throw new UserError("This week's challenge is not ready yet. Please check back soon.");
   var attempt = myAttempt(week, user.email);
   if (attempt && attempt.Submitted) throw new UserError("You have already done this week's challenge.");
   if (attempt && nowMs > deadlineOf(attempt) + CONFIG.LATE_GRACE_MS) {
@@ -71,9 +63,7 @@ function start(user, body, nowMs) {
 }
 
 function openAttempt(user, body, nowMs) {
-  var trial = trialWeek(body);
-  var attempt = trial ? myAttempt(trial, user.email)
-    : myAttempt(weekId(nowMs), user.email) || myAttempt(weekId(nowMs - CONFIG.TIME_LIMIT_MS - CONFIG.LATE_GRACE_MS), user.email);
+  var attempt = myAttempt(weekId(nowMs), user.email) || myAttempt(weekId(nowMs - CONFIG.TIME_LIMIT_MS - CONFIG.LATE_GRACE_MS), user.email);
   if (!attempt || attempt.Submitted) throw new UserError("There is no challenge in progress.");
   return attempt;
 }
@@ -112,18 +102,16 @@ function board(user, body, nowMs) {
   var p = playing(body, nowMs), sn = p.sn, week = p.week;
   var byEmail = labels();
   var show = function (w) {
-    var ranked = w && (p.trial || inSeason(sn, w)) ? rankingFor(w, sn, nowMs, byEmail) : [];
+    var ranked = w && inSeason(sn, w) ? rankingFor(w, sn, nowMs, byEmail) : [];
     return { id: w, entrants: ranked.length, rows: visibleRows(ranked, user.email).map(function (r) { return publicRow(r, byEmail, user.email); }) };
   };
-  return { thisWeek: show(week), lastWeek: show(p.trial ? "" : weekId(weekStartMs(week) - 1)) };
+  return { thisWeek: show(week), lastWeek: show(weekId(weekStartMs(week) - 1)) };
 }
 
 // The season table: points from closed weeks only, for students with points and the student asking.
-// On the trial page it shows how the trial would count, as if it were a finished week.
 function league(user, body, nowMs) {
-  var p = playing(body, nowMs), sn = p.sn, byEmail = labels(), weeks = {};
-  if (p.trial) weeks[p.week] = rankingFor(p.week, sn, nowMs, byEmail);
-  else closedSeasonWeeks(sn, nowMs).forEach(function (w) { weeks[w] = rankingFor(w, sn, nowMs, byEmail); });
+  var sn = season(nowMs), byEmail = labels(), weeks = {};
+  closedSeasonWeeks(sn, nowMs).forEach(function (w) { weeks[w] = rankingFor(w, sn, nowMs, byEmail); });
   var table = leagueTable(weeks);
   return { weeks: Object.keys(weeks).length, entrants: table.length, rows: visibleRows(table, user.email).map(function (r) {
     return { label: byEmail[r.key], points: r.points, played: r.played, firsts: r.firsts, seconds: r.seconds, thirds: r.thirds, place: r.place, you: r.key === user.email };
@@ -133,17 +121,13 @@ function league(user, body, nowMs) {
 // After a week closes: the full answers and explanations, with the student's own answers marked.
 function review(user, body, nowMs) {
   var week = String(body.week || "");
-  var trial = isTrialWeek(week);
-  if (trial && week !== trialWeek(body)) throw new UserError("Trial answers are only on the trial page.");
   // Someone who started at 23:59 on Sunday is still answering until 00:21 on Monday.
-  var revealAt = /^\d{4}-\d{2}-\d{2}$/.test(week) ? weekEndMs(week) + CONFIG.TIME_LIMIT_MS + CONFIG.LATE_GRACE_MS : trial ? 0 : Infinity;
+  var revealAt = /^\d{4}-\d{2}-\d{2}$/.test(week) ? weekEndMs(week) + CONFIG.TIME_LIMIT_MS + CONFIG.LATE_GRACE_MS : Infinity;
   if (nowMs < revealAt) throw new UserError("Answers appear after the week closes on Sunday night.");
   var challenge = challengeFor(week, season(nowMs));
   if (!challenge) throw new UserError("There was no challenge that week.");
   finishExpired(week, challenge, nowMs);
   var attempt = myAttempt(week, user.email);
-  // A tester sees the trial's answers as soon as they have handed it in.
-  if (trial && !(attempt && attempt.Submitted)) throw new UserError("Hand in the trial first, then its answers appear here.");
   var answers = attempt ? parseAnswers(attempt.Answers) : {};
   return { challenge: challenge, answers: answers, right: mark(challenge, answers).right };
 }

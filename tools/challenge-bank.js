@@ -16,7 +16,7 @@ function keyAnswers(ch) {
   const out = {};
   ch.lines.forEach((l, i) => {
     const e = L.parseProofLine(l[0]).error;
-    if (e) out[i] = { type: e.type, at: e.at, word: e.answers[0] || "" };
+    out[i] = e ? { type: e.type, at: e.at, word: e.answers[0] || "" } : { type: "ok" };
   });
   return out;
 }
@@ -62,8 +62,8 @@ function checkProof(set, ch) {
     check(line.error, set, "line " + (+i + 1) + " has other fixes but no mistake");
     alts.forEach(alt => check(oneChange(line.words, alt.split(/\s+/)), set, "line " + (+i + 1) + ": \"" + alt + "\" isn't one change away"));
   });
-  // leaving every line alone scores only the correct lines
-  check(L.mark(ch, {}).score === 15 - errors, set, "untouched lines score " + L.mark(ch, {}).score);
+  // a paper with no marks scores nothing: every line, even a correct one, needs a mark
+  check(L.mark(ch, {}).score === 0, set, "an unmarked paper scores " + L.mark(ch, {}).score);
 }
 
 const rows = [];

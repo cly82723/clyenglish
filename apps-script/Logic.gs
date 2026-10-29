@@ -75,20 +75,22 @@ function markCloze(challenge, answers) {
   return { score: countTrue(right), right: right };
 }
 
-// answers: { "3": { type, at, word } } keyed by line index. A line the student left alone means "no mistake".
+// answers: { "3": { type, at, word } } keyed by line index. Every line needs a mark: a fix, or { type: "ok" } for
+// "No mistake". A line with no mark (or a mark that makes no sense) scores nothing, even if the line is correct.
 // challenge.alsoRight: { "3": ["the whole line, fixed another way"] } lists other single fixes that are equally right.
 function markProofreading(challenge, answers) {
   var right = {};
   challenge.lines.forEach(function (l, i) {
-    var line = parseProofLine(l[0]);
-    var a = validMark((answers && answers[i]), line.words.length);
+    var line = parseProofLine(l[0]), given = answers && answers[i];
+    var a = validMark(given, line.words.length);
+    if (!given || (a.type === "none" && given.type !== "ok")) { right[i] = false; return; }
     var accepted = [line.fixed.join(" ")].concat((challenge.alsoRight && challenge.alsoRight[i]) || []).map(normalise);
     right[i] = accepted.indexOf(normalise(applyMark(line.words, a).join(" "))) >= 0;
   });
   return { score: countTrue(right), right: right };
 }
 
-// Anything malformed from the browser counts as leaving the line alone.
+// "No mistake", or anything malformed from the browser, changes nothing in the line.
 function validMark(a, length) {
   if (!a || ["replace", "insert", "delete"].indexOf(a.type) < 0) return { type: "none" };
   var at = Number(a.at);

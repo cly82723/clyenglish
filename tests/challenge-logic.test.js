@@ -39,21 +39,24 @@ test("cloze accepts the same spellings as practice", () => {
   assert.strictEqual(L.markCloze(cloze, {}).score, 0);
 });
 
-test("proofreading scores fixes and untouched correct lines", () => {
+test("proofreading scores fixes and lines marked \"No mistake\"; a line left blank scores nothing", () => {
   const answers = { 0: { type: "replace", at: 1, word: "have" }, 2: { type: "delete", at: 3 }, 3: { type: "insert", at: 4, word: "of" } };
-  assert.strictEqual(L.markProofreading(proof, answers).score, 4);
-  assert.strictEqual(L.markProofreading(proof, {}).score, 1);
+  assert.strictEqual(L.markProofreading(proof, answers).score, 3);
+  assert.strictEqual(L.markProofreading(proof, Object.assign({ 1: { type: "ok" } }, answers)).score, 4);
+  assert.strictEqual(L.markProofreading(proof, {}).score, 0);
+  assert.strictEqual(L.markProofreading(proof, {}).right[1], false, "a correct line left blank is not right");
 });
 
-test("proofreading: changing a correct line loses its mark, junk counts as untouched", () => {
+test("proofreading: changing a correct line loses its mark, and so does junk", () => {
   assert.strictEqual(L.markProofreading(proof, { 1: { type: "delete", at: 3 } }).right[1], false);
-  assert.strictEqual(L.markProofreading(proof, { 1: { type: "replace", at: 99, word: "x" } }).right[1], true);
+  assert.strictEqual(L.markProofreading(proof, { 1: { type: "replace", at: 99, word: "x" } }).right[1], false);
 });
 
-test("proofreading: a \"No mistake\" mark scores like a line left alone", () => {
+test("proofreading: \"No mistake\" is right only on a correct line", () => {
   const ok = { type: "ok" }, all = {};
   proof.lines.forEach((_, i) => { all[i] = ok; });
-  assert.strictEqual(L.markProofreading(proof, all).score, L.markProofreading(proof, {}).score);
+  const correctLines = proof.lines.filter(l => !/\[\[/.test(l[0])).length;
+  assert.strictEqual(L.markProofreading(proof, all).score, correctLines);
   assert.strictEqual(L.markProofreading(proof, { 1: ok }).right[1], true);
   assert.strictEqual(L.markProofreading(proof, { 0: ok }).right[0], false);
 });

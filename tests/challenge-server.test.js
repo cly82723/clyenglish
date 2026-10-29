@@ -81,7 +81,7 @@ function server() {
   };
   return {
     sheets, ctx, set, post, mail, codeIn,
-    enrol: (email, cls, number, tester) => set("Students", { Email: email, Class: cls, Number: number, Tester: tester ? "yes" : "" }),
+    enrol: (email, cls, number) => set("Students", { Email: email, Class: cls, Number: number }),
     at: iso => { clock = Date.parse(iso); },
     call: (email, action, extra) => post(Object.assign({ action, token: tokens[email] || (tokens[email] = signIn(email)) }, extra))
   };
@@ -321,31 +321,3 @@ test("outside the season nobody can start", () => {
   assert.match(s.call("amy@kings.edu.hk", "start").error, /not running/);
 });
 
-test("the trial page is for testers only, and its attempts never reach the league", () => {
-  const s = league();
-  s.set("Challenges", { Format: "cloze", Status: "trial", Title: "Trial cloze", Data: JSON.stringify(CLOZE) });
-  s.enrol("teacher@kings.edu.hk", "4T", 1, true);
-  s.enrol("amy@kings.edu.hk", "4C", 12);
-  // Before the season starts, so only the trial is open.
-  s.at("2026-10-30T10:00:00+08:00");
-  const trial = { trial: "cloze" };
-  assert.match(s.post({ action: "sendCode", email: "amy", trial: "cloze" }).error, /only for the teachers/);
-  assert.match(s.call("amy@kings.edu.hk", "me", trial).error, /only for the teachers/);
-  const me = s.call("teacher@kings.edu.hk", "me", trial).data;
-  assert.deepStrictEqual([me.week.id, me.week.title, me.week.closesAt, me.season.active], ["trial-cloze", "Trial cloze", null, true]);
-  assert.match(s.call("teacher@kings.edu.hk", "review", { week: "trial-cloze", trial: "cloze" }).error, /Hand in the trial first/);
-  s.call("teacher@kings.edu.hk", "start", trial);
-  s.at("2026-10-30T10:03:00+08:00");
-  assert.strictEqual(s.call("teacher@kings.edu.hk", "submit", Object.assign({ answers: { 1: "are held" } }, trial)).data.score, 1);
-  assert.match(s.call("teacher@kings.edu.hk", "start", trial).error, /already done/);
-  // Answers straight away on the trial page, never on the real page.
-  assert.strictEqual(s.call("teacher@kings.edu.hk", "review", { week: "trial-cloze", trial: "cloze" }).data.right[1], true);
-  assert.match(s.call("teacher@kings.edu.hk", "review", { week: "trial-cloze" }).error, /only on the trial page/);
-  assert.deepStrictEqual(s.call("teacher@kings.edu.hk", "me", trial).data.history.map(h => [h.week, h.score]), [["trial-cloze", 1]]);
-  assert.strictEqual(s.call("teacher@kings.edu.hk", "board", trial).data.thisWeek.rows[0].label, "4T-1");
-  // The real league and the real week don't see it.
-  s.at("2026-11-10T10:00:00+08:00");
-  assert.strictEqual(s.call("teacher@kings.edu.hk", "league").data.rows.length, 0);
-  assert.strictEqual(s.call("teacher@kings.edu.hk", "me").data.attempt.status, "none");
-  assert.strictEqual(s.call("teacher@kings.edu.hk", "board").data.lastWeek.entrants, 0);
-});

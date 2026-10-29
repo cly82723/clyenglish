@@ -7,7 +7,7 @@ Agreed with the user on 2026-10-28. This is the spec for the S.4 weekly grammar 
 - A new page, `challenge.html`, linked from the grammar page's Practice section and the S.4 card on the home page.
 - One challenge a week, alternating format: week 1 cloze, week 2 proofreading, and so on.
   - **Cloze**: 15 blanks and a word box of 18 verbs (15 used once each, 3 distractors). A blank is right only when the verb and its form are both right, marked with the same forgiving rules as the practice cloze (`bothNegatives`, `normalise`).
-  - **Proofreading**: 15 lines, about 11–12 with a mistake. One mark per line; a line with no mistake scores if it is left unchanged or marked “No mistake” (sent as `{ type: "ok" }`, which the server treats like an untouched line). Same marker format and `isRightLine` rule as the practice proofreading.
+  - **Proofreading**: 15 lines, about 11–12 with a mistake. One mark per line; every line needs a mark: a fix, or “No mistake” (sent as `{ type: "ok" }`). A line with no mark scores nothing, even when it is correct. Same marker format and `isRightLine` rule as the practice proofreading.
 - 15 marks maximum. One submission, no hints, a 20-minute limit with auto-submit when time runs out.
 - A week runs Monday 00:00 to Sunday 23:59, Hong Kong time, every week of the season including holidays. The page says so clearly.
 

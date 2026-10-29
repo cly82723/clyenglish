@@ -82,15 +82,6 @@ A classmate who types someone else's email gets nowhere without access to that i
 - **CLY League → Show league table**: writes the season table, with emails, into a **League** tab, so you know who to give prizes to.
 - **31 August**: the Students, Attempts, League and Sessions tabs are cleared automatically. Challenges and season dates are kept. **CLY League → Delete all student data now** does the same thing straight away.
 
-## Teacher trial page
-
-`challenge-trial.html` is the student page for invited testers, with a cloze and a proofreading set to try once each. Nothing on it counts towards the students' league, and testers see the answers as soon as they hand in.
-
-- In the **Students** tab, type `Tester` in the first empty heading cell of row 1 (column D), then `yes` in that column for each tester. Testers must be on the class list; nobody else can sign in on the trial page.
-- In the **Challenges** tab, the trial sets are rows with Status `trial` (one `cloze`, one `proofreading`).
-- To let a tester try a paper again, delete their row in the **Attempts** tab (its Week is `trial-cloze` or `trial-proofreading`).
-- Before launch, clear the `yes` marks (or leave them: testers only differ on the trial page).
-
 ## If something goes wrong
 
 - **A student's code doesn't arrive**: ask them to check spam, and to wait a minute before asking again. If no student ever gets one, the school blocks outside mail; tell me and we'll switch to printed codes.
