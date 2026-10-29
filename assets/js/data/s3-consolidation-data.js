@@ -149,7 +149,8 @@ window.CLY_S3_CONSOLIDATION = {
   statementsA: {
     title: "Open day interviews",
     textType: "Report for the school magazine",
-    task: "Last week, our class interviewed former students at the school's 60th anniversary open day. You are writing the report today, at school. Type the reported statement; the reporting verb is given. Change the tense, pronouns and time words where they need to change. If something is still true, you may keep the tense.",
+    task: "Type the reported statement; the reporting verb is given. Change the tense, pronouns and time words where they need to. If something is still true, you may keep the tense.",
+    situation: [["Said", "last week, at the school's 60th anniversary open day"], ["You are reporting", "today, at school"]],
     list: true,
     paragraphs: [["Ms Chan (class of 1998): ", 1], ["Mr Lee (class of 1985): ", 2], ["Kitty (class of 2015): ", 3], ["Mr Ho (class of 1990): ", 4], ["Ms Yip (class of 1979): ", 5], ["Eric (class of 2010): ", 6], ["Ms Fung (class of 1972): ", 7], ["Dr Ma (class of 1995): ", 8], ["Mrs Lau (class of 1988): ", 9], ["Mr Tse (class of 1982), to us: ", 10]],
     items: {
@@ -169,7 +170,8 @@ window.CLY_S3_CONSOLIDATION = {
   questionsB: {
     title: "Questions for a marine biologist",
     textType: "Class newsletter",
-    task: "Last Friday, the marine biologist Dr Kwan visited our class. You are writing the newsletter this week. Type the reported question; the reporting verb is given. Use if or whether for yes/no questions, statement word order, and a full stop.",
+    task: "Type the reported question; the reporting verb is given. Use if or whether for yes/no questions, statement word order, and a full stop.",
+    situation: [["Asked", "last Friday, when the marine biologist Dr Kwan visited our class"], ["You are reporting", "this week, in the class newsletter"]],
     list: true,
     paragraphs: [["Ben: ", 1], ["Amy: ", 2], ["Kit: ", 3], ["Joy: ", 4], ["Leo: ", 5], ["Mia: ", 6], ["Sam: ", 7], ["Ivy: ", 8], ["Tom: ", 9], ["Lily: ", 10]],
     items: {

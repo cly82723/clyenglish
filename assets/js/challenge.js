@@ -435,7 +435,7 @@
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
           ? "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb."
-          : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: leave those as they are."),
+          : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those."),
         sheet.el,
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(bottomSpot); } }, "Hand in")),
         bottomSpot));

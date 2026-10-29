@@ -766,7 +766,7 @@
         h("li", null, "let him ", h("span", { class: "word deleted" }, "to"), " go: delete a word")),
       h("p", null, "Tap a word to change it, delete it or add a missing word next to it. If a line has no mistake, tap “No mistake”.")));
     if (passage.textType) root.appendChild(h("p", { class: "tagline" }, passage.textType));
-    if (passage.lookFor) root.appendChild(lookout(passage.lookFor, "Each line has one mistake at most, and some lines are correct."));
+    if (passage.lookFor) root.appendChild(lookout(passage.lookFor, "Each line has one mistake at most, and some lines are correct: tap “No mistake” for those."));
     root.appendChild(count);
     root.appendChild(list);
     root.appendChild(h("div", { class: "actions" }, checkBtn, h("button", { type: "button", class: "btn-quiet", onclick: reset }, "Start again")));

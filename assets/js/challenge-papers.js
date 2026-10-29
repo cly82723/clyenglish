@@ -103,10 +103,20 @@
             onkeydown: function (e) { wordKeys(e, i, at); }, onclick: function () { openWord(i, at); } }, w)), " ");
       });
       words.push(caret(lines[i].length));
-      var li = h("li", { role: "group", "aria-label": "Line " + (i + 1) }, h("div", { class: "proof-row" }, h("div", { class: "proof-text" }, words)));
+      // "No mistake" is a mark of its own; the server scores it the same as a line left alone
+      var ok = a && a.type === "ok";
+      var li = h("li", { role: "group", "aria-label": "Line " + (i + 1) }, h("div", { class: "proof-row" }, h("div", { class: "proof-text" }, words),
+        h("button", { type: "button", class: "ok-btn", "data-key": "ok" + i, "aria-pressed": String(!!ok), onclick: function () { toggleOk(i); } }, "No mistake")));
       if (editing && editing.line === i) li.appendChild(editor(i));
-      else if (a) li.appendChild(h("p", { class: "clear" }, h("button", { type: "button", class: "link-btn", onclick: function () { setAnswer(i, null); } }, "Clear my mark")));
+      else if (a && !ok) li.appendChild(h("p", { class: "clear" }, h("button", { type: "button", class: "link-btn", onclick: function () { setAnswer(i, null); } }, "Clear my mark")));
       return li;
+    }
+    function toggleOk(i) {
+      if (answers[i] && answers[i].type === "ok") delete answers[i]; else answers[i] = { type: "ok" };
+      if (editing && editing.line === i) { editing = null; draft = ""; }
+      changed();
+      draw(i);
+      list.querySelector("[data-key='ok" + i + "']").focus();
     }
 
     function editor(i) {
@@ -162,10 +172,13 @@
           h("li", null, h("span", { class: "word-wrap" }, h("span", { class: "above" }, "built"), h("span", { class: "word changed" }, "build")), " change a word"),
           h("li", null, "look forward ", h("span", { class: "caret" }, h("b", null, "to"), h("i", null, "^")), " seeing: add a word"),
           h("li", null, "let him ", h("span", { class: "word deleted" }, "to"), " go: delete a word")),
-        h("p", null, "Tap a word to change it, delete it or add a missing word next to it. Leave a correct line as it is.")),
+        h("p", null, "Tap a word to change it, delete it or add a missing word next to it. If a line has no mistake, tap “No mistake”.")),
         list],
       progress: function () { return plural(marked(), "line") + " marked"; },
-      handInNote: function () { return "You've marked " + marked() + " of " + lines.length + " lines. Lines you leave alone count as correct."; }
+      handInNote: function () {
+        var left = lines.length - marked();
+        return "You've marked " + marked() + " of " + lines.length + " lines." + (left ? " " + plural(left, "line") + " without a mark will count as “No mistake”." : "");
+      }
     };
   }
 

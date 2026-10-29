@@ -31,18 +31,19 @@
   }
 
   // One participle phrase: who does the action, and the test that proves it.
+  // flow: who does what to whom; the subject of the sentence is the green chip
   var PARTICIPLE = {
-    present: { label: "Present participle (V-ing)", sentence: ["Wanting to save money", ", he walked to school."], subject: "he", verb: "want", arrow: "does", test: "He wanted to save money. ✔", rule: "The subject does the action." },
-    past: { label: "Past participle (V3)", sentence: ["Frightened by the dog", ", the boy ran away."], subject: "the boy", verb: "frighten", arrow: "is done to", test: "The boy was frightened. ✔", rule: "The action is done to the subject, or the subject feels it." }
+    present: { label: "Present participle (V-ing)", sentence: ["Wanting to save money", ", he walked to school."], flow: [["he", true], "wanted", ["to save money", false]], test: "He wanted to save money. ✔", rule: "The subject does the action." },
+    past: { label: "Past participle (V3)", sentence: ["Frightened by the dog", ", the boy ran away."], flow: [["the dog", false], "frightened", ["the boy", true]], test: "The boy was frightened. ✔", rule: "The action is done to the subject, or the subject feels it." }
   };
   function participleCard(kind) {
-    var p = PARTICIPLE[kind], doer = kind === "present";
-    var subject = h("span", { class: "dg-chip dg-subject" }, p.subject), action = h("span", { class: "dg-chip dg-action" }, p.verb);
+    var p = PARTICIPLE[kind], f = p.flow;
+    var chip = function (c) { return h("span", { class: "dg-chip" + (c[1] ? " dg-subject" : "") }, c[0], c[1] ? h("small", { class: "dg-tag" }, "subject") : null); };
     return h("div", { class: "dg-who dg-" + kind },
       h("p", { class: "field-label" }, p.label),
       h("p", { class: "dg-sentence" }, h("span", { class: "dg-phrase" }, p.sentence[0]), p.sentence[1]),
-      h("p", { class: "dg-flow", "aria-label": doer ? p.subject + " does the action" : "the action is done to " + p.subject },
-        doer ? subject : action, h("span", { class: "dg-arrow" }, p.arrow, h("span", { "aria-hidden": "true" }, " →")), doer ? action : subject),
+      h("p", { class: "dg-flow", "aria-label": f[0][0] + " " + f[1] + " " + f[2][0] + "; the subject is " + (f[0][1] ? f[0][0] : f[2][0]) },
+        chip(f[0]), h("span", { class: "dg-arrow" }, f[1], h("span", { "aria-hidden": "true" }, " →")), chip(f[2])),
       h("p", { class: "dg-test" }, h("span", { class: "field-label" }, "Test"), " ", p.test),
       h("p", { class: "note-line" }, p.rule));
   }
@@ -90,7 +91,7 @@
       ORDER.map(function (o) {
         return h("div", { class: "dg-order" },
           h("p", { class: "field-label" }, "Direct question"), tiles(o.direct, true),
-          h("p", { class: "field-label" }, "Reported: asked …"), tiles(o.reported));
+          h("p", { class: "field-label" }, "Reported question"), tiles([["He asked", "lead"]].concat(o.reported)));
       }),
       h("ul", { class: "legend" },
         h("li", null, h("i", { class: "dg-key dg-helper" }), "do / does / did: drop it"),
@@ -143,11 +144,20 @@
     var saved = (store && store.get()) || {};
     var typed = saved.typed || {}, tries = saved.tries || {}, done = saved.done || {}, firstTry = saved.firstTry || {};
     var kind = saved.kind || {}, kindWrong = saved.kindWrong || {};
-    var boxes = {}, summary = h("div", { "aria-live": "polite" });
+    var boxes = {}, summary = h("div", { "aria-live": "polite" }), fresh = new CLY.Fresh();
     // set.whole: the student types the whole new sentence instead of only the missing part
     var marking = function (id) { return set.whole ? wholeSentence(set.items[id]) : set.items[id]; };
     var save = function () { if (store) store.set({ typed: typed, tries: tries, done: done, firstTry: firstTry, kind: kind, kindWrong: kindWrong }); };
+    // the student's words begin the sentence, so a phone keyboard should start with a capital
+    var startsSentence = function (id) { return set.whole || !set.items[id].frame.split("___")[0].trim(); };
 
+    // After a right answer the cursor moves on to the next item still to do, so a phone needs no scrolling.
+    function focusNext(id) {
+      var rest = ids.filter(function (n) { return n > id && !done[n]; }).concat(ids.filter(function (n) { return n < id && !done[n]; }));
+      if (!rest.length) return;
+      var target = boxes[rest[0]].querySelector("input, .choice:not([disabled])");
+      if (target) target.focus();
+    }
     function check(id) {
       if (done[id] || !(typed[id] || "").trim()) return;
       var r = judge(typed[id], marking(id));
@@ -155,15 +165,18 @@
       else tries[id] = (tries[id] || 0) + 1;
       save(); draw(id); drawSummary();
       // a miss redraws the box, so the cursor goes back into it for the next try
-      if (!r.ok) boxes[id].querySelector("input").focus();
+      if (r.ok) focusNext(id); else boxes[id].querySelector("input").focus();
     }
     function pick(id, k) {
       if (k === set.items[id].kind) kind[id] = k;
       else (kindWrong[id] = kindWrong[id] || []).push(k);
       save(); draw(id);
-      var input = boxes[id].querySelector("input");
-      if (input) input.focus();
+      var next = boxes[id].querySelector("input, .choice:not([disabled])");
+      if (next) next.focus();
     }
+    var verdict = function (id, state, kids) {
+      return h("div", { class: "verdict " + (state === "do" ? "do" : "hint") + (fresh.is("v" + id, state) ? " fresh" : "") }, kids);
+    };
 
     function draw(id) {
       var it = set.items[id], parts = it.frame.split("___");
@@ -174,24 +187,33 @@
         var right = (kind[id] || (done[id] && it.kind)) === k[0], crossed = (kindWrong[id] || []).indexOf(k[0]) >= 0;
         return h("button", { type: "button", class: "choice" + (right ? " right" : crossed ? " crossed" : ""), disabled: right || crossed || !needsKind, "aria-pressed": String(right), onclick: function () { pick(id, k[0]); } }, k[1]);
       })));
-      if (it.kind && (kindWrong[id] || []).length && needsKind) boxes[id].appendChild(h("div", { class: "verdict hint" }, h("strong", null, "Look again."), "Does the subject after the comma do the action, or is it done to them (or do they feel it)?"));
-      if (needsKind) return;
+      if (needsKind) {
+        if ((kindWrong[id] || []).length) boxes[id].appendChild(verdict(id, "kind", [h("strong", null, "Look again."), "Does the subject after the comma do the action, or is it done to them (or do they feel it)?"]));
+        return;
+      }
 
       var r = done[id] ? judge(typed[id], marking(id)) : null;
-      var input = h("input", { type: "text", autocomplete: "off", autocapitalize: "off", spellcheck: "false", value: typed[id] || "", readonly: done[id] || null,
+      // the gap shows what is typed as it is typed; once right, it shows the correct version
+      var gap = h("span", { class: "rw-gap" + (done[id] ? " right" : tries[id] ? " wrong" : ""), "aria-hidden": "true" }, done[id] ? r.model : (typed[id] || "").trim() || "______");
+      var input = h("input", { type: "text", autocomplete: "off", autocapitalize: startsSentence(id) ? "sentences" : "off", spellcheck: "false", value: typed[id] || "", readonly: done[id] || null,
+        placeholder: set.whole ? "Type the whole new sentence…" : "Type the missing part…",
         "aria-label": set.whole ? "Rewrite " + id + ": the whole sentence" : "Rewrite " + id + ": " + it.frame.replace("___", "blank"),
-        oninput: function (e) { typed[id] = e.target.value; save(); },
+        oninput: function (e) { typed[id] = e.target.value; gap.textContent = e.target.value.trim() || "______"; save(); },
         onkeydown: function (e) { if (e.key === "Enter") { e.preventDefault(); check(id); } } });
-      if (!set.whole) boxes[id].appendChild(h("p", { class: "rw-frame" }, parts[0], h("span", { class: "rw-gap" + (done[id] ? " right" : tries[id] ? " wrong" : "") }, done[id] ? typed[id].trim() : "______"), parts[1] || ""));
+      gap.addEventListener("click", function () { if (!done[id]) input.focus(); });
+      if (!set.whole) boxes[id].appendChild(h("p", { class: "rw-frame" }, parts[0], gap, parts[1] || ""));
+      else if (done[id]) boxes[id].appendChild(h("p", { class: "rw-frame" }, gap));
       boxes[id].appendChild(h("div", { class: "rw-row" }, input, done[id] ? null : h("button", { type: "button", class: "btn", onclick: function () { check(id); } }, "Check")));
       if (done[id]) {
-        boxes[id].appendChild(h("div", { class: "verdict do" }, h("strong", null, tries[id] ? "Well done, you got there!" : "Correct!"), it.why,
-          r.reminders.length ? h("ul", { class: "rw-reminders" }, r.reminders.map(function (n) { return h("li", null, n); })) : null));
+        var copied = tries[id] > 1;
+        boxes[id].appendChild(verdict(id, "do", [h("strong", null, copied ? "Done. Try this one again later." : tries[id] ? "Well done, you got there!" : "Correct!"), it.why,
+          r.reminders.length ? [h("p", { class: "rw-fix-title" }, r.reminders.length > 1 ? "Small things to fix:" : "One thing to fix:"),
+            h("ul", { class: "rw-reminders" }, r.reminders.map(function (n) { return h("li", null, n); }))] : null]));
       } else if (tries[id]) {
         var model = judge("", marking(id)).model;
-        boxes[id].appendChild(h("div", { class: "verdict hint" }, h("strong", null, "Not quite. Have another go."), it.hint,
-          tries[id] > 1 ? h("p", null, "Model answer: ", h("strong", null, model), " Type it in to finish this one.") : null));
-      }
+        boxes[id].appendChild(verdict(id, "hint" + tries[id], [h("strong", null, "Not quite. Have another go."), it.hint,
+          tries[id] > 1 ? h("p", null, "Model answer: ", h("strong", null, model), " Type it in to finish this one.") : null]));
+      } else fresh.is("v" + id, "");
     }
 
     function drawSummary() {
@@ -204,7 +226,7 @@
         h("p", { class: "meta" }, "Right first time: " + first + " / " + ids.length)));
     }
     function reset() {
-      typed = {}; tries = {}; done = {}; firstTry = {}; kind = {}; kindWrong = {};
+      typed = {}; tries = {}; done = {}; firstTry = {}; kind = {}; kindWrong = {}; fresh = new CLY.Fresh();
       if (store) store.clear();
       ids.forEach(draw); drawSummary();
       CLY.scrollTo(root);
@@ -218,6 +240,8 @@
     // inside a set switcher the title is already shown above the squares
     root.appendChild(h("p", { class: "tagline" }, root.closest(".set-panel") ? set.textType : set.textType + ": " + set.title));
     root.appendChild(h("p", null, set.task));
+    // when it was said and when it is reported decide what changes, so the situation gets its own box
+    if (set.situation) root.appendChild(h("dl", { class: "rw-situation" }, set.situation.map(function (s) { return h("div", null, h("dt", null, s[0]), h("dd", null, s[1])); })));
     root.appendChild(set.list ? h("ul", { class: "passage rw-quotes" }, passage) : h("div", { class: "passage" }, passage));
     var list = h("div", { class: "rw-items" }, ids.map(function (id) { boxes[id] = h("div", { class: "question" }); return boxes[id]; }));
     root.appendChild(list);

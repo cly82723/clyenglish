@@ -50,6 +50,14 @@ test("proofreading: changing a correct line loses its mark, junk counts as untou
   assert.strictEqual(L.markProofreading(proof, { 1: { type: "replace", at: 99, word: "x" } }).right[1], true);
 });
 
+test("proofreading: a \"No mistake\" mark scores like a line left alone", () => {
+  const ok = { type: "ok" }, all = {};
+  proof.lines.forEach((_, i) => { all[i] = ok; });
+  assert.strictEqual(L.markProofreading(proof, all).score, L.markProofreading(proof, {}).score);
+  assert.strictEqual(L.markProofreading(proof, { 1: ok }).right[1], true);
+  assert.strictEqual(L.markProofreading(proof, { 0: ok }).right[0], false);
+});
+
 test("proofreading accepts a line's other listed fixes, and nothing else", () => {
   const p = Object.assign({}, proof, { alsoRight: { 3: ["She is in charge for the club."] } });
   const add = word => L.markProofreading(p, { 3: { type: "insert", at: 4, word } }).right[3];
