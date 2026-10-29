@@ -1743,3 +1743,5 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 .rw-situation dd { margin: 2px 0 0; font-weight: 700; }
 .formula-line { margin: 0 0 6px; font-size: 1.0625rem; }
 .formula-line .formula { color: var(--sky); }
+/* a long formula (a list of word swaps) wraps at its spaces, so the example column keeps its room */
+.table-wrap .formula { white-space: normal; }

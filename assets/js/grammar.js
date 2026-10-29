@@ -541,11 +541,11 @@
     var counts = {};
     lesson.form.forEach(function (f) { counts[f.formula] = (counts[f.formula] || 0) + 1; });
     var shared = Object.keys(counts).filter(function (k) { return counts[k] > 1; }).sort(function (a, b) { return counts[b] - counts[a]; })[0];
-    if (shared) root.appendChild(h("p", { class: "formula-line" }, "Formula: ", h("span", { class: "formula" }, shared)));
+    if (shared) root.appendChild(h("p", { class: "formula-line" }, "Formula: ", h("span", { class: "formula" }, keepHyphens(shared))));
     root.appendChild(h("div", { class: "table-wrap stack" }, h("table", null,
       h("thead", null, h("tr", null, h("th", { scope: "col" }, "Pattern"), shared ? null : h("th", { scope: "col" }, "Formula"), h("th", { scope: "col" }, "Example"))),
       h("tbody", null, lesson.form.map(function (f) {
-        var own = f.formula !== shared ? h("span", { class: "formula" }, f.formula) : null;
+        var own = f.formula !== shared ? h("span", { class: "formula" }, keepHyphens(f.formula)) : null;
         return h("tr", null,
           h("th", { scope: "row" }, f.label, shared && own ? [h("br"), own] : null),
           shared ? null : h("td", null, own),
