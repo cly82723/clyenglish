@@ -154,6 +154,21 @@
     fullMarks: "Full marks! Now try Match & change to use the conditionals yourself."
   };
 
+  // S.3 quizzes: one topic each, and every clue points back to that topic's rules
+  function topicKit(topic) {
+    var rules = TOPICS[topic].review;
+    return {
+      topicOf: function () { return topic; },
+      genericHint: "Read the whole sentence again and check it against the rule.",
+      where: "the rules",
+      section: rules,
+      bigClue: "compare each option with the examples in the rules for " + topic + ".",
+      review: function () { CLY.go(rules); },
+      reviewHeading: "Worth reviewing:",
+      fullMarks: "Full marks! Now try the Challenge to use all six topics in longer texts."
+    };
+  }
+
   function reviewLink(topic, where, review) {
     return h("button", { type: "button", class: "link-btn", onclick: function () { review(topic); } }, "Review " + topic + " in " + where);
   }
@@ -176,6 +191,9 @@
     "Prepositions": { ex: "She is good [[in>at]] maths." },
     "Word form": { ex: "The concert was a great [[successful>success]]." }
   };
+  // the S.3 page (s3-grammar.html) brings its own topics, each pointing at its rules on that page
+  var S3 = window.CLY_S3_GRAMMAR;
+  if (S3) Object.keys(S3.topics).forEach(function (k) { TOPICS[k] = S3.topics[k]; });
   var topicTab = function (focus) { return (TOPICS[focus] && TOPICS[focus].review) || G.FOCUS_TABS[focus]; };
   // A chip for a topic: it opens the lesson when this page has one, and is plain text when it doesn't.
   function topicChip(focus) {
@@ -522,8 +540,10 @@
       h("tbody", null, lesson.form.map(function (f) { return h("tr", null, h("th", { scope: "row" }, f.label), h("td", null, h("span", { class: "formula" }, f.formula)), h("td", null, bold(f.example))); })))));
     if (lesson.spelling) root.appendChild(h("div", null, h("p", { class: "field-label" }, "Spelling the -ing form"), h("ul", null, lesson.spelling.map(function (sp) { return h("li", null, sp); }))));
 
-    root.appendChild(h("h3", null, lesson.visualTitle));
-    root.appendChild(h("div", null, VISUALS[lesson.visual]()));
+    if (lesson.visual) {
+      root.appendChild(h("h3", null, lesson.visualTitle));
+      root.appendChild(h("div", null, VISUALS[lesson.visual]()));
+    }
 
     root.appendChild(h("h3", null, "When to use it"));
     root.appendChild(h("ol", { class: "lesson-functions" }, lesson.functions.map(function (f) {
@@ -558,7 +578,8 @@
     })));
 
     root.appendChild(h("div", { class: "tip" }, h("p", { class: "field-label" }, "Proofreading tip"), h("p", null, lesson.tip)));
-    root.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { CLY.go("proofreading"); } }, "Try the proofreading exercise")));
+    var next = lesson.practice || { id: "proofreading", label: "Try the proofreading exercise" };
+    root.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { CLY.go(next.id); } }, next.label)));
   }
 
   // ---------- Proofreading exercise ----------
@@ -1140,7 +1161,15 @@
     proofreading: function (el) { Sets(el, "proofmix", window.CLY_PROOFREADING.map(proofPassage), titled, Proofreading); },
     condmatrix: function (el) { widgets.condmatrix = ConditionalsMatrix(el); },
     condquiz: function (el) { Sets(el, "condquiz", [G.condQuizQuestions].concat(more("condquiz")), howMany, function (b, q, store) { McQuiz(b, q, COND_KIT, store); }); },
-    condmatch: function (el) { Sets(el, "condmatch", [G.defaultCondMatch].concat(more("condmatch")), titled, ConditionalMatch); }
+    condmatch: function (el) { Sets(el, "condmatch", [G.defaultCondMatch].concat(more("condmatch")), titled, ConditionalMatch); },
+    // S.3: data-set names the topic (pastPerfect, ing, ed, statements, questions, linking)
+    s3lesson: function (el) { Lesson(el, S3.lessons[el.getAttribute("data-set")]); },
+    s3quiz: function (el) {
+      var quiz = S3.quizzes[el.getAttribute("data-set")];
+      Sets(el, "s3quiz:" + el.getAttribute("data-set"), quiz.sets, howMany, function (b, q, store) { McQuiz(b, q, topicKit(quiz.topic), store); });
+    },
+    s3cloze: function (el) { Sets(el, "s3cloze", S3.cloze, titled, Cloze); },
+    s3proof: function (el) { Sets(el, "s3proof", S3.proofreading.map(proofPassage), titled, Proofreading); }
   };
   document.querySelectorAll("[data-grammar]").forEach(function (el) {
     var fn = mount[el.getAttribute("data-grammar")];
