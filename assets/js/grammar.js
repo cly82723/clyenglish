@@ -21,9 +21,9 @@
     if (key) { var again = container.querySelector("[data-key='" + key + "']"); if (again && !again.disabled) again.focus(); }
   }
 
-  function label(x, y, text, cls, anchor) {
-    var half = String(text).length * 4.2;
-    var cx = anchor ? x : Math.min(Math.max(x, half + 6), 600 - half - 6);
+  function label(x, y, text, cls, anchor, width) {
+    var half = String(text).length * 4.2, w = width || 600;
+    var cx = anchor ? x : Math.min(Math.max(x, half + 6), w - half - 6);
     return s("text", { x: cx, y: y, "text-anchor": anchor || "middle", class: cls || "ink" }, text);
   }
   function arrowDefs(id, cls) {
@@ -35,41 +35,47 @@
   var tenseTimelines = G.tenseTimelines;
   function TenseTimeline(tense, example) {
     var items = tenseTimelines[tense] || [];
-    var X = function (at) { return 40 + at * 5.2; }, AXIS = 90;
+    // a phone gets a narrower canvas, so the labels stay readable and nothing scrolls sideways
+    var W = window.matchMedia("(max-width: 600px)").matches ? 340 : 600;
+    var X = function (at) { return W === 600 ? 40 + at * 5.2 : 16 + at * 3.08; }, AXIS = 90;
+    var lastPoint = null;
     var g = items.map(function (it) {
       if (it.type === "point") {
-        var y = it.below ? AXIS + 28 : AXIS - 20;
+        // on the narrow canvas two close events would overlap, so the later label goes up a line
+        var crowded = W !== 600 && !it.below && lastPoint !== null && X(it.at) - lastPoint < 120;
+        lastPoint = X(it.at);
+        var y = it.below ? AXIS + 28 : AXIS - (crowded ? 44 : 20);
         return s("g", null,
           s("line", { x1: X(it.at), y1: AXIS - 10, x2: X(it.at), y2: AXIS + 10, class: "ink-line", "stroke-width": "3" }),
           s("circle", { cx: X(it.at), cy: AXIS, r: "7", class: "ink" }),
-          label(X(it.at), y, it.label, it.below ? "copper" : "ink"));
+          label(X(it.at), y, it.label, it.below ? "copper" : "ink", null, W));
       }
       if (it.type === "span") return s("g", null,
         s("rect", { x: X(it.from), y: AXIS - 9, width: X(it.to) - X(it.from), height: "18", rx: "9", class: "span" }),
-        label((X(it.from) + X(it.to)) / 2, AXIS - 20, it.label));
+        label((X(it.from) + X(it.to)) / 2, AXIS - 20, it.label, null, null, W));
       if (it.type === "result") return s("g", null,
         s("path", { d: "M" + X(it.from) + "," + AXIS + " Q" + (X(it.from) + X(it.to)) / 2 + "," + (AXIS - 40) + " " + (X(it.to) - 3) + "," + (AXIS - 4), class: "green-line", "stroke-width": "2", "stroke-dasharray": "5 3", "marker-end": "url(#tl-res)" }),
         s("circle", { cx: X(it.from), cy: AXIS, r: "7", class: "ink" }),
-        label(X(it.from), AXIS - 44, it.label),
-        label((X(it.from) + X(it.to)) / 2 + 10, AXIS + 24, "result still matters now", "green"));
+        label(X(it.from), AXIS - 44, it.label, null, null, W),
+        label((X(it.from) + X(it.to)) / 2 + 10, AXIS + 24, "result still matters now", "green", null, W));
       if (it.type === "repeat") {
         var marks = [];
         for (var a = it.from; a <= it.to; a += 10) marks.push(s("line", { x1: X(a), y1: AXIS - 8, x2: X(a), y2: AXIS + 8, class: "ink-line", "stroke-width": "3", "stroke-linecap": "round" }));
-        return s("g", null, marks, label(X(50), AXIS - 20, it.label));
+        return s("g", null, marks, label(X(50), AXIS - 20, it.label, null, null, W));
       }
       if (it.type === "ref") return s("g", null,
         s("line", { x1: X(it.at), y1: AXIS - 30, x2: X(it.at), y2: AXIS + 12, class: "soft-line", "stroke-width": "1.5", "stroke-dasharray": "3 3" }),
-        label(X(it.at), AXIS + 28, it.label, "copper"));
+        label(X(it.at), AXIS + 28, it.label, "copper", null, W));
       return null;
     });
     return h("figure", { class: "figure" },
       h("p", { class: "field-label" }, "Timeline"),
       h("p", null, h("em", null, "“" + example + "”")),
-      s("svg", { viewBox: "0 0 600 150", role: "img", "aria-label": "Timeline for " + tense + ": " + example },
+      s("svg", { viewBox: "0 0 " + W + " 150", class: W === 600 ? null : "narrow", role: "img", "aria-label": "Timeline for " + tense + ": " + example },
         s("defs", null, arrowDefs("tl-arrow", "soft"), arrowDefs("tl-res", "green")),
-        s("line", { x1: "20", y1: AXIS, x2: "585", y2: AXIS, class: "axis", "marker-end": "url(#tl-arrow)" }),
+        s("line", { x1: "8", y1: AXIS, x2: W - 15, y2: AXIS, class: "axis", "marker-end": "url(#tl-arrow)" }),
         s("text", { x: "24", y: AXIS + 48, class: "soft small" }, "past"),
-        s("text", { x: "580", y: AXIS + 48, class: "soft small", "text-anchor": "end" }, "future"),
+        s("text", { x: W - 20, y: AXIS + 48, class: "soft small", "text-anchor": "end" }, "future"),
         s("line", { x1: X(50), y1: AXIS - 14, x2: X(50), y2: AXIS + 14, class: "now" }),
         s("text", { x: X(50), y: AXIS + 48, class: "copper small", "text-anchor": "middle" }, "now"),
         g));

@@ -173,7 +173,7 @@
 
     root.appendChild(h("div", { class: "tip" },
       h("p", { class: "field-label" }, "Instructions"),
-      h("p", null, "Fill in each blank using ", h("strong", null, "one"), " appropriate word or phrase from the ", h("strong", null, g.source), ". Change the form if necessary. The first letter of the word or phrase is given."),
+      h("p", null, "Fill in each blank using ", h("strong", null, "one"), " appropriate word or phrase from the ", h("strong", null, g.source), ". Change the form if necessary. The first letter of the word or phrase is given: type the whole word, and repeating the first letter is fine."),
       changedCount ? h("details", null,
         h("summary", null, changedCount + " blanks need a different part of speech"),
         h("p", null, "The word is on the list, but in a different form (check the Parts of Speech tables on your worksheet). Look at the words around each blank to decide.")) : null

@@ -14,7 +14,7 @@ window.CLY_S3_GRAMMAR = {
 
   lessons: {
     pastPerfect: {
-      intro: "The past perfect (had + V3) is the past of the past. Use it when you are already talking about the past and need to step further back.",
+      intro: "The past perfect is had + V3. V3 is the past participle, the third form of a verb: go – went – gone, eat – ate – eaten, finish – finished – finished. The past perfect is the past of the past. Use it when you are already talking about the past and need to step further back.",
       form: [
         { label: "Positive", formula: "had + V3", example: "By the time we arrived, the film **had started**." },
         { label: "Negative", formula: "had not (hadn't) + V3", example: "I **hadn't eaten** all day, so I was starving." },

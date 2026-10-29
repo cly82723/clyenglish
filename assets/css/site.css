@@ -746,7 +746,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .figure text { font-size: 15px; font-weight: 600; }
 /* labels sit on a thin paper outline, so a line that runs past them (like NOW) goes behind the words, not through them */
 .figure svg text { paint-order: stroke; stroke: var(--paper); stroke-width: 6px; stroke-linejoin: round; }
-.figure .small { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+.figure .small { font-size: 14px; font-weight: 700; letter-spacing: 0.08em; }
 .figure .box { stroke-width: 1.5; }
 .figure .box-doer { fill: var(--paper); stroke: var(--ink); }
 .figure .box-action { fill: var(--highlight); stroke: var(--sky); }
@@ -1517,7 +1517,9 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 /* phones: the contents collapse to one line naming where you are; the label panel shows on the first section only */
 .index-toggle { display: none; }
 @media (max-width: 760px) {
-  .index[data-collapse] { padding: 10px var(--gutter); }
+  /* the contents line stays at the top while you scroll, so a long page never strands you */
+  .index[data-collapse] { padding: 10px var(--gutter); position: sticky; top: 0; z-index: 20; background: var(--paper); }
+  .index[data-collapse].open ol { max-height: 70vh; }
   .index-toggle {
     display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 12px; width: 100%;
     min-height: 52px; padding: 6px 14px; text-align: left; cursor: pointer;
@@ -1675,7 +1677,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .js [data-tabs][data-later] .column > p.tip { display: none; }
 
 /* ---------- S.3 grammar diagrams (s3-grammar.js) ---------- */
-.figure .small-plain { font-size: 13px; font-weight: 700; }
+.figure .small-plain { font-size: 14px; font-weight: 700; }
 .dg-caption { margin: 10px 0 2px; font-size: 1rem; color: var(--ink-soft); }
 .dg-chip {
   display: inline-block; padding: 3px 10px; border: 1.5px solid var(--ink-soft); border-radius: 8px;
@@ -1745,3 +1747,12 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 .formula-line .formula { color: var(--sky); }
 /* a long formula (a list of word swaps) wraps at its spaces, so the example column keeps its room */
 .table-wrap .formula { white-space: normal; }
+
+/* touch screens: every control is at least 44px tall, so a thumb hits what it aims at */
+@media (pointer: coarse) {
+  .chip { min-height: 44px; display: inline-flex; align-items: center; }
+  .back-cover nav a { display: inline-flex; align-items: center; min-height: 44px; }
+  .blank input { min-height: 44px; }
+}
+.terms { font-size: 1rem; color: var(--ink-soft); }
+.form-parts { margin: -6px 0 18px; }
