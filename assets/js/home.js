@@ -95,8 +95,7 @@
 
   function initFox(hello, tips) {
     if (!tips || !KINDS.every(function (k) { return tips[k.key] && tips[k.key].length; })) return;
-    var fox = hello.querySelector(".fox"), bubble = hello.querySelector(".bubble");
-    var hint = fox.querySelector(".fox-hint");
+    var fox = hello.querySelector(".fox"), bubble = document.querySelector(".tip-day .bubble");
     var day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
     var at = day;
 
@@ -155,11 +154,9 @@
       var now = Date.now();
       if (now - swapped > 250) replay(bubble, "swap"); else bubble.classList.remove("swap");
       swapped = now;
-      if (!hint.hidden) { hint.hidden = true; store("cly:fox", "1"); }
     }
     fox.addEventListener("click", next);
     more.addEventListener("click", next);
-    if (!store("cly:fox")) hint.hidden = false;
     draw();
     // today's tip is in place before anything is announced: only a tip the student asks for is read out
     var body = bubble.querySelector(".bubble-body");

@@ -227,7 +227,7 @@ components:
 
 **Creative North Star: "The Student's Own Exercise Book"**
 
-Every page is a sheet in a Hong Kong exercise book. The cover is a bright picture of a sunny day out, under a soft white veil, with leaf-green tabs hanging from it: one tab per form (S.1 · S.2 · S.3 for the junior track, S.4 · S.5 & S.6 for the senior track). White writing paper sits on that cover. A double margin rule separates the contents from the page. A label panel (Subject / Words / Aim) titles each guide like the label on a real exercise book. Nothing looks like a tutoring site: there is no hero band, no call-to-action strip and no card grid. Structure comes from the book itself: cover, tabs, margin line, label panel, ruled lines and a teacher's marks.
+Every page is a sheet in a Hong Kong exercise book. The cover is a bright picture of a sunny day out, under a soft white veil, with leaf-green tabs hanging from it: one tab per form (S.1 · S.2 · S.3 for the junior track, S.4 · S.5 & S.6 for the senior track). White writing paper sits on that cover. A thin margin line separates the contents from the page. A label panel (Subject / Words / Aim) titles each guide like the label on a real exercise book. Nothing looks like a tutoring site: there is no hero band, no call-to-action strip and no card grid. Structure comes from the book itself: cover, tabs, margin line, label panel, ruled lines and a teacher's marks.
 
 Reading comes first. Body type is set for students who read English as a second language: Atkinson Hyperlegible at 17px with a 1.65 line height, a 68ch measure, a 14px floor for anything meant to be read, and WCAG AA contrast everywhere, including navy on the picture cover. Bricolage Grotesque carries the voice: headings, labels, tabs and level marks. Colour comes from a picnic day: sky blue, leaf green and mint, with the logo's fox orange as the one warm accent, on deep navy ink. State is never shown by colour alone; it is shown with a mark (tick, cross, circle, strike-through, a letter, or the highlighter).
 
@@ -236,7 +236,7 @@ The level is the one axis that matters. Comparisons climb Level 3 → Level 5 �
 **Key Characteristics:**
 - A bright picture cover framing a white paper sheet; the sheet lifts off the cover with one soft shadow.
 - Form tabs hang from the cover; the open tab carries a fox-orange top edge.
-- An exercise-book double margin rule (5px double) between the contents and the page.
+- A thin margin line (1px rule) between the contents and the page.
 - Circled level marks, the level ladder and the versions box carry Level 3 → 5 → 5** everywhere.
 - Marks show state: tick = do, cross = avoid, strike-through = the weaker version, a letter for each CREI move.
 - One highlighter swipe in view per section, on the line that moves your level.
@@ -252,8 +252,8 @@ Picnic day: sky blue, leaf green and mint on white paper, deep navy ink, the log
 - **Fox Orange** (fox): The selected level mark (navy number, 4.95:1), the ladder's climb line, and the 4px top edge of the open cover tab.
 
 ### Secondary
-- **Exercise-Book Margin Line** (margin-rule): The margin rule only: 5px double at desktop, a 2px single rule under the contents on phones.
-- **Orange Highlighter** (highlight): Highlighter swipes, text selection, the "Tap me" hint under the fox, the "From a real script" tag and the "CLY's rewrite" tag.
+- **Exercise-Book Margin Line** (margin-rule): No longer drawn: the margin is a 1px rule in the ruling colour at desktop and under the contents on phones.
+- **Orange Highlighter** (highlight): Highlighter swipes, text selection, the "From a real script" tag and the "CLY's rewrite" tag.
 - **Pale Sky** (cover): The cover behind its picture, shown while the picture loads.
 
 ### Neutral
@@ -311,7 +311,7 @@ A marking set for the four moves of a body paragraph, used nowhere else. Each mo
 - **Lead** (400, 1.25rem, 1.55): A section's opening line, ladder example lines, the climbing sentence on home.
 - **Body** (400, 1.0625rem, 1.65): All reading text, max 68ch. Paragraphs and list items use `text-wrap: pretty`; headings use `balance`.
 - **UI** (600, 1rem, 1.3): Tabs, contents links, strip links, chips, buttons, pager.
-- **Label** (700, 0.875rem): Field names. Uppercase with 0.06–0.08em tracking only in the label panel, table headers and summary keys; everywhere else labels are sentence case (contents step names, matrix headings).
+- **Label** (700, 0.875rem): Field names. Always sentence case, with no extra tracking, including the label panel, table headers and summary keys; labels are sentence case everywhere (contents step names, matrix headings).
 
 ### Named Rules
 **The Two Voices Rule.** Bricolage speaks (headings, labels, marks, navigation). Atkinson reads (paragraphs, list items, table cells, scripts).
@@ -324,7 +324,7 @@ A marking set for the four moves of a body paragraph, used nowhere else. Each mo
 
 ## Layout
 
-The page is a sheet (max 1160px) centred on the picture cover. Guide and practice pages are a two-column grid: a 230px contents column behind the 5px double margin rule, and the reading column (40px top padding, 68ch sections). Pages with sections show one section at a time, with a Previous / Next pager at its end. A page with no contents column (vocab, whose forms are the cover tabs) uses a single-column sheet narrowed to 1040px, and its cover narrows with it. The home page is a 1040px "hub" sheet: the fox and its tip, a "Continue where you left off" card, the directory, the climbing sentence, and a closing invitation.
+The page is a sheet (max 1160px) centred on the picture cover. Guide and practice pages are a two-column grid: a 230px contents column behind the 1px margin rule, and the reading column (40px top padding, 68ch sections). Pages with sections show one section at a time, with a Previous / Next pager at its end. A page with no contents column (vocab, whose forms are the cover tabs) uses a single-column sheet narrowed to 1040px, and its cover narrows with it. The home page is a 1040px "hub" sheet: the fox and its tip, a "Continue where you left off" card, the directory, the climbing sentence, and a closing invitation.
 
 The S.5 & S.6 pages add a mint strip across the top of the sheet: "S.5 Part A · Part B · Toolkit" and "S.6 Final reminders".
 
@@ -354,7 +354,7 @@ Each page's cover carries a picture like an illustrated exercise-book cover (ste
 
 ## Shapes
 
-Soft stationery shapes. Outlined boxes (label panel, versions box, task box, level cards, table wrapper) use a 1px pencil-edge outline with 12px corners; ladders use 14px; real exam scripts keep a 1px navy outline. Numbered step circles use a 1.5px ink ring. Tabs are rounded on top only (10px) so they hang from the cover. Contents links use 6px. Anything that is a level is a full circle or pill: level marks, numbered skeleton steps (36px circles), the logo disc, chips and buttons. A form (S.1–S.6) is a square 8px-cornered label, so it never reads as a level. CREI badges and highlighted collocations use 3–4px corners. CLY's rewrites alone use a dashed outline. Lines are part of the language: the 5px double margin rule, 1px ruling between rows, dashed rules under word lists.
+Soft stationery shapes. Outlined boxes (label panel, versions box, task box, level cards) use a 1px pencil-edge outline with 12px corners; tables and diagrams have no outline and sit between 1px rules; ladders use 14px; real exam scripts keep a 1px navy outline. Numbered step circles use a 1.5px ink ring. Tabs are rounded on top only (10px) so they hang from the cover. Contents links use 6px. Anything that is a level is a full circle or pill: level marks, numbered skeleton steps (36px circles), the logo disc, chips and buttons. A form (S.1–S.6) is a plain bold label with no outline, so it never reads as a button or a level. CREI badges and highlighted collocations use 3–4px corners. CLY's rewrites alone use a dashed outline. Lines are part of the language: the 1px margin line, 1px ruling between rows, dashed rules under word lists.
 
 ## Components
 

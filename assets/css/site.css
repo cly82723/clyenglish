@@ -71,7 +71,10 @@ body::before {
   content: ""; position: fixed; inset: 0; z-index: -1;
   background: var(--cover) var(--print-s, none) center top / cover no-repeat;
 }
-@media (min-width: 901px) { body::before { background-image: var(--print-l, none); } }
+@media (min-width: 901px) {
+  /* beside the sheet the picture is only a backdrop, so a white veil keeps it from competing with the text */
+  body::before { background-image: linear-gradient(rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.62)), var(--print-l, none); }
+}
 [data-cover="steps"] { --print-s: url("../img/cover/steps-1200.jpg"); --print-l: url("../img/cover/steps-2400.jpg"); }
 [data-cover="hillside"] { --print-s: url("../img/cover/hillside-1200.jpg"); --print-l: url("../img/cover/hillside-2400.jpg"); }
 [data-cover="meadow"] { --print-s: url("../img/cover/meadow-1200.jpg"); --print-l: url("../img/cover/meadow-2400.jpg"); }
@@ -174,7 +177,7 @@ a.ext::after {
 /* left index (subtabs) */
 .index {
   padding: 40px 22px 40px var(--gutter);
-  border-right: 5px double var(--margin-rule); /* the exercise book's double margin rule */
+  border-right: 1px solid var(--rule); /* the margin between the contents and the page */
 }
 .index-title {
   font: 700 var(--step--1)/1.2 var(--font-display);
@@ -414,12 +417,12 @@ mark, .hl {
 
 /* ---------- Tables ---------- */
 
-.table-wrap { overflow-x: auto; margin: 20px 0 28px; border: 1px solid var(--edge); border-radius: 12px; }
+.table-wrap { overflow-x: auto; margin: 20px 0 28px; }
 table { border-collapse: collapse; width: 100%; font-size: 1rem; font-variant-numeric: tabular-nums; }
 th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
 thead th {
-  font: 700 var(--step--1)/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.06em;
-  background: var(--chest); color: var(--sky); border-bottom: 1px solid var(--edge);
+  font: 700 var(--step--1)/1.2 var(--font-display);
+  color: var(--ink-soft); border-bottom: 1px solid var(--ink);
 }
 tbody th { font-family: var(--font-display); font-weight: 700; }
 tbody tr:last-child > * { border-bottom: 0; }
@@ -475,10 +478,8 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 
 /* a form (S.1–S.4) is a square label, so it never reads as a circled level */
 .form-mark {
-  display: inline-grid; place-items: center;
-  min-width: 2.9em; height: 2.4em; padding: 0 0.4em;
-  border: 1px solid currentColor; border-radius: 8px;
-  font: 800 0.875rem/1 var(--font-display); color: var(--ink);
+  display: inline-block; min-width: 2.9em;
+  font: 800 1rem/1 var(--font-display); color: var(--ink);
 }
 .domains { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 20px 0 28px; }
 .domains > div { padding: 4px 22px 10px 0; }
@@ -672,7 +673,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .wordlist em { color: var(--ink-soft); }
 
 /* formulas */
-.formula { font: 700 1rem/1.4 var(--font-display); background: var(--chest); border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+.formula { font: 700 1rem/1.4 var(--font-display); white-space: nowrap; }
 
 /* the tense and conditional matrices: a table of buttons */
 /* every cell fills its row: the table is 1px tall and grows to its content, and rows and cells take 100% of that.
@@ -725,7 +726,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .tip p:last-child { margin-bottom: 0; }
 
 /* diagrams drawn in ink and blue */
-.figure { margin: 18px 0; padding: 14px 16px 10px; border: 1px solid var(--rule); border-radius: 12px; overflow-x: auto; }
+.figure { margin: 18px 0 24px; padding: 16px 0 6px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); overflow-x: auto; }
 .figure > p:first-child { margin: 0 0 6px; }
 .figure svg { display: block; width: 100%; height: auto; min-width: 520px; font-family: var(--font-display); }
 .figure .narrow { min-width: 0; }
@@ -1080,11 +1081,13 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   background: var(--paper); box-shadow: 0 18px 40px rgb(16 38 59 / 0.18);
   padding: 40px clamp(20px, 5vw, 64px) 48px;
 }
-/* the name on its own line; below it the fox speaks, its bubble pointing straight at it */
+/* the fox beside the name; the fox's tip of the day sits below the directory */
 .hello {
   display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px 28px; align-items: center;
-  grid-template-areas: "title title" "fox bubble";
+  grid-template-areas: "fox title";
 }
+.tip-day { margin-top: 36px; }
+.tip-day .bubble::before { display: none; }
 .hello-title { grid-area: title; }
 .hello h1 { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.6rem); letter-spacing: -0.04em; }
 .hello-title p { margin: 6px 0 0; font: 600 var(--step-0)/1.3 var(--font-display); color: var(--ink-soft); }
@@ -1094,14 +1097,9 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   display: grid; justify-items: center; gap: 8px;
 }
 .fox img {
-  width: 148px; height: 148px; border-radius: 50%; background: var(--paper);
+  width: 96px; height: 96px; border-radius: 50%; background: var(--paper);
   box-shadow: 0 8px 22px rgb(16 38 59 / 0.22);
 }
-.fox-hint {
-  font: 700 0.875rem/1 var(--font-display); color: var(--ink);
-  background: var(--highlight); border-radius: 999px; padding: 6px 12px;
-}
-.fox-hint[hidden] { display: none; }
 .fox.hop img { animation: hop 0.5s var(--ease-out); }
 @keyframes hop {
   0% { transform: translateY(0) scale(1, 1); }
@@ -1249,7 +1247,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   .forms { gap: 10px 20px; padding: 12px var(--gutter); }
   .forms a { padding: 0 14px; }
   .index {
-    border-right: 0; border-bottom: 2px solid var(--margin-rule);
+    border-right: 0; border-bottom: 1px solid var(--rule);
     padding: 14px 0 12px;
     position: sticky; top: 0; z-index: 5; background: var(--paper);
   }
@@ -1274,9 +1272,9 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 
   .hub { margin-top: 0; box-shadow: none; padding: 24px var(--gutter) 36px; }
   /* phone: the fox sits beside the name, and the bubble points up at it */
-  .hello { grid-template-areas: "fox title" "bubble bubble"; gap: 14px 16px; }
+  .hello { gap: 14px 16px; }
+  .tip-day { margin-top: 28px; }
   .fox img { width: 72px; height: 72px; }
-  .fox-hint { font-size: 0.875rem; padding: 4px 8px; }
   .bubble::before { left: 28px; top: -8px; }
   .resume { margin-top: 20px; }
   .resume a { display: grid; }
@@ -1297,9 +1295,14 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 
 /* ---------- Tabbed pages: the page name is a quiet title line; the open section's heading leads ---------- */
 
+/* the page name is already at the top of the contents, so the title stays for screen readers only;
+   a page with no contents column (vocab) keeps it as a quiet title line */
 [data-tabs] .column > .title {
   font-size: var(--step-2); letter-spacing: -0.02em; color: var(--ink-soft);
   max-width: none; margin: 0 0 10px;
+}
+[data-tabs]:has(.index-title) .column > .title {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0;
 }
 [data-tabs] .column > section > h2 {
   font-size: clamp(2.2rem, 1.5rem + 2.6vw, 3.6rem); letter-spacing: -0.035em; margin-bottom: 24px;
@@ -1580,9 +1583,12 @@ body:has(.hub) .back-cover { max-width: 1040px; }
   .drill-items .letter.right::after, .drill-items .letter.wrong::after { animation: none; }
 }
 
-/* Labels read as words: uppercase stays only in the label panel, table headers and summary keys (DESIGN.md) */
+/* Labels read as words: no uppercase anywhere (DESIGN.md) */
 .index-title, .versions-title, .pager a small, .bubble-label, .resume small, .directory h3, .field-label, .ladder-panel .tag {
   text-transform: none; letter-spacing: 0; font-size: 1rem;
+}
+.label dt, .summary dt, .slots .role, .index .index-group, .reality-ends, .rw-situation dt, .dg-tag, .figure .small {
+  text-transform: none; letter-spacing: 0;
 }
 
 /* the checklist count confirms a tick with a quick fade of the new number */
@@ -1655,7 +1661,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .bubble-eg .rung u { text-decoration-color: var(--ring); }
 .bubble-eg .rung.up u { text-decoration-color: var(--sky); }
 /* the built-in tip waits a moment for today's; if the script never runs, it shows anyway */
-.js .hello .bubble-body:not(.drawn) { animation: fade-in 0.2s 1s both; }
+.js .tip-day .bubble-body:not(.drawn) { animation: fade-in 0.2s 1s both; }
 
 /* ---------- Proofreading: the key folds away after the first visit ---------- */
 .proof-help > summary { cursor: pointer; margin: 0; list-style-position: inside; }
@@ -1675,7 +1681,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
   display: inline-block; padding: 3px 10px; border: 1.5px solid var(--ink-soft); border-radius: 8px;
   background: var(--paper); font: 600 1rem/1.4 var(--font-display); color: var(--ink);
 }
-.dg-chip.dg-action { background: var(--highlight); border-color: var(--sky); }
+.dg-chip.dg-action { border-color: var(--sky); color: var(--sky); }
 .dg-chip.dg-subject { background: var(--chest); border-color: var(--ink); }
 .dg-arrow { font: 700 0.9375rem/1 var(--font-display); color: var(--sky); white-space: nowrap; }
 .dg-single { max-width: 34rem; }
@@ -1698,7 +1704,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .dg-tile.dg-helper, .dg-key.dg-helper { border-color: var(--avoid); color: var(--avoid); }
 s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 .dg-tile.dg-subject, .dg-key.dg-subject { background: var(--chest); border-color: var(--ink); }
-.dg-tile.dg-verb, .dg-key.dg-verb { background: var(--highlight); border-color: var(--sky); }
+.dg-tile.dg-verb, .dg-key.dg-verb { border-color: var(--sky); color: var(--sky); border-width: 2px; }
 .dg-tile.dg-wh { border-color: var(--sky); color: var(--sky); }
 .dg-tile.dg-end { min-width: 2.2em; text-align: center; font-weight: 800; }
 .dg-none { color: var(--ink-soft); }
@@ -1709,7 +1715,7 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 .passage.rw-quotes li + li { margin-top: 8px; }
 .rw-source { text-decoration-color: var(--sky); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 .rw-source sup { font: 700 0.8125rem/1 var(--font-display); color: var(--sky); text-decoration: none; display: inline-block; }
-.passage:has(.rw-source) { line-height: 1.75; }
+.passage:has(.rw-source) { line-height: 1.75; border: 0; border-left: 3px solid var(--rule); border-radius: 0; padding: 4px 0 4px 20px; }
 .rw-frame { margin: 10px 0; }
 .rw-gap { display: inline-block; min-width: 4em; padding: 0 8px; border-bottom: 2px solid var(--ink-soft); font-weight: 700; color: var(--ink-soft); }
 .rw-gap.right { color: var(--do); border-bottom-color: var(--do); }
@@ -1728,10 +1734,12 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
   .dg-linkers .dg-empty { display: none; }
   .dg-col { display: block; font: 700 var(--step--1)/1.3 var(--font-display); color: var(--sky); }
 }
-.dg-tag { display: block; font: 700 0.6875rem/1.2 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--do); }
+.dg-tag { display: block; font: 700 0.75rem/1.2 var(--font-display); color: var(--do); }
 .dg-tile.dg-lead { border-style: dashed; color: var(--ink-soft); background: transparent; }
 .rw-gap:not(.right) { cursor: text; }
 .rw-fix-title { margin: 10px 0 0 !important; font: 700 1rem/1.3 var(--font-display); color: var(--avoid); }
 .rw-situation { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 8px 16px; margin: 0 0 14px; padding: 12px 16px; border-left: 4px solid var(--sky); background: var(--chest); border-radius: 0 10px 10px 0; }
-.rw-situation dt { font: 700 var(--step--1)/1.3 var(--font-display); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sky); }
+.rw-situation dt { font: 700 var(--step--1)/1.3 var(--font-display); color: var(--sky); }
 .rw-situation dd { margin: 2px 0 0; font-weight: 700; }
+.formula-line { margin: 0 0 6px; font-size: 1.0625rem; }
+.formula-line .formula { color: var(--sky); }

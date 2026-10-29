@@ -25,8 +25,8 @@
         point(95, "1", "the train left", "had left", "copper"),
         point(225, "2", "I got there", "got", "ink"),
         s("line", { x1: "318", y1: AXIS - 14, x2: "318", y2: AXIS + 14, class: "now" }),
-        s("text", { x: "318", y: AXIS + 34, "text-anchor": "middle", class: "copper small" }, "NOW"),
-        s("text", { x: "12", y: AXIS + 34, class: "soft small" }, "EARLIER")),
+        s("text", { x: "318", y: AXIS + 34, "text-anchor": "middle", class: "copper small" }, "now"),
+        s("text", { x: "12", y: AXIS + 34, class: "soft small" }, "earlier")),
       h("p", { class: "dg-caption" }, "Step back to the ", h("strong", null, "earlier"), " event: ", h("strong", null, "had + V3"), ". The later event stays in the past simple."));
   }
 

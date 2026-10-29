@@ -68,10 +68,10 @@
       s("svg", { viewBox: "0 0 600 150", role: "img", "aria-label": "Timeline for " + tense + ": " + example },
         s("defs", null, arrowDefs("tl-arrow", "soft"), arrowDefs("tl-res", "green")),
         s("line", { x1: "20", y1: AXIS, x2: "585", y2: AXIS, class: "axis", "marker-end": "url(#tl-arrow)" }),
-        s("text", { x: "24", y: AXIS + 48, class: "soft small" }, "PAST"),
-        s("text", { x: "580", y: AXIS + 48, class: "soft small", "text-anchor": "end" }, "FUTURE"),
+        s("text", { x: "24", y: AXIS + 48, class: "soft small" }, "past"),
+        s("text", { x: "580", y: AXIS + 48, class: "soft small", "text-anchor": "end" }, "future"),
         s("line", { x1: X(50), y1: AXIS - 14, x2: X(50), y2: AXIS + 14, class: "now" }),
-        s("text", { x: X(50), y: AXIS + 48, class: "copper small", "text-anchor": "middle" }, "NOW"),
+        s("text", { x: X(50), y: AXIS + 48, class: "copper small", "text-anchor": "middle" }, "now"),
         g));
   }
 
@@ -537,9 +537,20 @@
     root.appendChild(h("p", { class: "lead" }, lesson.intro));
 
     root.appendChild(h("h3", null, "Form"));
+    // a formula shared by several rows is said once above the table; only the rows that differ show their own
+    var counts = {};
+    lesson.form.forEach(function (f) { counts[f.formula] = (counts[f.formula] || 0) + 1; });
+    var shared = Object.keys(counts).filter(function (k) { return counts[k] > 1; }).sort(function (a, b) { return counts[b] - counts[a]; })[0];
+    if (shared) root.appendChild(h("p", { class: "formula-line" }, "Formula: ", h("span", { class: "formula" }, shared)));
     root.appendChild(h("div", { class: "table-wrap stack" }, h("table", null,
-      h("thead", null, h("tr", null, h("th", { scope: "col" }, "Pattern"), h("th", { scope: "col" }, "Formula"), h("th", { scope: "col" }, "Example"))),
-      h("tbody", null, lesson.form.map(function (f) { return h("tr", null, h("th", { scope: "row" }, f.label), h("td", null, h("span", { class: "formula" }, f.formula)), h("td", null, bold(f.example))); })))));
+      h("thead", null, h("tr", null, h("th", { scope: "col" }, "Pattern"), shared ? null : h("th", { scope: "col" }, "Formula"), h("th", { scope: "col" }, "Example"))),
+      h("tbody", null, lesson.form.map(function (f) {
+        var own = f.formula !== shared ? h("span", { class: "formula" }, f.formula) : null;
+        return h("tr", null,
+          h("th", { scope: "row" }, f.label, shared && own ? [h("br"), own] : null),
+          shared ? null : h("td", null, own),
+          h("td", null, bold(f.example)));
+      })))));
     if (lesson.spelling) root.appendChild(h("div", null, h("p", { class: "field-label" }, "Spelling the -ing form"), h("ul", null, lesson.spelling.map(function (sp) { return h("li", null, sp); }))));
 
     if (lesson.visual) {
@@ -833,10 +844,10 @@
       s("svg", { viewBox: "0 0 640 190", role: "img", "aria-label": "Diagram for the " + name + ": " + c.meaning },
         s("defs", null, arrowDefs("cd-ink", "ink"), arrowDefs("cd-soft", "soft"), arrowDefs("cd-copper", "copper")),
         s("line", { x1: "20", y1: AXIS, x2: "585", y2: AXIS, class: "axis", "marker-end": "url(#cd-soft)" }),
-        s("text", { x: "24", y: AXIS + 34, class: "soft small" }, "PAST"),
-        s("text", { x: "580", y: AXIS + 34, class: "soft small", "text-anchor": "end" }, "FUTURE"),
+        s("text", { x: "24", y: AXIS + 34, class: "soft small" }, "past"),
+        s("text", { x: "580", y: AXIS + 34, class: "soft small", "text-anchor": "end" }, "future"),
         s("line", { x1: NOW, y1: AXIS - 8, x2: NOW, y2: AXIS + 12, class: "now" }),
-        s("text", { x: NOW, y: AXIS + 34, class: "copper small", "text-anchor": "middle" }, "NOW"),
+        s("text", { x: NOW, y: AXIS + 34, class: "copper small", "text-anchor": "middle" }, "now"),
         body));
   }
 
