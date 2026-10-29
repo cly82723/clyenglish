@@ -1167,7 +1167,6 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 .directory ul { list-style: none; margin: 0; padding: 0; }
 .directory li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
 .directory .form-mark { width: 3.6em; margin-right: 6px; }
-.directory .row-label { font: 600 1rem/1.2 var(--font-display); color: var(--ink-soft); margin-right: 6px; }
 .directory li a {
   display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
   font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
@@ -1668,3 +1667,64 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 /* ---------- The page's cover (label panel, and the toolkit's note) shows on the first section only ---------- */
 .js [data-tabs][data-later] .column > .label,
 .js [data-tabs][data-later] .column > p.tip { display: none; }
+
+/* ---------- S.3 grammar diagrams (s3-grammar.js) ---------- */
+.figure .small-plain { font-size: 13px; font-weight: 700; }
+.dg-caption { margin: 10px 0 2px; font-size: 1rem; color: var(--ink-soft); }
+.dg-chip {
+  display: inline-block; padding: 3px 10px; border: 1.5px solid var(--ink-soft); border-radius: 8px;
+  background: var(--paper); font: 600 1rem/1.4 var(--font-display); color: var(--ink);
+}
+.dg-chip.dg-action { background: var(--highlight); border-color: var(--sky); }
+.dg-chip.dg-subject { background: var(--chest); border-color: var(--ink); }
+.dg-arrow { font: 700 0.9375rem/1 var(--font-display); color: var(--sky); white-space: nowrap; }
+.dg-single { max-width: 34rem; }
+.dg-who > p { margin: 0 0 10px; }
+.dg-sentence { font-size: 1.0625rem; }
+.dg-phrase { background: var(--highlight); border-radius: 4px; padding: 1px 8px; font-weight: 700; color: var(--ink); }
+.dg-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.dg-test { font-weight: 700; }
+.dg-test .field-label { display: inline; margin: 0 4px 0 0; }
+.dg-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 14px; margin-bottom: 14px; }
+.dg-step { padding: 10px 12px; border-left: 4px solid var(--sky); background: var(--chest); border-radius: 0 10px 10px 0; }
+.dg-step .field-label { margin-bottom: 8px; }
+.dg-swaps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.dg-swaps li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.dg-swaps-wide { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); margin-bottom: 4px; }
+.dg-order + .dg-order { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--rule-dash); }
+.dg-order .field-label { margin: 0 0 6px; }
+.dg-tiles { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.dg-tile { padding: 4px 10px; border: 1.5px solid var(--edge); border-radius: 8px; background: var(--paper); font: 600 1rem/1.4 var(--font-display); color: var(--ink); }
+.dg-tile.dg-helper, .dg-key.dg-helper { border-color: var(--avoid); color: var(--avoid); }
+s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
+.dg-tile.dg-subject, .dg-key.dg-subject { background: var(--chest); border-color: var(--ink); }
+.dg-tile.dg-verb, .dg-key.dg-verb { background: var(--highlight); border-color: var(--sky); }
+.dg-tile.dg-wh { border-color: var(--sky); color: var(--sky); }
+.dg-tile.dg-end { min-width: 2.2em; text-align: center; font-weight: 800; }
+.dg-none { color: var(--ink-soft); }
+.dg-linkers td, .dg-linkers th[scope="row"] { vertical-align: top; }
+
+/* ---------- S.3 consolidation rewrites ---------- */
+.passage.rw-quotes { list-style: none; line-height: 1.6; }
+.passage.rw-quotes li + li { margin-top: 8px; }
+.rw-source { text-decoration-color: var(--sky); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.rw-source sup { font: 700 0.8125rem/1 var(--font-display); color: var(--sky); text-decoration: none; display: inline-block; }
+.passage:has(.rw-source) { line-height: 1.75; }
+.rw-frame { margin: 10px 0; }
+.rw-gap { display: inline-block; min-width: 4em; padding: 0 8px; border-bottom: 2px solid var(--ink-soft); font-weight: 700; color: var(--ink-soft); }
+.rw-gap.right { color: var(--do); border-bottom-color: var(--do); }
+.rw-gap.wrong { border-bottom-color: var(--avoid); }
+.rw-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.rw-row input {
+  flex: 1 1 16rem; min-width: 0; font: inherit; font-size: 1rem; line-height: 1.4; color: var(--ink);
+  padding: 9px 12px; border: 1.5px solid var(--edge); border-radius: 10px; background: var(--paper);
+}
+.rw-row input:focus-visible { outline: 2px solid var(--sky); outline-offset: 1px; border-color: var(--sky); }
+.rw-row input[readonly] { background: var(--chest); border-color: var(--do); }
+.rw-reminders { margin: 8px 0 0; padding-left: 1.2em; color: var(--ink); }
+.dg-kinds { margin-bottom: 4px; }
+.dg-col { display: none; }
+@media (max-width: 760px) {
+  .dg-linkers .dg-empty { display: none; }
+  .dg-col { display: block; font: 700 var(--step--1)/1.3 var(--font-display); color: var(--sky); }
+}

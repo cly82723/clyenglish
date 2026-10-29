@@ -165,7 +165,7 @@
       bigClue: "compare each option with the examples in the rules for " + topic + ".",
       review: function () { CLY.go(rules); },
       reviewHeading: "Worth reviewing:",
-      fullMarks: "Full marks! Now try the Challenge to use all six topics in longer texts."
+      fullMarks: "Full marks! You know this topic well."
     };
   }
 
@@ -528,6 +528,8 @@
   }
 
   var VISUALS = { "passive-diagram": PassiveDiagram, "passive-tenses": PassiveTenseTable, "gerund-slots": GerundSlots, "meaning-pairs": MeaningPairs, "verb-patterns": VerbPatterns };
+  // the S.3 page brings its own diagrams (s3-grammar.js)
+  Object.assign(VISUALS, window.CLY_S3_VISUALS || {});
 
   // ---------- Lessons: passive voice, gerunds, to-infinitives ----------
 
@@ -1162,14 +1164,19 @@
     condmatrix: function (el) { widgets.condmatrix = ConditionalsMatrix(el); },
     condquiz: function (el) { Sets(el, "condquiz", [G.condQuizQuestions].concat(more("condquiz")), howMany, function (b, q, store) { McQuiz(b, q, COND_KIT, store); }); },
     condmatch: function (el) { Sets(el, "condmatch", [G.defaultCondMatch].concat(more("condmatch")), titled, ConditionalMatch); },
-    // S.3: data-set names the topic (pastPerfect, ing, ed, statements, questions, linking)
+    // S.3: data-set names the topic (pastPerfect, present, past, statements, questions, linking),
+    // the diagram (s3visual) or the consolidation exercise (s3rewrite)
     s3lesson: function (el) { Lesson(el, S3.lessons[el.getAttribute("data-set")]); },
     s3quiz: function (el) {
       var quiz = S3.quizzes[el.getAttribute("data-set")];
       Sets(el, "s3quiz:" + el.getAttribute("data-set"), quiz.sets, howMany, function (b, q, store) { McQuiz(b, q, topicKit(quiz.topic), store); });
     },
-    s3cloze: function (el) { Sets(el, "s3cloze", S3.cloze, titled, Cloze); },
-    s3proof: function (el) { Sets(el, "s3proof", S3.proofreading.map(proofPassage), titled, Proofreading); }
+    s3visual: function (el) { el.appendChild(h("div", null, VISUALS[el.getAttribute("data-set")]())); },
+    s3rewrite: function (el) {
+      // an exercise is one set, or a list of sets with a switcher above it
+      var key = el.getAttribute("data-set");
+      Sets(el, "s3rewrite:" + key, [].concat(window.CLY_S3_CONSOLIDATION[key]), titled, window.CLY_S3_REWRITE);
+    }
   };
   document.querySelectorAll("[data-grammar]").forEach(function (el) {
     var fn = mount[el.getAttribute("data-grammar")];

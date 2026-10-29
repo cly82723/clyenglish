@@ -35,25 +35,15 @@ test("quiz questions have four different options and a valid answer, hint and ex
   })));
 });
 
-test("cloze blanks and paragraph gaps match one to one", () => {
-  S3.cloze.forEach(p => {
-    const gaps = p.paragraphs.flat().filter(x => typeof x === "number");
-    // joined to strings: the data's arrays come from another realm, so their prototypes differ
-    assert.strictEqual(gaps.map(String).sort().join(), Object.keys(p.blanks).sort().join(), p.title);
-    Object.entries(p.blanks).forEach(([n, b]) => {
-      assert.ok(b.answers.length && b.why && b.hint && b.form, p.title + " blank " + n);
-      assert.ok(S3.topics[b.focus], p.title + " blank " + n + " focus");
-    });
-    p.lookFor.forEach(t => assert.ok(S3.topics[t], t));
-  });
+test("every lesson diagram exists in s3-grammar.js", () => {
+  const code = fs.readFileSync(path.join(root, "assets/js/s3-grammar.js"), "utf8");
+  const visuals = code.slice(code.indexOf("window.CLY_S3_VISUALS"));
+  const used = Object.values(S3.lessons).map(l => l.visual).concat([...html.matchAll(/data-grammar="s3visual" data-set="([^"]+)"/g)].map(m => m[1]));
+  used.forEach(v => assert.ok(v && visuals.includes('"' + v + '"'), "missing diagram: " + v));
 });
 
-test("proofreading lines parse, and every mistake has a topic, explanation and hint", () => {
-  S3.proofreading.forEach(p => p.lines.forEach((l, i) => {
-    const r = G.parseProofLine(l[0]);
-    const where = p.title + " line " + (i + 1);
-    if (!r.error) { assert.strictEqual(l.length, 1, where + " has notes but no mistake"); return; }
-    assert.ok(S3.topics[l[1]] && l[2] && l[3], where);
-    assert.notDeepStrictEqual(r.words, r.fixed, where);
-  }));
+test("the page has no Challenge or Three versions left", () => {
+  assert.ok(!/id="challenge"|s3cloze|s3proof|class="versions"/.test(html));
+  assert.ok(!S3.cloze && !S3.proofreading);
+  assert.ok(!/class="versions"/.test(fs.readFileSync(path.join(root, "grammar.html"), "utf8")), "S.4 grammar still has a Three versions box");
 });
