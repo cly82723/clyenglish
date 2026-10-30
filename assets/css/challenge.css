@@ -133,3 +133,16 @@ tr.you > td { background: var(--chest); }
   #challenge th, #challenge td { padding: 10px 8px; }
   .season-table th:nth-child(n+4):nth-child(-n+6), .season-table td:nth-child(n+4):nth-child(-n+6) { display: none; }
 }
+
+/* A form whose blanks can hold a whole phrase (S.3) gives every blank the room, so a wider one doesn't give the answer away. */
+.wide-blanks .blank input { width: 14em; max-width: 70vw; }
+.coverage { margin-top: 12px; }
+
+/* The word box as a table: each word has its own cell, and tapping crosses it off. */
+.word-group + .word-group { margin-top: 14px; }
+.word-group-name { margin: 0 0 6px; font-weight: 700; }
+.word-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5em, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink-soft); border-left: 1px solid var(--ink-soft); background: #fff; }
+.word-cells li { margin: 0; border-right: 1px solid var(--ink-soft); border-bottom: 1px solid var(--ink-soft); }
+.word-cell { display: block; width: 100%; height: 100%; min-height: 44px; padding: 8px 10px; font: inherit; color: var(--ink); text-align: left; background: none; border: 0; cursor: pointer; }
+.word-cell:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.word-cell.used { color: var(--ink-soft); text-decoration: line-through; background: var(--chest); }

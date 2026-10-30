@@ -82,6 +82,18 @@ A classmate who types someone else's email gets nowhere without access to that i
 - **CLY League → Show league table**: writes the season table, with emails, into a **League** tab, so you know who to give prizes to.
 - **31 August**: the Students, Attempts, League and Sessions tabs are cleared automatically. Challenges and season dates are kept. **CLY League → Delete all student data now** does the same thing straight away.
 
+## The S.3 league: a second copy
+
+S.3 has its own Sheet and web app, so nothing you do there can affect S.4. Do Steps 1 to 4 again, with these differences:
+
+- Name the sheet `CLY S.3 English League`, and paste the files from this folder as they are now.
+- In the **Season** tab, type `2026-11-02` next to "Season start" and `2027-01-10` next to "Season end".
+- Name the deployment `CLY S.3 League v1`, and send me its Web app URL. It goes into `s3-challenge.html`.
+- In the **Challenges** tab, paste `C:\Users\CaL\cly-league-bank\s3\challenges.tsv` (open it in Notepad, Ctrl+A, Ctrl+C). Set the first row's Status to `approved` and the other four to `backup`.
+- In the **Students** tab, paste the S.3 class list. Until then nobody can sign in.
+
+You don't need to change the S.4 script: the new comma marking only matters to S.3's sets.
+
 ## If something goes wrong
 
 - **A student's code doesn't arrive**: ask them to check spam, and to wait a minute before asking again. If no student ever gets one, the school blocks outside mail; tell me and we'll switch to printed codes.

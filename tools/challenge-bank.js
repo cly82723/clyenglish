@@ -1,11 +1,26 @@
 // Checks a challenge bank and writes the files the teacher needs. The bank holds answers, so it is never kept in this repo.
-// Run: node tools/challenge-bank.js <folder holding bank.json>
+// Run: node tools/challenge-bank.js <folder holding bank.json> [s3]   (with s3, the S.3 league's rules apply as well)
 // Writes, next to bank.json: challenges.tsv (rows to paste into the sheet's Challenges tab) and review.html (to read before approving).
 const fs = require("fs");
 const path = require("path");
 const dir = path.resolve(process.argv[2] || ".");
 const L = require(path.join(__dirname, "../apps-script/Logic.gs"));
 const bank = JSON.parse(fs.readFileSync(path.join(dir, "bank.json"), "utf8"));
+const S3 = process.argv[3] === "s3";
+
+// The S.3 league: what may be tested, and when. Add a topic here when the page's list in s3-challenge.html gets it.
+const S3_TOPICS = ["Indefinite pronouns", "Noun phrases", "Bare infinitives", "So, so that, so as to", "Must, have to, need to", "Tenses", "Participles"];
+const S3_UNIT4_TOPICS = ["Reported statements", "Reported questions", "Linking words"];
+const S3_UNIT4_FROM = "2026-12-07";
+const S3_MAX_TOPICS = 3;
+const NATURAL = "Natural English";
+const S3_MAX_NATURAL = 2;
+const MAX_ANSWER_CHARS = 60; // the web app cuts answers to this length (CONFIG in apps-script/Code.gs)
+// These topics are never in the box: students choose the word, so every right choice must be accepted.
+const S3_OPEN_TOPICS = ["Indefinite pronouns", "So, so that, so as to", "Must, have to, need to", "Linking words"];
+const S3_INDEFINITES = ["somebody", "someone", "no one", "nobody", "everyone", "everybody", "everything", "something", "anyone", "anybody", "anything"];
+const S3_DISTRACTORS = 3;
+const PERFECT_CONTINUOUS = /\b(has|have|had|hasn't|haven't|hadn't)\s+(not\s+)?been\s+\w+ing\b/i;
 
 const problems = [];
 const check = (ok, set, msg) => { if (!ok) problems.push(set.title + ": " + msg); };
@@ -26,14 +41,18 @@ function checkCloze(set, ch) {
   const inText = ch.paragraphs.flat().filter(p => typeof p === "number");
   check(ids.length === 15, set, ids.length + " blanks, not 15");
   check(inText.join() === ids.map(Number).sort((a, b) => a - b).join(), set, "blanks in the passage don't match the key: " + inText.join());
-  const box = ids.map(id => ch.blanks[id].verb).concat(ch.distractors);
-  check(new Set(box).size === 18, set, "the verb box has " + new Set(box).size + " different verbs, not 18");
+  const box = ids.map(id => ch.blanks[id].verb).filter(Boolean).concat(ch.distractors, ch.phraseDistractors || []);
+  if (S3) {
+    const extra = ch.distractors.length + (ch.phraseDistractors || []).length;
+    check(extra === S3_DISTRACTORS, set, extra + " distractors, not " + S3_DISTRACTORS);
+    check(new Set(box).size === box.length, set, "the box repeats an item");
+  } else check(new Set(box).size === 18, set, "the box has " + new Set(box).size + " different items, not 18");
   ids.forEach(id => {
     const b = ch.blanks[id];
     check(b.why && b.answers.length, set, "blank " + id + " needs answers and a why");
     // every listed answer is accepted on its own, and the bare verb is not
     b.answers.forEach(a => check(L.markCloze(ch, { [id]: a }).right[id], set, "blank " + id + " rejects its own answer " + a));
-    if (b.answers.indexOf(b.verb) < 0) check(!L.markCloze(ch, { [id]: b.verb }).right[id], set, "blank " + id + " accepts the bare verb");
+    if (b.verb && b.answers.indexOf(b.verb) < 0) check(!L.markCloze(ch, { [id]: b.verb }).right[id], set, "blank " + id + " accepts the bare verb");
   });
 }
 
@@ -66,10 +85,47 @@ function checkProof(set, ch) {
   check(L.mark(ch, {}).score === 0, set, "an unmarked paper scores " + L.mark(ch, {}).score);
 }
 
+function checkS3(set, ch) {
+  const cloze = set.format === "cloze";
+  const unit4Due = !!set.week && set.week >= S3_UNIT4_FROM;
+  const allowed = S3_TOPICS.concat(unit4Due ? S3_UNIT4_TOPICS : []);
+  const marks = cloze ? Object.values(ch.blanks) : ch.lines.filter(l => L.parseProofLine(l[0]).error);
+  const tagged = marks.map(m => cloze ? m.topic : m[1]);
+  const natural = tagged.filter(t => t === NATURAL).length;
+  const topics = [...new Set(tagged.filter(t => t !== NATURAL))];
+  topics.forEach(t => check(allowed.includes(t), set, "\"" + t + "\" is not a topic for this week"));
+  check(topics.length <= S3_MAX_TOPICS, set, topics.length + " grammar topics (at most " + S3_MAX_TOPICS + ")");
+  if (cloze) check(!natural, set, "a cloze tests grammar items only, not " + NATURAL);
+  else check(natural <= S3_MAX_NATURAL, set, natural + " natural-English marks (at most " + S3_MAX_NATURAL + ")");
+  if (unit4Due) check(topics.some(t => S3_UNIT4_TOPICS.includes(t)), set, "needs at least one Unit 4 topic");
+  if (cloze) {
+    Object.entries(ch.blanks).forEach(([id, b]) => {
+      check(b.answers.every(a => !PERFECT_CONTINUOUS.test(a)), set, "blank " + id + " uses the perfect continuous");
+      check(b.answers.every(a => !/\bnever\b/i.test(a)), set, "blank " + id + " uses never: a negative is not or n't");
+      const open = S3_OPEN_TOPICS.includes(b.topic);
+      check(open ? !b.verb : b.verb, set, "blank " + id + (open ? " must not be in the box: students choose " + b.topic : " needs a word in the box"));
+      // So and so that test different things, so a blank must have only one of them right: rewrite it otherwise.
+      check(!(b.answers.includes("so") && b.answers.includes("so that")), set, "blank " + id + " accepts both so and so that: rewrite it so that only one fits");
+      if (b.topic === "Indefinite pronouns") b.answers.forEach(a => check(S3_INDEFINITES.includes(a.toLowerCase()), set, "blank " + id + ": \"" + a + "\" is not on the list of indefinite pronouns"));
+      check(b.answers.every(a => a.length <= MAX_ANSWER_CHARS), set, "blank " + id + " has an answer over " + MAX_ANSWER_CHARS + " characters, which could never be marked right");
+      if (b.topic === "Noun phrases") check(b.commas, set, "blank " + id + " tests a noun phrase, so it must have commas: true");
+    });
+  } else {
+    ch.lines.forEach((l, i) => {
+      const line = L.parseProofLine(l[0]);
+      check(!PERFECT_CONTINUOUS.test(line.fixed.join(" ")), set, "line " + (i + 1) + " uses the perfect continuous");
+      if (line.error) check(!/\bnever\b/i.test(line.fixed.join(" ")), set, "line " + (i + 1) + " uses never: a negative is not or n't");
+      // Marking ignores commas in proofreading, so a comma-only fix could never be marked.
+      if (line.error) check(L.normalise(line.fixed.join(" ")) !== L.normalise(line.words.join(" ")), set, "line " + (i + 1) + " only changes a comma: commas are tested in the cloze");
+    });
+  }
+}
+
 const rows = [];
 bank.forEach(set => {
   const ch = Object.assign({ format: set.format, title: set.title }, set.data);
   if (set.format === "cloze") checkCloze(set, ch); else checkProof(set, ch);
+  if (S3) checkS3(set, ch);
   check(L.mark(ch, keyAnswers(ch)).score === 15, set, "the answer key scores " + L.mark(ch, keyAnswers(ch)).score + " / 15");
   const data = JSON.stringify(set.data);
   check(!/[\t\n]/.test(data) && data.length < 45000, set, "data can't go in one sheet cell");
@@ -88,11 +144,11 @@ function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").
 
 function clozeHtml(ch) {
   const passage = ch.paragraphs.map(p => "<p>" + p.map(x => typeof x === "number" ? "<b class=gap>(" + x + ") ______</b>" : esc(x)).join("") + "</p>").join("");
-  const box = Object.values(ch.blanks).map(b => b.verb).concat(ch.distractors).sort().join(" · ");
+  const box = Object.values(ch.blanks).map(b => b.verb).filter(Boolean).concat(ch.distractors, ch.phraseDistractors || []).sort().join(" · ");
   const key = Object.entries(ch.blanks).map(([id, b]) =>
-    "<li><b>" + esc(b.answers.join(" / ")) + "</b> <span class=dim>(" + esc(b.verb) + ")</span><br>" + esc(b.why) + "</li>").join("");
-  return "<p class=box><b>Verb box:</b> " + esc(box) + "</p><div class=passage>" + passage + "</div><h3>Answers</h3><ol class=key>" + key + "</ol>" +
-    "<p class=dim>Not used: " + esc(ch.distractors.join(", ")) + ". Negatives also count in full or without the apostrophe (hasn't won = has not won = hasnt won).</p>";
+    "<li><b>" + esc(b.answers.join(" / ")) + "</b> <span class=dim>(" + (b.verb ? esc(b.verb) : "not in the box") + (b.topic ? " · " + esc(b.topic) : "") + (b.commas ? " · commas count" : "") + ")</span><br>" + esc(b.why) + "</li>").join("");
+  return "<p class=box><b>" + (S3 ? "Word box" : "Verb box") + ":</b> " + esc(box) + "</p><div class=passage>" + passage + "</div><h3>Answers</h3><ol class=key>" + key + "</ol>" +
+    "<p class=dim>Not used: " + esc(ch.distractors.concat(ch.phraseDistractors || []).join(", ")) + ". Negatives also count in full or without the apostrophe (hasn't won = has not won = hasnt won).</p>";
 }
 
 function proofHtml(ch) {

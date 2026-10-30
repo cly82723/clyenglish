@@ -4,6 +4,7 @@
 (function () {
   "use strict";
   var h = CLY.h, G = window.CLY_GRAMMAR;
+  var S = window.CLY_CHALLENGE;
   var plural = function (n, word) { return n + " " + word + (n === 1 ? "" : "s"); };
 
   // ---------- Cloze ----------
@@ -11,14 +12,21 @@
   function clozeSheet(ch, answers, changed) {
     var crossed = {};
     var blanks = ch.paragraphs.reduce(function (n, parts) { return n + parts.filter(function (p) { return typeof p === "number"; }).length; }, 0);
-    var bank = h("ul", { class: "chips" }, ch.bank.map(function (v) {
-      var b = h("button", { type: "button", class: "chip", "aria-pressed": "false", onclick: function () {
+    function boxItem(v, cls) {
+      var b = h("button", { type: "button", class: cls, "aria-pressed": "false", onclick: function () {
         crossed[v] = !crossed[v];
         b.classList.toggle("used", crossed[v]);
         b.setAttribute("aria-pressed", String(crossed[v]));
       } }, v);
       return h("li", null, b);
-    }));
+    }
+    function wordGroup(name, items) {
+      return items && items.length ? h("div", { class: "word-group" }, h("p", { class: "word-group-name" }, name),
+        h("ul", { class: "word-cells" }, items.map(function (v) { return boxItem(v, "word-cell"); }))) : null;
+    }
+    var bank = S.wordTable
+      ? h("div", { class: "word-table" }, wordGroup("Verbs", ch.bank), wordGroup("Names and phrases", ch.phrases))
+      : h("ul", { class: "chips" }, ch.bank.map(function (v) { return boxItem(v, "chip"); }));
     var passage = h("div", { class: "passage" }, ch.paragraphs.map(function (parts) {
       return h("p", null, parts.map(function (part) {
         if (typeof part !== "number") return part;
@@ -30,8 +38,8 @@
     }));
     return {
       el: [h("div", { class: "tip" },
-        h("p", { class: "field-label" }, "Verb box"), bank,
-        h("p", null, "Tap a verb to cross it off once you've used it.")), passage],
+        h("p", { class: "field-label" }, S.boxLabel), bank,
+        h("p", null, S.boxHelp)), passage],
       progress: function () { return (blanks - empty()) + " / " + blanks + " filled"; },
       handInNote: function () { var n = empty(); return n ? n + (n === 1 ? " blank is" : " blanks are") + " still empty." : "Every blank is filled."; }
     };
@@ -201,18 +209,19 @@
       var notes = ids.length ? h("ul", { class: "marks para-notes" }, ids.map(function (id) {
         var b = ch.blanks[id];
         return h("li", { class: right[id] ? "do" : "avoid" },
-          h("strong", null, id + ". " + b.answers[0]), h("span", { class: "meta" }, " (" + b.verb + ")"),
+          h("strong", null, id + ". " + b.answers[0]), b.verb ? h("span", { class: "meta" }, " (" + b.verb + ")") : null,
           b.why ? h("span", { class: "more" }, b.why) : null);
       })) : null;
       return [p, notes];
     }));
   }
 
-  // The grammar topics of the proofreading lines a student got wrong (cloze blanks carry no topic).
+  // The grammar topics of the lines or blanks a student got wrong (only S.3's cloze blanks carry a topic).
   function missedTopics(ch, right) {
-    if (ch.format === "cloze") return [];
-    return ch.lines.filter(function (l, i) { return !right[i] && l[1]; }).map(function (l) { return l[1]; })
-      .filter(function (t, i, all) { return all.indexOf(t) === i; });
+    var missed = ch.format === "cloze"
+      ? Object.keys(ch.blanks).filter(function (id) { return !right[id] && ch.blanks[id].topic; }).map(function (id) { return ch.blanks[id].topic; })
+      : ch.lines.filter(function (l, i) { return !right[i] && l[1]; }).map(function (l) { return l[1]; });
+    return missed.filter(function (t, i, all) { return all.indexOf(t) === i; });
   }
 
   function fixText(line) {

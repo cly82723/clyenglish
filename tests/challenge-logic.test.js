@@ -98,3 +98,60 @@ test("time taken is capped at the limit", () => {
   assert.strictEqual(L.timeTaken(1000, 5000, 20 * 60000), 4000);
   assert.strictEqual(L.timeTaken(0, 30 * 60000, 20 * 60000), 20 * 60000);
 });
+
+const commaCloze = {
+  format: "cloze", title: "C",
+  blanks: {
+    1: { verb: "a spicy Thai soup", answers: [", a spicy Thai soup,"], commas: true },
+    2: { verb: "Kit", answers: ["Kit"], commas: true },
+    3: { verb: "go", answers: ["went"] }
+  },
+  paragraphs: [["Tom yam ", 1, " is good. My friend ", 2, " ", 3, " home."]],
+  distractors: []
+};
+
+test("a comma blank needs its commas, however they are spaced", () => {
+  assert.strictEqual(L.markCloze(commaCloze, { 1: ", a spicy thai soup," }).right[1], true);
+  assert.strictEqual(L.markCloze(commaCloze, { 1: " ,a spicy Thai soup , " }).right[1], true);
+  assert.strictEqual(L.markCloze(commaCloze, { 1: "a spicy Thai soup" }).right[1], false);
+  assert.strictEqual(L.markCloze(commaCloze, { 1: ", a spicy Thai soup" }).right[1], false);
+});
+
+test("a defining phrase in a comma blank loses the mark if commas are added", () => {
+  assert.strictEqual(L.markCloze(commaCloze, { 2: "Kit" }).right[2], true);
+  assert.strictEqual(L.markCloze(commaCloze, { 2: ", Kit," }).right[2], false);
+});
+
+test("other blanks and proofreading still ignore commas", () => {
+  assert.strictEqual(L.markCloze(commaCloze, { 3: "went," }).right[3], true);
+  assert.strictEqual(L.markCloze(cloze, { 1: "are, held" }).right[1], true);
+});
+
+test("the public challenge says commas count without saying which blanks", () => {
+  const pub = L.publicChallenge(commaCloze);
+  assert.strictEqual(pub.commas, true);
+  assert.strictEqual(JSON.stringify(pub).includes("answers"), false);
+  assert.strictEqual("commas" in L.publicChallenge(cloze), false);
+});
+
+test("a comma from a Chinese keyboard counts in a comma blank", () => {
+  assert.strictEqual(L.markCloze(commaCloze, { 1: "，a spicy Thai soup，" }).right[1], true);
+});
+
+test("the public challenge splits verbs from phrases and names the kinds of word not in the box", () => {
+  const ch = { format: "cloze", title: "T", paragraphs: [["x ", 1, " y ", 2, " z ", 3]], distractors: ["swim"], phraseDistractors: ["a tall tree"],
+    blanks: { 1: { verb: "go", answers: ["went"] }, 2: { verb: "Kit", answers: ["Kit"], commas: true }, 3: { answers: ["someone", "somebody"], topic: "Indefinite pronouns" } } };
+  const pub = L.publicChallenge(ch);
+  assert.deepStrictEqual(pub.bank, ["go", "swim"]);
+  assert.deepStrictEqual(pub.phrases, ["Kit", "a tall tree"]);
+  assert.deepStrictEqual(pub.open, ["Indefinite pronouns"]);
+  assert.strictEqual(JSON.stringify(pub).includes("someone"), false);
+  assert.strictEqual(L.markCloze(ch, { 3: "somebody" }).right[3], true);
+});
+
+test("an S.4 challenge gets no new fields", () => {
+  const pub = L.publicChallenge(cloze);
+  assert.deepStrictEqual(pub.bank, ["give", "hold", "swim"]);
+  assert.strictEqual("phrases" in pub, false);
+  assert.strictEqual("open" in pub, false);
+});

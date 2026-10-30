@@ -32,6 +32,10 @@ function formatDue(seasonStartId, id) {
 
 var normalise = function (s) { return String(s).toLowerCase().replace(/[’']/g, "'").replace(/[.,!?]/g, "").replace(/\s+/g, " ").trim(); };
 
+// For a blank marked commas: true, where the commas are what is being tested. Spaces around a comma still don't matter,
+// and a comma from a Chinese keyboard counts.
+var keepCommas = function (s) { return String(s).toLowerCase().replace(/，/g, ",").replace(/[’']/g, "'").replace(/[.!?]/g, "").replace(/\s*,\s*/g, ", ").replace(/\s+/g, " ").trim(); };
+
 // A negative counts in any spelling: "hadn't been told", "had not been told" or "hadnt been told".
 var NOT_FORMS = { "won't": "will not", "can't": "cannot", "shan't": "shall not" };
 function bothNegatives(answer) {
@@ -69,8 +73,9 @@ function parseProofLine(text) {
 function markCloze(challenge, answers) {
   var right = {};
   Object.keys(challenge.blanks).forEach(function (id) {
-    var accepted = [].concat.apply([], challenge.blanks[id].answers.map(bothNegatives)).map(normalise);
-    right[id] = accepted.indexOf(normalise((answers && answers[id]) || "")) >= 0;
+    var clean = challenge.blanks[id].commas ? keepCommas : normalise;
+    var accepted = [].concat.apply([], challenge.blanks[id].answers.map(bothNegatives)).map(clean);
+    right[id] = accepted.indexOf(clean((answers && answers[id]) || "")) >= 0;
   });
   return { score: countTrue(right), right: right };
 }
@@ -111,9 +116,17 @@ function countTrue(o) { return Object.keys(o).filter(function (k) { return o[k];
 function publicChallenge(challenge) {
   var base = { format: challenge.format, title: challenge.title, textType: challenge.textType || "" };
   if (challenge.format === "cloze") {
-    var bank = Object.keys(challenge.blanks).map(function (id) { return challenge.blanks[id].verb; })
-      .concat(challenge.distractors || []).sort();
-    return Object.assign(base, { paragraphs: challenge.paragraphs, bank: bank });
+    var blanks = Object.keys(challenge.blanks).map(function (id) { return challenge.blanks[id]; });
+    var boxed = blanks.filter(function (b) { return b.verb; });
+    var bank = boxed.filter(function (b) { return !b.commas; }).map(function (b) { return b.verb; }).concat(challenge.distractors || []).sort();
+    var phrases = boxed.filter(function (b) { return b.commas; }).map(function (b) { return b.verb; }).concat(challenge.phraseDistractors || []).sort();
+    // A blank with no verb isn't in the box: the student chooses the word. The page says which kinds, not which blanks.
+    var open = blanks.filter(function (b) { return !b.verb; }).map(function (b) { return b.topic; })
+      .filter(function (t, i, all) { return all.indexOf(t) === i; });
+    // Says that commas count somewhere, not which blanks: the page shows a reminder.
+    var commas = blanks.some(function (b) { return b.commas; });
+    return Object.assign(base, { paragraphs: challenge.paragraphs, bank: bank }, phrases.length ? { phrases: phrases } : {},
+      open.length ? { open: open } : {}, commas ? { commas: true } : {});
   }
   return Object.assign(base, { lines: challenge.lines.map(function (l) { return parseProofLine(l[0]).words; }) });
 }

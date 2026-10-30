@@ -53,3 +53,14 @@ Agreed with the user on 2026-10-28. This is the spec for the S.4 weekly grammar 
 1. Check that an email from the personal Gmail reaches a student's school inbox.
 2. Set up the Sheet and web app (`apps-script/README.md`) and paste in the class list.
 3. Approve the first challenge and the four backup sets.
+
+## The S.3 league
+
+Agreed with the user on 2026-10-31. Everything above applies, with its own Sheet and web app, page (`s3-challenge.html`) and sign-in, so the two leagues don't touch. Different for S.3:
+
+- **Season**: Monday 2 November 2026 to Sunday 10 January 2027.
+- **What's tested**: Units 1–3. From the week of 7 December, each set also includes at least one Unit 4 topic. The page lists the topics from `topics` in `s3-challenge.html`; a new topic goes there and in `S3_TOPICS` in `tools/challenge-bank.js`.
+- **Each set**: at most 3 grammar topics, and natural passages come first. Tenses count as one topic (no perfect continuous and no passive; negatives stay in). Present and past participles count as one topic.
+- **Cloze**: grammar items only. The word box, shown as a table, holds only verbs and noun phrases, plus 3 distractors. Indefinite pronouns, so/so that/so as to, must/have to/need to and linking words are never in the box: the page says these kinds of word are needed, students choose the word themselves, and every correct choice is accepted. Indefinite pronouns come only from: somebody, someone, no one, nobody, everyone, everybody, everything, something, anyone, anybody, anything. A so or so that blank is written so that only one of them fits. Linking words may appear in either format. A negative means not or n't, never "never". A blank with `commas: true` also marks its commas, for noun phrases: a phrase in the box is typed with any commas it needs. A reminder shows on those weeks. Every blank is wider, so its width gives nothing away.
+- **Proofreading**: commas are ignored, as in S.4. Of the 11–12 mistakes, 1–2 may be natural English (agreement, collocation, phrasal verbs), tagged `Natural English`, outside the 3 topics.
+- **Each week**: a separate routine drafts the set on Thursdays and emails it with the subject "CLY S.3 League draft". The private bank is `cly-league-bank\s3`, checked with `node tools/challenge-bank.js <folder> s3`.

@@ -5,8 +5,24 @@
 (function () {
   "use strict";
 
-  var WEB_APP = "https://script.google.com/macros/s/AKfycbyISXddli7FK0eppikCORtBaRSd4LWmBWVu3bUakmInmqZ52-Gf7AMS9WSCX88-Q9Lv/exec";
-  var TOKEN_KEY = "cly:league-token";
+  // S.4's league. Another form's page sets window.CLY_CHALLENGE before this script to replace any of these; each form has its own web app and sign-in.
+  var S = window.CLY_CHALLENGE = Object.assign({
+    form: "S.4",
+    webApp: "https://script.google.com/macros/s/AKfycbyISXddli7FK0eppikCORtBaRSd4LWmBWVu3bUakmInmqZ52-Gf7AMS9WSCX88-Q9Lv/exec",
+    tokenKey: "cly:league-token",
+    practiceHref: "grammar.html#practice",
+    practiceNote: "While you wait, practise the same kind of paper with hints and instant marking.",
+    boxLabel: "Verb box",
+    boxHelp: "Tap a verb to cross it off once you've used it.",
+    clozeTask: "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb.",
+    commaReminder: "",
+    wordTable: false,       // the box as a table, grouped into verbs and phrases, instead of a row of chips
+    openHints: {},          // { topic: how to name it }: the kinds of word students must choose themselves
+    topics: [],             // [{ from: "YYYY-MM-DD" or "", names: [...] }]: what the league covers from that Monday on
+    testCloze: ""           // test mode's cloze: a script setting window.CLY_TEST_CLOZE, instead of the practice passage
+  }, window.CLY_CHALLENGE);
+  var WEB_APP = S.webApp;
+  var TOKEN_KEY = S.tokenKey;
   var OFFLINE = "Can't reach the league. Check your internet connection and try again.";
   var GARBLED = "The league didn't answer properly. Please try again in a minute.";
 
@@ -71,12 +87,13 @@
   var LIMIT_MS = 20 * 60 * 1000;
   var GRACE_MS = 60 * 1000;
   // Made-up classmates so the board and the league table have something to show.
-  var OTHERS = [{ key: "4A-3", score: 13, timeMs: 512000 }, { key: "4D-18", score: 11, timeMs: 655000 }, { key: "4B-7", score: 11, timeMs: 690000 }];
-  var ME = { key: "4C-12", cls: "4C", number: 12, email: "student@kings.edu.hk" };
+  var YEAR = S.form.slice(2);
+  var OTHERS = [{ key: YEAR + "A-3", score: 13, timeMs: 512000 }, { key: YEAR + "D-18", score: 11, timeMs: 655000 }, { key: YEAR + "B-7", score: 11, timeMs: 690000 }];
+  var ME = { key: YEAR + "C-12", cls: YEAR + "C", number: 12, email: "student@kings.edu.hk" };
 
   function testLeague(rules) {
     var passages = {
-      cloze: Object.assign({ format: "cloze" }, window.CLY_TENSE_CLOZE[0]),
+      cloze: Object.assign({ format: "cloze" }, window.CLY_TEST_CLOZE || window.CLY_TENSE_CLOZE[0]),
       proofreading: Object.assign({ format: "proofreading" }, window.CLY_PROOFREADING[0])
     };
     var st, signedIn = false;
@@ -207,6 +224,6 @@
   // Test mode is for the teacher's own computer only (tools/serve.js); on the published site ?test does nothing.
   var testing = /[?&]test\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   window.CLY_LEAGUE = testing
-    ? Promise.all([loadRules(), loadScript("assets/js/data/grammar-tense-cloze.js"), loadScript("assets/js/data/grammar-proofreading.js")]).then(function (r) { return testLeague(r[0]); })
+    ? Promise.all([loadRules(), loadScript("assets/js/data/grammar-tense-cloze.js"), loadScript("assets/js/data/grammar-proofreading.js"), S.testCloze ? loadScript(S.testCloze) : null]).then(function (r) { return testLeague(r[0]); })
     : Promise.resolve(league);
 })();

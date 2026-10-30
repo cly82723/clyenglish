@@ -4,7 +4,7 @@
    Talks to the league through assets/js/challenge-api.js; the papers themselves are in challenge-papers.js. */
 (function () {
   "use strict";
-  var h = CLY.h, clear = CLY.clear, P = window.CLY_PAPERS;
+  var h = CLY.h, clear = CLY.clear, P = window.CLY_PAPERS, S = window.CLY_CHALLENGE;
   var root = document.getElementById("challenge");
   var testBar = h("div");
   root.parentNode.insertBefore(testBar, root);
@@ -17,6 +17,7 @@
   var FORMAT = { cloze: "Cloze", proofreading: "Proofreading" };
 
   var league = null;
+  var currentWeek = "";
   var playing = false;
   var saveNow = null;          // while playing: saves the answers at once (the test bar uses it before reloading)
   // Timers and listeners belong to one view and stop when the next view is drawn.
@@ -74,7 +75,7 @@
   function intro() {
     var fact = function (n, what) { return h("li", null, h("strong", null, n), h("span", null, what)); };
     return [
-      h("p", { class: "lead" }, "One grammar challenge every week for S.4. Do your best, beat the clock and climb the league."),
+      h("p", { class: "lead" }, "One grammar challenge every week for " + S.form + ". Do your best, beat the clock and climb the league."),
       h("ul", { class: "facts", "aria-label": "The challenge at a glance" }, fact("15", "marks"), fact("20", "minutes"), fact("1", "go a week"))
     ];
   }
@@ -182,14 +183,29 @@
     league.call("signOut").then(function () { signIn("You've signed out.", true); }, function () { signIn(); });
   }
 
+  // What the league covers in this week, for a form whose page lists it; later entries add to the earlier ones.
+  function coverage(week) {
+    var names = [];
+    S.topics.forEach(function (t) { if (!t.from || t.from <= week) names = names.concat(t.names); });
+    return names.length ? h("p", { class: "meta coverage" }, h("strong", null, "What the league tests: "), names.join("; ") + ".") : null;
+  }
+
+  // The kinds of word that aren't in the box this week; the student works out which blanks need them.
+  function openHint(ch) {
+    var kinds = (ch.open || []).map(function (t) { return S.openHints[t]; }).filter(Boolean);
+    return kinds.length ? h("p", null, h("strong", null, "Not in the box: "), "some blanks need " + kinds.join("; ") + ". Choose the right word yourself.") : null;
+  }
+
   function thisWeek(me) {
     var w = me.week, a = me.attempt, s = me.season;
+    currentWeek = w.id;
     var box = h("section", { class: "this-week", "aria-labelledby": "this-week" },
       h("h2", { id: "this-week" }, "This week"),
       h("dl", { class: "label" },
         h("dt", null, "Week"), h("dd", null, weekName(w.id)),
         h("dt", null, "Challenge"), h("dd", null, w.format ? FORMAT[w.format] + " · " + w.title : "Not ready yet"),
-        h("dt", null, "Closes"), h("dd", null, "Sunday 23:59", s.active ? countdown(w.closesAt) : null)));
+        h("dt", null, "Closes"), h("dd", null, "Sunday 23:59", s.active ? countdown(w.closesAt) : null)),
+      coverage(w.id));
     if (!s.active) {
       var starts = s.start && s.start > w.id;
       box.appendChild(h("p", null, starts ? "The league starts on Monday " + day(Date.parse(s.start + "T00:00:00Z")) + ". See you then!"
@@ -417,8 +433,11 @@
         h("h2", { id: "paper-title" }, ch.title),
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
-          ? "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb."
+          ? S.clozeTask
           : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those. A line with no mark scores nothing."),
+        openHint(ch),
+        ch.commas && S.commaReminder ? h("p", null, h("strong", null, S.commaReminder)) : null,
+        coverage(currentWeek),
         sheet.el,
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(bottomSpot); } }, "Hand in")),
         bottomSpot));
@@ -452,7 +471,7 @@
   function nextStep(text) {
     return h("div", { class: "tip next-step" },
       h("p", { class: "field-label" }, "Next step"),
-      h("p", null, text, " ", h("a", { href: "grammar.html#practice" }, "Go to S.4 grammar practice")));
+      h("p", null, text, " ", h("a", { href: S.practiceHref }, "Go to " + S.form + " grammar practice")));
   }
 
   function result(r, timeUp) {
@@ -465,7 +484,7 @@
         h("p", { class: "result-line" }, cheer(r.score)),
         h("p", null, "Time taken: " + duration(r.timeSec) + "."),
         h("p", { class: "meta" }, "Answers come out on Monday. Please don't share yours before then, so it's fair for everyone."),
-        nextStep("While you wait, practise the same kind of paper with hints and instant marking."),
+        nextStep(S.practiceNote),
         h("div", { class: "actions" },
           h("button", { type: "button", class: "btn", onclick: function () { home("board", true); } }, "See the weekly board"))));
       el.querySelector("h2").setAttribute("tabindex", "-1");
