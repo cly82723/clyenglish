@@ -18,7 +18,9 @@
     commaReminder: "",
     wordTable: false,       // the box as a table, grouped into verbs and phrases, instead of a row of chips
     wordRanges: {},         // { topic: { name, words } }: a whole group shown in the box when a set has blanks on that topic
-    rangeHelp: "",
+    clozeExamples: null,    // { verb, phrase, noCommas, choose }: worked examples, [sentence, answer]; each shows only when the set needs it
+    proofTask: "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those. A line with no mark scores nothing.",
+    linesOutOf: false,      // "3 / 15 lines marked" instead of "3 lines marked"
     topics: [],             // [{ from: "YYYY-MM-DD" or "", names: [...] }]: what the league covers from that Monday on
     testCloze: ""           // test mode's cloze: a script setting window.CLY_TEST_CLOZE, instead of the practice passage
   }, window.CLY_CHALLENGE);

@@ -15,7 +15,7 @@
 <link rel="icon" href="images/brand/cly-icon-16.png" sizes="16x16">
 <meta name="theme-color" content="#1f7a45">
 </head>
-<body data-cover="garden" class="wide-blanks">
+<body data-cover="garden" class="league-words">
 <a class="skip" href="#main">Skip to the weekly challenge</a>
 
 <header class="cover">
@@ -52,17 +52,24 @@ window.CLY_CHALLENGE = {
   practiceHref: "s3-grammar.html",
   practiceNote: "While you wait, go over the same grammar with quizzes and rewrites.",
   boxLabel: "Word box",
-  boxHelp: "Tap a verb or phrase to cross it off once you've used it.",
-  rangeHelp: "The other groups are for you to choose from: use the right word for each blank, in the right form. You can use a word more than once, and you won't need them all.",
-  clozeTask: "Fill in every blank using the word box, and write each word in the right form. You might need any tense or “not”. You won't need everything in the box.",
+  boxHelp: "Tap a verb or phrase to cross it off. Lost the box? Tap “Words” at the top.",
+  linesOutOf: true,
+  proofTask: "Mark every line. Tap the wrong word and fix it, or tap “No mistake” if the line is correct. A line with no mark scores 0.",
+  clozeExamples: {
+    verb: ["Yesterday I ____ home late. (go)", "went"],
+    phrase: ["Tom yam ____ is spicy. (a Thai soup)", ", a Thai soup,"],
+    noCommas: ["My friend ____ is here. I have many friends. (Kit)", "Kit"],
+    choose: ["____ called me, but I don't know who.", "someone"]
+  },
+  clozeTask: "Fill in all 15 blanks using the word box. Verbs can be in any tense, or need “not”. 3 of the verbs and phrases are not used.",
   wordTable: true,
   wordRanges: {
     "Indefinite pronouns": { name: "Indefinite pronouns", words: ["somebody", "someone", "something", "anybody", "anyone", "anything", "everybody", "everyone", "everything", "nobody", "no one"] },
-    "So, so that, so as to": { name: "For results and aims", words: ["so", "so that", "so as to"] },
-    "Must, have to, need to": { name: "For rules and needs", words: ["must", "have to", "need to"] },
+    "So, so that, so as to": { name: "So words", words: ["so", "so that", "so as to"] },
+    "Must, have to, need to": { name: "Must words", words: ["must", "have to", "need to"] },
     "Linking words": { name: "Linking words", words: ["moreover", "furthermore", "in addition", "as well as", "however", "although", "even though", "yet", "on the other hand", "because", "since", "due to", "as a result", "therefore", "for example", "for instance", "such as", "including", "as long as", "provided that", "in case", "in order to", "so as to", "so that", "all in all", "overall", "in conclusion", "to sum up"] }
   },
-  commaReminder: "This passage tests defining and non-defining noun phrases: type any commas the phrase needs, as part of your answer.",
+  commaReminder: "Names and phrases: type the commas too, if the phrase needs them.",
   topics: [
     { from: "", names: ["Indefinite pronouns", "Defining and non-defining noun phrases", "Bare infinitives", "So, so that, so as to", "Must, have to, need to", "Tenses (not the perfect continuous)", "Present and past participles"] },
     { from: "2026-12-07", names: ["Reported statements", "Reported questions", "Linking words"] }

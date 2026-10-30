@@ -17,7 +17,6 @@
   var FORMAT = { cloze: "Cloze", proofreading: "Proofreading" };
 
   var league = null;
-  var currentWeek = "";
   var playing = false;
   var saveNow = null;          // while playing: saves the answers at once (the test bar uses it before reloading)
   // Timers and listeners belong to one view and stop when the next view is drawn.
@@ -192,7 +191,6 @@
 
   function thisWeek(me) {
     var w = me.week, a = me.attempt, s = me.season;
-    currentWeek = w.id;
     var box = h("section", { class: "this-week", "aria-labelledby": "this-week" },
       h("h2", { id: "this-week" }, "This week"),
       h("dl", { class: "label" },
@@ -338,11 +336,13 @@
       var sheet = P.sheet(ch, answers, changed);
       var done15 = h("span", { class: "progress-count" });
       var drain = h("i");
-      var bar = h("div", { class: "clock-bar", role: "region", "aria-label": "Time and handing in" },
+      var bar = h("div", { class: "clock-bar" + (sheet.boxButton ? " has-box" : ""), role: "region", "aria-label": "Time and handing in" },
         h("p", { class: "time" }, h("span", { class: "visually-hidden" }, "Time left: "), left),
         h("p", { class: "clock-meta" }, timeNote, done15, status),
+        sheet.boxButton || null,
         h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(topSpot); } }, "Hand in"),
         topSpot,
+        sheet.boxPanel || null,
         h("span", { class: "time-drain", "aria-hidden": "true" }, drain));
       var countDone = function () { done15.textContent = sheet.progress(); };
 
@@ -379,6 +379,7 @@
       }
       function confirmHandIn(spot) {
         clear(topSpot); clear(bottomSpot);
+        if (sheet.closeBox) sheet.closeBox();
         spot.appendChild(h("div", { class: "confirm", role: "alertdialog", "aria-label": "Hand in now?" },
           h("p", null, h("strong", null, "Hand in now?"), " You can't change your answers afterwards. " + sheet.handInNote()),
           h("div", { class: "actions" },
@@ -428,9 +429,8 @@
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
           ? S.clozeTask
-          : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those. A line with no mark scores nothing."),
+          : S.proofTask),
         ch.commas && S.commaReminder ? h("p", null, h("strong", null, S.commaReminder)) : null,
-        coverage(currentWeek),
         sheet.el,
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(bottomSpot); } }, "Hand in")),
         bottomSpot));
