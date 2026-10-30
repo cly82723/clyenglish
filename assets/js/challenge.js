@@ -190,12 +190,6 @@
     return names.length ? h("p", { class: "meta coverage" }, h("strong", null, "What the league tests: "), names.join("; ") + ".") : null;
   }
 
-  // The kinds of word that aren't in the box this week; the student works out which blanks need them.
-  function openHint(ch) {
-    var kinds = (ch.open || []).map(function (t) { return S.openHints[t]; }).filter(Boolean);
-    return kinds.length ? h("p", null, h("strong", null, "Not in the box: "), "some blanks need " + kinds.join("; ") + ". Choose the right word yourself.") : null;
-  }
-
   function thisWeek(me) {
     var w = me.week, a = me.attempt, s = me.season;
     currentWeek = w.id;
@@ -435,7 +429,6 @@
         h("p", null, ch.format === "cloze"
           ? S.clozeTask
           : "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those. A line with no mark scores nothing."),
-        openHint(ch),
         ch.commas && S.commaReminder ? h("p", null, h("strong", null, S.commaReminder)) : null,
         coverage(currentWeek),
         sheet.el,

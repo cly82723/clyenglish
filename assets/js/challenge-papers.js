@@ -24,8 +24,14 @@
       return items && items.length ? h("div", { class: "word-group" }, h("p", { class: "word-group-name" }, name),
         h("ul", { class: "word-cells" }, items.map(function (v) { return boxItem(v, "word-cell"); }))) : null;
     }
+    // A whole group to choose from, so a word can be used again and isn't crossed off.
+    function wordRange(topic) {
+      var range = S.wordRanges[topic];
+      return range ? h("div", { class: "word-group" }, h("p", { class: "word-group-name" }, range.name),
+        h("ul", { class: "word-cells" }, range.words.map(function (w) { return h("li", null, h("span", { class: "word-cell word-range" }, w)); }))) : null;
+    }
     var bank = S.wordTable
-      ? h("div", { class: "word-table" }, wordGroup("Verbs", ch.bank), wordGroup("Names and phrases", ch.phrases))
+      ? h("div", { class: "word-table" }, wordGroup("Verbs", ch.bank), wordGroup("Names and phrases", ch.phrases), (ch.open || []).map(wordRange))
       : h("ul", { class: "chips" }, ch.bank.map(function (v) { return boxItem(v, "chip"); }));
     var passage = h("div", { class: "passage" }, ch.paragraphs.map(function (parts) {
       return h("p", null, parts.map(function (part) {
@@ -39,7 +45,7 @@
     return {
       el: [h("div", { class: "tip" },
         h("p", { class: "field-label" }, S.boxLabel), bank,
-        h("p", null, S.boxHelp)), passage],
+        h("p", null, S.boxHelp, ch.open && ch.open.length && S.rangeHelp ? " " + S.rangeHelp : "")), passage],
       progress: function () { return (blanks - empty()) + " / " + blanks + " filled"; },
       handInNote: function () { var n = empty(); return n ? n + (n === 1 ? " blank is" : " blanks are") + " still empty." : "Every blank is filled."; }
     };

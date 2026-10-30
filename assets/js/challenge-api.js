@@ -17,7 +17,8 @@
     clozeTask: "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb.",
     commaReminder: "",
     wordTable: false,       // the box as a table, grouped into verbs and phrases, instead of a row of chips
-    openHints: {},          // { topic: how to name it }: the kinds of word students must choose themselves
+    wordRanges: {},         // { topic: { name, words } }: a whole group shown in the box when a set has blanks on that topic
+    rangeHelp: "",
     topics: [],             // [{ from: "YYYY-MM-DD" or "", names: [...] }]: what the league covers from that Monday on
     testCloze: ""           // test mode's cloze: a script setting window.CLY_TEST_CLOZE, instead of the practice passage
   }, window.CLY_CHALLENGE);

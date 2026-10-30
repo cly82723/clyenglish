@@ -131,11 +131,11 @@ function openBlank(d, id, topic, answers) {
 test("indefinite pronouns, so and must are not in the box", () => {
   const boxed = run([clozeSet(["Tenses", "Indefinite pronouns"])], "s3");
   assert.ok(!boxed.ok);
-  assert.match(boxed.out, /must not be in the box/);
+  assert.match(boxed.out, /must have no verb/);
   const open = clozeSet(["Tenses"], "", d => { openBlank(d, 2, "Indefinite pronouns", ["someone", "somebody"]); openBlank(d, 3, "So, so that, so as to", ["so that"]); });
   const r = run([open], "s3");
   assert.ok(r.ok, r.out);
-  assert.match(r.review, /not in the box/);
+  assert.match(r.review, /chosen from the group/);
 });
 
 test("an indefinite pronoun outside the list fails", () => {
@@ -169,4 +169,10 @@ test("no-one with a hyphen is not on the list", () => {
   const r = run([clozeSet(["Tenses"], "", d => { openBlank(d, 2, "Indefinite pronouns", ["nobody", "no-one"]); })], "s3");
   assert.ok(!r.ok);
   assert.match(r.out, /no-one/);
+});
+
+test("a so answer outside the group shown in the box fails", () => {
+  const r = run([clozeSet(["Tenses"], "", d => { openBlank(d, 2, "So, so that, so as to", ["so as not to"]); })], "s3");
+  assert.ok(!r.ok);
+  assert.match(r.out, /so as not to/);
 });

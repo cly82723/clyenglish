@@ -16,9 +16,10 @@ const S3_MAX_TOPICS = 3;
 const NATURAL = "Natural English";
 const S3_MAX_NATURAL = 2;
 const MAX_ANSWER_CHARS = 60; // the web app cuts answers to this length (CONFIG in apps-script/Code.gs)
-// These topics are never in the box: students choose the word, so every right choice must be accepted.
+// For these topics the box shows the whole group (wordRanges in s3-challenge.html), not the answers: students choose the word, so every right choice must be accepted.
 const S3_OPEN_TOPICS = ["Indefinite pronouns", "So, so that, so as to", "Must, have to, need to", "Linking words"];
 const S3_INDEFINITES = ["somebody", "someone", "no one", "nobody", "everyone", "everybody", "everything", "something", "anyone", "anybody", "anything"];
+const S3_SO_WORDS = ["so", "so that", "so as to"];
 const S3_DISTRACTORS = 3;
 const PERFECT_CONTINUOUS = /\b(has|have|had|hasn't|haven't|hadn't)\s+(not\s+)?been\s+\w+ing\b/i;
 
@@ -103,9 +104,10 @@ function checkS3(set, ch) {
       check(b.answers.every(a => !PERFECT_CONTINUOUS.test(a)), set, "blank " + id + " uses the perfect continuous");
       check(b.answers.every(a => !/\bnever\b/i.test(a)), set, "blank " + id + " uses never: a negative is not or n't");
       const open = S3_OPEN_TOPICS.includes(b.topic);
-      check(open ? !b.verb : b.verb, set, "blank " + id + (open ? " must not be in the box: students choose " + b.topic : " needs a word in the box"));
+      check(open ? !b.verb : b.verb, set, "blank " + id + (open ? " must have no verb: the box shows the whole group for " + b.topic : " needs a word in the box"));
       // So and so that test different things, so a blank must have only one of them right: rewrite it otherwise.
       check(!(b.answers.includes("so") && b.answers.includes("so that")), set, "blank " + id + " accepts both so and so that: rewrite it so that only one fits");
+      if (b.topic === "So, so that, so as to") b.answers.forEach(a => check(S3_SO_WORDS.includes(a.toLowerCase()), set, "blank " + id + ": \"" + a + "\" is not one of so, so that, so as to"));
       if (b.topic === "Indefinite pronouns") b.answers.forEach(a => check(S3_INDEFINITES.includes(a.toLowerCase()), set, "blank " + id + ": \"" + a + "\" is not on the list of indefinite pronouns"));
       check(b.answers.every(a => a.length <= MAX_ANSWER_CHARS), set, "blank " + id + " has an answer over " + MAX_ANSWER_CHARS + " characters, which could never be marked right");
       if (b.topic === "Noun phrases") check(b.commas, set, "blank " + id + " tests a noun phrase, so it must have commas: true");
@@ -146,7 +148,7 @@ function clozeHtml(ch) {
   const passage = ch.paragraphs.map(p => "<p>" + p.map(x => typeof x === "number" ? "<b class=gap>(" + x + ") ______</b>" : esc(x)).join("") + "</p>").join("");
   const box = Object.values(ch.blanks).map(b => b.verb).filter(Boolean).concat(ch.distractors, ch.phraseDistractors || []).sort().join(" · ");
   const key = Object.entries(ch.blanks).map(([id, b]) =>
-    "<li><b>" + esc(b.answers.join(" / ")) + "</b> <span class=dim>(" + (b.verb ? esc(b.verb) : "not in the box") + (b.topic ? " · " + esc(b.topic) : "") + (b.commas ? " · commas count" : "") + ")</span><br>" + esc(b.why) + "</li>").join("");
+    "<li><b>" + esc(b.answers.join(" / ")) + "</b> <span class=dim>(" + (b.verb ? esc(b.verb) : "chosen from the group") + (b.topic ? " · " + esc(b.topic) : "") + (b.commas ? " · commas count" : "") + ")</span><br>" + esc(b.why) + "</li>").join("");
   return "<p class=box><b>" + (S3 ? "Word box" : "Verb box") + ":</b> " + esc(box) + "</p><div class=passage>" + passage + "</div><h3>Answers</h3><ol class=key>" + key + "</ol>" +
     "<p class=dim>Not used: " + esc(ch.distractors.concat(ch.phraseDistractors || []).join(", ")) + ". Negatives also count in full or without the apostrophe (hasn't won = has not won = hasnt won).</p>";
 }
