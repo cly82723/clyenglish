@@ -1,9 +1,14 @@
-/* CLY English: S.3 grammar, Units 3 and 4. Six topics, each with a short rule lesson, a diagram and a hard quiz.
+/* CLY English: S.3 grammar, Units 1 to 4. Eleven topics, each with a short rule lesson, a diagram and a hard quiz.
    The consolidation rewrites are in s3-consolidation-data.js. Quizzes test what sounds natural, not just what follows
    a formula: meaning questions, "which sounds right", dangling phrases, register and still-true facts. */
 window.CLY_S3_GRAMMAR = {
   // review: the rules part on s3-grammar.html. ex uses the proofreading mark: [[wrong>right]].
   topics: {
+    "Indefinite pronouns": { review: "indefinite-rules", ex: "I don't know [[no one>anyone]] here." },
+    "Noun phrases": { review: "noun-rules", ex: "[[Sushi a>Sushi, a]] Japanese dish, is popular." },
+    "Bare infinitives": { review: "bare-rules", ex: "Mum made me [[to tidy>tidy]] my room." },
+    "So, so that, so as to": { review: "so-rules", ex: "I left early [[so that>so as to]] catch the bus." },
+    "Must, have to, need to": { review: "must-rules", ex: "He must [[to go>go]] now." },
     "Past perfect": { review: "pastperfect-rules", ex: "When we arrived, the bus [[left>had left]]." },
     "Present participle phrases": { review: "present-rules", ex: "[[Walked>Walking]] home, I saw a stray cat." },
     "Past participle phrases": { review: "past-rules", ex: "[[Exciting>Excited]] about the trip, we couldn't sleep." },
@@ -13,6 +18,160 @@ window.CLY_S3_GRAMMAR = {
   },
 
   lessons: {
+    indefinite: {
+      intro: "Indefinite pronouns talk about people or things without naming them. Words with -one or -body mean people. Words with -thing mean things.",
+      form: [
+        { label: "All", formula: "everyone / everybody, everything", example: "**Everyone** enjoyed the film." },
+        { label: "One, not sure which", formula: "someone / somebody, something", example: "**Someone** has taken my umbrella." },
+        { label: "It doesn't matter which", formula: "anyone / anybody, anything", example: "I don't know **anyone** here." },
+        { label: "Zero", formula: "no one / nobody, nothing, none of …", example: "**Nobody** has seen this film yet." }
+      ],
+      visual: "pronoun-crowd", visualTitle: "How many does each word mean?",
+      functions: [
+        { title: "Always a singular verb", text: "These words look like many people, but the verb is singular, as with \"he\" or \"she\".", examples: ["Everyone **loves** this film. (not: Everyone love)", "Nothing **was** left in the fridge."] },
+        { title: "Only one negative", text: "\"No one\", \"nobody\" and \"nothing\" are already negative, so the verb stays positive. After a negative verb, use \"anyone\" or \"anything\".", examples: ["I **know nobody** here. = I **don't know anybody** here.", "Not: I don't know nobody here."] },
+        { title: "\"None of\" needs a group", text: "Use \"none of\" before a group of people or things. \"No one\" stands alone.", examples: ["**None of** my friends has seen it.", "**No one** has seen it."] }
+      ],
+      compare: {
+        title: "Some- or any-?",
+        text: "Both can go in a question, but the idea changes.",
+        rows: [
+          ["some-", "There's **something** in my shoe.", "One thing. I don't know what."],
+          ["any- (negative)", "There isn't **anything** in my shoe.", "Not one thing."],
+          ["any- (positive)", "My brother will eat **anything**.", "It doesn't matter what."]
+        ]
+      },
+      mistakes: [
+        { wrong: "Everyone in my class have a phone.", right: "Everyone in my class has a phone.", why: "\"Everyone\" takes a singular verb." },
+        { wrong: "I didn't see nobody at the bus stop.", right: "I didn't see anybody at the bus stop.", why: "Only one negative: \"didn't\" is already negative, so use \"anybody\"." },
+        { wrong: "No one of my friends came.", right: "None of my friends came.", why: "Before \"of\" + a group, use \"none\"." }
+      ],
+      tip: "Check the verb after every -one, -body and -thing word: it must be singular. Then count the negatives: there should be only one.",
+      practice: { id: "indefinite-quiz", label: "Try the quiz" }
+    },
+
+    noun: {
+      intro: "A noun phrase can sit beside a noun to tell us more about it. Ask one question: can you take it out and still know who or what the sentence means?",
+      form: [
+        { label: "Defining (needed)", formula: "noun + phrase, no commas", example: "Millions of tourists visit the Indian palace **Taj Mahal** every year." },
+        { label: "Non-defining (extra)", formula: "noun, + phrase + ,", example: "The croissant**, a famous French pastry,** is my favourite breakfast." },
+        { label: "Non-defining at the end", formula: "noun, + phrase + .", example: "We had lunch in Sai Kung**, a popular seafood destination.**" }
+      ],
+      visual: "noun-phrase-test", visualTitle: "Take it out and see",
+      functions: [
+        { title: "Defining: it tells us which one", text: "There are many Indian palaces. Without the name, we don't know which one. So it stays, with no commas.", examples: ["The film **Coco** won many awards.", "My friend **Kit** plays the drums. (I have other friends.)"] },
+        { title: "Non-defining: it is just extra", text: "We already know who or what it is. The phrase adds a fact, so commas go around it like a pair of hands.", examples: ["Tom yam**, a spicy Thai soup,** is a must-try.", "Mount Fuji**, Japan's highest mountain,** is very popular."] }
+      ],
+      compare: {
+        title: "Two commas change the meaning",
+        text: "Same words, different facts about my family.",
+        rows: [
+          ["No commas", "My cousin **Ann** lives in Canada.", "I have other cousins. Ann is the one in Canada."],
+          ["With commas", "My cousin**, Ann,** lives in Canada.", "I have only one cousin, and her name is Ann."]
+        ]
+      },
+      mistakes: [
+        { wrong: "Sushi a famous Japanese dish is easy to find.", right: "Sushi, a famous Japanese dish, is easy to find.", why: "It is extra information, so it needs a comma on both sides." },
+        { wrong: "Sushi, a famous Japanese dish is easy to find.", right: "Sushi, a famous Japanese dish, is easy to find.", why: "Commas come in pairs. Don't forget the second one." },
+        { wrong: "Former US President won many people's hearts.", right: "Former US President Barack Obama won many people's hearts.", why: "Which president? The name is needed here, so it can't be left out." }
+      ],
+      tip: "Cover the phrase with your finger. If you still know exactly who or what the sentence means, use commas. If not, use no commas.",
+      practice: { id: "noun-quiz", label: "Try the quiz" }
+    },
+
+    bare: {
+      intro: "A bare infinitive is the base form of a verb (V1) with no \"to\": go, eat, be. It never changes, whoever the subject is and whatever the tense.",
+      form: [
+        { label: "After modal verbs", formula: "can, could, may, might, must, should, will, would + V1", example: "I must **leave** now." },
+        { label: "After these phrases", formula: "need not, dare not, had better, would rather … than + V1", example: "You had better **stop** talking." },
+        { label: "Make, let, have", formula: "make / let / have + someone + V1", example: "Mum has me **clean** the flat every day." },
+        { label: "Senses", formula: "see / hear / watch / notice / feel + someone + V1", example: "We heard Sally's mother **scold** her." }
+      ],
+      visual: "bare-infinitive", visualTitle: "These words switch off \"to\"",
+      functions: [
+        { title: "The V1 never changes", text: "Even after he, she or it, and even when the story is in the past, the verb after these words stays in V1.", examples: ["She must **go**. (not: She must goes.)", "He made me **cry**. (not: He made me cried.)"] },
+        { title: "Help can go both ways", text: "After \"help\", the verb can have \"to\" or not. Both are correct.", examples: ["I help my brother **pack** his bag.", "I help my brother **to pack** his bag."] },
+        { title: "Senses: the whole action", text: "See + someone + V1 means you saw the whole action. With V-ing, you saw only part of it.", examples: ["I saw the boy **cross** the road. (He got to the other side.)", "I saw the boy **crossing** the road. (He was in the middle.)"] }
+      ],
+      compare: {
+        title: "Needn't or don't need?",
+        text: "They mean the same, but only one drops \"to\".",
+        rows: [
+          ["needn't + V1", "You needn't **come** early.", "\"Need not\" works like a modal verb."],
+          ["don't need + to V1", "You don't need **to come** early.", "Here \"need\" is a normal verb, so \"to\" stays."]
+        ]
+      },
+      mistakes: [
+        { wrong: "Please let me to help you.", right: "Please let me help you.", why: "\"Let\" + someone + V1, with no \"to\"." },
+        { wrong: "You had better to stop now.", right: "You had better stop now.", why: "\"Had better\" takes V1, even though it looks like a past tense." },
+        { wrong: "I would rather stay at home than going out.", right: "I would rather stay at home than go out.", why: "Both verbs are V1: would rather + V1 + than + V1." }
+      ],
+      tip: "Find can, must, should, had better, would rather, make or let. Then check the next verb (or the verb after the person): it must be plain V1.",
+      practice: { id: "bare-quiz", label: "Try the quiz" }
+    },
+
+    so: {
+      intro: "These three look alike, but they do two different jobs. \"So\" tells you what happened next. \"So that\" and \"so as to\" tell you why someone did something.",
+      form: [
+        { label: "Result", formula: "clause, + so + clause", example: "It rained, **so** the match was cancelled." },
+        { label: "Purpose + clause", formula: "so that + subject + can / could / will / would", example: "I left early **so that** I could get a seat." },
+        { label: "Purpose + verb", formula: "so as to + V1", example: "I left early **so as to** get a seat." },
+        { label: "Negative purpose", formula: "so as not to + V1", example: "Please turn it down **so as not to** disturb others." }
+      ],
+      visual: "so-chart", visualTitle: "Did it happen, or was it the aim?",
+      functions: [
+        { title: "So: the result", text: "Put it in the middle of the sentence, with a comma before it.", examples: ["Tom wants to be a voice actor**, so** he practises speaking every day."] },
+        { title: "So that: match the tense", text: "Present or future sentence: use can, will or may. Past sentence: use could, would or might.", examples: ["We're taking a taxi **so that** we **can** arrive on time.", "Tom bought a ticket early **so that** he **could** get a good seat."] },
+        { title: "So as to: just a verb", text: "No subject after it. The person doing the action stays the same.", examples: ["Sally bought a cookbook **so as to** learn how to cook.", "Not: Sally bought a cookbook so as to she can learn."] }
+      ],
+      compare: {
+        title: "He passed, or he only hoped to?",
+        text: "One small word changes what we know.",
+        rows: [
+          ["so", "He studied hard**, so** he passed.", "He passed. It happened."],
+          ["so that", "He studied hard **so that** he could pass.", "Passing was his aim. We don't know if he passed."]
+        ]
+      },
+      mistakes: [
+        { wrong: "It is going to rain so that I bring an umbrella.", right: "It is going to rain, so I am bringing an umbrella.", why: "Bringing an umbrella is the result of the rain, not the rain's aim." },
+        { wrong: "I moved closer so to hear the teacher.", right: "I moved closer so as to hear the teacher.", why: "Don't drop \"as\": the phrase is \"so as to\"." },
+        { wrong: "I whispered so as to not to wake the baby.", right: "I whispered so as not to wake the baby.", why: "\"Not\" goes before \"to\", and \"to\" appears only once." }
+      ],
+      tip: "Ask: did it happen, or was it someone's plan? Happened: so. Plan: look after the gap. A subject needs \"so that\"; a verb alone needs \"so as to\".",
+      practice: { id: "so-quiz", label: "Try the quiz" }
+    },
+
+    must: {
+      intro: "In a positive sentence, all three mean \"this is necessary\". In a negative sentence they split: \"must not\" means it is not allowed, but \"don't have to\" and \"don't need to\" mean you can choose.",
+      form: [
+        { label: "Must", formula: "subject + must + V1", example: "We **must** work together to slow down climate change." },
+        { label: "Have to", formula: "subject + have / has to + V1", example: "We **have to** show our student ID." },
+        { label: "Need to", formula: "subject + need / needs to + V1", example: "We **need to** finish this soon." },
+        { label: "Questions", formula: "Must + subject + V1? / Do + subject + have to / need to + V1?", example: "**Do** we **have to** show our student ID?" },
+        { label: "Past", formula: "had to / needed to + V1", example: "I **had to** stay late yesterday. (\"Must\" has no past form.)" }
+      ],
+      visual: "must-chart", visualTitle: "Who says so, and what does \"not\" do?",
+      functions: [
+        { title: "Choosing in a positive sentence", text: "Must: you feel it yourself. Have to: someone else or a rule says so. Need to: it is necessary now. Often more than one is fine.", examples: ["I **must** call Grandma. (I feel I should.)", "Everyone **has to** wear a uniform. (It's the school rule.)", "We **need to** leave now. (Or we'll miss the bus.)"] },
+        { title: "Choosing in a negative sentence", text: "This is where the meaning changes, so choose with care.", examples: ["You **must not** touch the paintings. (It isn't allowed.)", "You **don't have to** come. (It's your choice.)", "You **don't need to** bring lunch. (It isn't necessary.)"] }
+      ],
+      compare: {
+        title: "One \"not\", two meanings",
+        text: "Imagine a sign at a swimming pool.",
+        rows: [
+          ["must not", "You **must not** run here.", "Stop. It isn't allowed."],
+          ["don't have to", "You **don't have to** swim today.", "You can if you want. It's up to you."]
+        ]
+      },
+      mistakes: [
+        { wrong: "He must to focus on his work.", right: "He must focus on his work.", why: "After \"must\", use V1 with no \"to\"." },
+        { wrong: "She musted leave early yesterday.", right: "She had to leave early yesterday.", why: "\"Must\" has no past form. Use \"had to\"." },
+        { wrong: "You must not come tomorrow if you are busy.", right: "You don't have to come tomorrow if you are busy.", why: "It is the person's choice, not a ban, so use \"don't have to\"." }
+      ],
+      tip: "When you see \"must not\", ask: is this really forbidden? If the person is simply free to choose, you need \"don't have to\" or \"don't need to\".",
+      practice: { id: "must-quiz", label: "Try the quiz" }
+    },
+
     pastPerfect: {
       intro: "The past perfect is had + V3. V3 is the past participle, the third form of a verb: go – went – gone, eat – ate – eaten, finish – finished – finished. The past perfect is the past of the past. Use it when you are already talking about the past and need to step further back.",
       form: [
@@ -179,15 +338,15 @@ window.CLY_S3_GRAMMAR = {
         { label: "Contrast", formula: "however, although, even though, yet, on the other hand", example: "**Although** it rained, we went hiking." },
         { label: "Cause and effect", formula: "because, since, due to, as a result, therefore", example: "The road was closed. **As a result**, we were late." },
         { label: "Example", formula: "for example, for instance, such as, including", example: "Some cities, **such as** Tokyo and Seoul, are very safe." },
-        { label: "Condition", formula: "as long as, provided that, unless, in case", example: "You can go out **as long as** you finish your homework." },
+        { label: "Condition", formula: "as long as, provided that, in case", example: "You can go out **as long as** you finish your homework." },
         { label: "Purpose", formula: "in order to, so as to, so that", example: "I left early **so that** I could get a seat." },
         { label: "Conclusion", formula: "all in all, overall, in conclusion, to sum up", example: "**All in all**, it was a great trip." }
       ],
       visual: "linking-chart", visualTitle: "What comes after it?",
       functions: [
-        { title: "Joiners and sentence starters", text: "Some words join two clauses in one sentence (although, because, unless, so that). Others start a new sentence and take a comma (However, Therefore, Moreover).", examples: ["**Although** the film was long, I enjoyed it.", "The film was long. **However,** I enjoyed it.", "Not: Although the film was long, but I enjoyed it. (Use one linker, not two.)"] },
+        { title: "Joiners and sentence starters", text: "Some words join two clauses in one sentence (although, because, so that). Others start a new sentence and take a comma (However, Therefore, Moreover).", examples: ["**Although** the film was long, I enjoyed it.", "The film was long. **However,** I enjoyed it.", "Not: Although the film was long, but I enjoyed it. (Use one linker, not two.)"] },
         { title: "What comes next: a noun or a clause?", text: "\"Because of\", \"due to\", \"despite\", \"in addition to\" and \"such as\" take a noun or V-ing. \"Because\", \"although\" and \"so that\" take a clause (subject + verb).", examples: ["**Because of** the rain, the match was cancelled.", "**Because** it rained, the match was cancelled.", "**In addition to** winning the prize, she was interviewed on TV."] },
-        { title: "Unless and in case", text: "\"Unless\" means \"if not\". \"In case\" means \"to be ready because something might happen\". Neither is followed by \"will\".", examples: ["We'll walk **unless** it rains. (= if it doesn't rain)", "Take an umbrella **in case** it rains. (= because it might rain)"] }
+        { title: "As long as and in case", text: "\"As long as\" means \"only if\". \"In case\" means \"to be ready because something might happen\". Neither is followed by \"will\".", examples: ["You can stay **as long as** you are quiet. (= only if you are quiet)", "Take an umbrella **in case** it rains. (= because it might rain)"] },
       ],
       compare: {
         title: "Same idea, different grammar",
@@ -209,6 +368,71 @@ window.CLY_S3_GRAMMAR = {
   },
 
   quizzes: {
+    indefinite: { topic: "Indefinite pronouns", sets: [[
+      { q: "Hurry up! ______ is waiting for you at the gate, and the coach leaves in two minutes.", options: ["Everyone", "Anyone", "No one", "None"], answer: 0, explanation: "The whole group is waiting, and that's why you must hurry. \"No one\" would mean you don't need to.", hint: "Why must you hurry? How many people are waiting?" },
+      { q: "I don't know ______ at my new school, so lunchtime is quite lonely.", options: ["anyone", "no one", "someone", "everyone"], answer: 0, explanation: "After the negative \"don't\", use \"anyone\". \"No one\" would make two negatives.", hint: "\"Don't\" is already negative. Which word fits after a negative verb?" },
+      { q: "‘You can ask anyone in my class for help.’ What does this mean?", options: ["Only one classmate can help you.", "It doesn't matter which classmate you ask.", "Nobody can help you.", "You must ask every classmate."], answer: 1, explanation: "In a positive sentence, \"anyone\" means it doesn't matter who.", hint: "Does \"anyone\" point to one person, or to no person in particular?" },
+      { q: "Which sentence is correct?", options: ["Everyone in my class have a smartphone.", "Everyone in my class has a smartphone.", "Everybody in my class are having a smartphone.", "Every one in my class have smartphones."], answer: 1, explanation: "\"Everyone\" takes a singular verb: has.", hint: "Is the verb after \"everyone\" singular or plural?" },
+      { q: "There's ______ in my shoe. It really hurts!", options: ["anything", "something", "nothing", "none"], answer: 1, explanation: "A real thing is there, but you don't know what it is: something.", hint: "Is there a thing in the shoe? Do you know what it is?" },
+      { q: "‘What did you buy at the sale?’ ‘______. It was all too expensive.’", options: ["Nothing", "Anything", "None", "No one"], answer: 0, explanation: "\"Nothing\" answers \"what\" and means zero things. \"None\" needs a group, and \"no one\" means people.", hint: "The question is about things, and the answer is zero." },
+      { q: "______ of my friends has seen the film, so I went on my own.", options: ["None", "No one", "Nobody", "Nothing"], answer: 0, explanation: "Before \"of\" + a group, use \"none\".", hint: "Look at the word right after the blank. Which one goes with \"of\"?" },
+      { q: "Which sentence is NOT correct?", options: ["I didn't see anybody at the bus stop.", "I saw nobody at the bus stop.", "There was nobody at the bus stop.", "I didn't see nobody at the bus stop."], answer: 3, explanation: "\"Didn't\" and \"nobody\" are both negative. English uses only one.", hint: "Count the negative words in each sentence." },
+      { q: "I feel that ______ is missing from this soup, but I can't say what.", options: ["anything", "something", "nothing", "everything"], answer: 1, explanation: "One thing is missing and you aren't sure what, so use \"something\".", hint: "\"I can't say what\" is the clue. Is it one unknown thing?" },
+      { q: "My little brother will eat ______. Last week he even tried sea urchin.", options: ["something", "anything", "nothing", "none"], answer: 1, explanation: "In a positive sentence, \"anything\" means it doesn't matter what. \"Even\" shows this.", hint: "\"Even\" sea urchin! Does it matter what the food is?" }
+    ]] },
+
+    noun: { topic: "Noun phrases", sets: [[
+      { q: "Which sentence is punctuated correctly?", options: ["Sushi, a famous Japanese dish, is easy to find in Hong Kong.", "Sushi a famous Japanese dish is easy to find in Hong Kong.", "Sushi, a famous Japanese dish is easy to find in Hong Kong.", "Sushi a famous Japanese dish, is easy to find in Hong Kong."], answer: 0, explanation: "We know what sushi is, so the phrase is extra. Extra information has a comma on both sides.", hint: "Is the phrase needed or extra? Do commas come alone or in pairs?" },
+      { q: "‘Millions of people visit the Indian palace Taj Mahal every year.’ Why are there no commas?", options: ["Without the name, we wouldn't know which palace.", "\"Taj Mahal\" is extra information.", "Names never take commas.", "The sentence is too short for commas."], answer: 0, explanation: "India has many palaces, so the name is needed. Needed information takes no commas.", hint: "Take the name out. Do you still know which palace?" },
+      { q: "‘Victoria Harbour, Hong Kong's best-known sight, lies between Kowloon and Hong Kong Island.’ Which part can you remove?", options: ["Victoria Harbour", ", Hong Kong's best-known sight,", "lies between", "Kowloon and Hong Kong Island"], answer: 1, explanation: "The part inside the commas is extra. The sentence still works without it.", hint: "Commas often mark what can come out." },
+      { q: "‘My cousin, Ann, lives in Canada.’ What do the commas tell us?", options: ["I have many cousins.", "I have only one cousin.", "Ann is not my cousin.", "Ann has many cousins."], answer: 1, explanation: "With commas, the name is extra: \"my cousin\" is already clear, so I must have just one. Without commas, I would have others.", hint: "With commas, the name is extra. Then how many cousins must I have?" },
+      { q: "Combine: ‘Cheung Chau is an island south-west of Hong Kong Island. It is famous for its bun festival.’", options: ["Cheung Chau, an island south-west of Hong Kong Island, is famous for its bun festival.", "Cheung Chau an island south-west of Hong Kong Island, is famous for its bun festival.", "Cheung Chau, is an island south-west of Hong Kong Island, is famous for its bun festival.", "Cheung Chau, it is an island south-west of Hong Kong Island, is famous for its bun festival."], answer: 0, explanation: "Drop \"is\" and \"it\", and put the phrase between two commas.", hint: "A noun phrase has no verb of its own. Which option has no extra \"is\" or \"it\"?" },
+      { q: "There are many film directors in Hong Kong. Which sentence is correct?", options: ["The film director June Ma will visit our school.", "The film director, June Ma, will visit our school.", "The film director, June Ma will visit our school.", "The film director June Ma, will visit our school."], answer: 0, explanation: "There are many directors, so the name tells us which one. It is needed, so no commas.", hint: "If there are many directors, is her name needed or extra?" },
+      { q: "Which sentence is NOT correct?", options: ["The film Coco won many awards.", "Former US President won many people's hearts.", "Tom yam, a spicy Thai soup, is a must-try.", "The Japanese city Kyoto is famous for its temples."], answer: 1, explanation: "Which president? The name is needed but missing.", hint: "Which sentence leaves you asking \"Which one?\"" },
+      { q: "Which sentence needs commas around the noun phrase?", options: ["The song Let It Go was a huge hit.", "Mount Fuji Japan's highest mountain attracts many climbers.", "The painter Picasso was born in Spain.", "The Japanese city Kyoto has many temples."], answer: 1, explanation: "There is only one Mount Fuji, so \"Japan's highest mountain\" is extra. The other names tell us which song, painter or city.", hint: "In which sentence do you already know exactly what is meant before the phrase?" },
+      { q: "‘We had lunch in Sai Kung, a popular seafood destination.’ Why is there only one comma?", options: ["The writer forgot the other one.", "The full stop takes the place of the second comma.", "Place names take one comma.", "The phrase is defining."], answer: 1, explanation: "The phrase ends the sentence, so the full stop closes it.", hint: "Where would the second comma go? What is already there?" },
+      { q: "You are writing to a penfriend who has never heard of Tai O. Which sentence is best?", options: ["Last weekend I went to Tai O, a fishing village on Lantau Island.", "Last weekend I went to Tai O a fishing village on Lantau Island.", "Last weekend I went to Tai O, it is a fishing village on Lantau Island.", "Last weekend I went to the fishing village, on Lantau Island Tai O."], answer: 0, explanation: "The phrase explains the name for your reader. It is extra, so it takes a comma, with no \"it is\".", hint: "Find the one with a comma and no second verb." }
+    ]] },
+
+    bare: { topic: "Bare infinitives", sets: [[
+      { q: "Mum made me ______ my room before I could go out.", options: ["tidy", "to tidy", "tidying", "tidied"], answer: 0, explanation: "Make + someone + V1. It stays V1 even though the sentence is in the past.", hint: "What follows \"make + someone\"? Does the past tense change it?" },
+      { q: "It's nearly midnight. We'd better ______ now, or we'll miss the last bus.", options: ["leave", "to leave", "leaving", "left"], answer: 0, explanation: "\"Had better\" takes V1. Here \"we'd\" means \"we had\".", hint: "\"Had better\" looks past, but which form follows it?" },
+      { q: "I'd rather ______ at home than ______ out in this typhoon.", options: ["stay / go", "to stay / to go", "staying / going", "stay / to go"], answer: 0, explanation: "Would rather + V1 + than + V1. Both verbs are bare.", hint: "Do both verbs need the same form?" },
+      { q: "‘I saw the boy cross the road.’ What does this tell us?", options: ["I saw the whole action, from start to finish.", "I saw only part of the action.", "He is going to cross later.", "He did not reach the other side."], answer: 0, explanation: "See + someone + V1 shows the whole action. \"Crossing\" would show only part of it.", hint: "V1 after \"saw\": a complete action, or one still going on?" },
+      { q: "Which sentence is NOT correct?", options: ["She helped me carry the boxes.", "She helped me to carry the boxes.", "She made me carry the boxes.", "She let me to carry the boxes."], answer: 3, explanation: "\"Let\" never takes \"to\". \"Help\" can go both ways.", hint: "Only \"help\" can go both ways." },
+      { q: "Fill both blanks: ‘You needn't ______ early.’ / ‘You don't need ______ early.’", options: ["come / to come", "to come / come", "come / come", "to come / to come"], answer: 0, explanation: "\"Needn't\" works like a modal: V1. \"Don't need\" is a normal verb, so it keeps \"to\".", hint: "Which one works like a modal verb?" },
+      { q: "She ______ tell her mum about the broken vase.", options: ["dare not", "dare not to", "dares not to", "not dare"], answer: 0, explanation: "\"Dare not\" + V1, with no \"to\".", hint: "\"Dare not\" works like \"need not\". Does it take \"to\"?" },
+      { q: "My parents won't let me ______ out late, and they make me ______ home by ten.", options: ["go / be", "to go / to be", "going / being", "go / to be"], answer: 0, explanation: "Let + someone + V1 and make + someone + V1.", hint: "\"Let\" and \"make\" follow the same pattern." },
+      { q: "The teacher had us ______ our essays again because of the many mistakes.", options: ["rewrite", "to rewrite", "rewriting", "rewrote"], answer: 0, explanation: "Have + someone + V1 means you get someone to do something.", hint: "\"Have\" here works like \"make\". Which form follows?" },
+      { q: "Which sentence is correct?", options: ["Everyone must hands in the form by Friday.", "Everyone must hand in the form by Friday.", "Everyone must to hand in the form by Friday.", "Everyone must handed in the form by Friday."], answer: 1, explanation: "After \"must\", always V1. \"Everyone\" does not add -s here, because \"must\" comes first.", hint: "\"Everyone\" is singular, but what does \"must\" do to the next verb?" }
+    ]] },
+
+    so: { topic: "So, so that, so as to", sets: [[
+      { q: "It was raining heavily, ______ the match was cancelled.", options: ["so", "so that", "so as to", "so as"], answer: 0, explanation: "The cancellation is what happened as a result of the rain.", hint: "Did the rain aim to cancel the match, or was that just the result?" },
+      { q: "I set three alarms ______ I wouldn't oversleep.", options: ["so", "so that", "so as to", "so as not to"], answer: 1, explanation: "This is a purpose, and a subject (I) follows the gap, so use \"so that\".", hint: "Is it a result or a plan? What comes right after the blank?" },
+      { q: "I set three alarms ______ oversleep.", options: ["so as not to", "so that not", "so not to", "so as not"], answer: 0, explanation: "A verb follows the gap, and the purpose is negative: so as not to + V1.", hint: "Only a verb follows the blank. Where does \"not\" go?" },
+      { q: "‘He studied hard, so he passed.’ / ‘He studied hard so that he could pass.’ What is the difference?", options: ["The first says he passed. The second only tells us his aim.", "The first shows his aim. The second says he passed.", "They mean exactly the same.", "Both say he failed."], answer: 0, explanation: "\"So\" gives the result, which really happened. \"So that\" gives the aim.", hint: "Which one tells you what really happened?" },
+      { q: "Which sentence is NOT correct?", options: ["He studies recipes every day so as to improve his cooking.", "I broke my leg, so I can't join the marathon.", "It is going to rain so that I bring an umbrella.", "I got up early so that I could go jogging."], answer: 2, explanation: "Rain has no aim. Say: It is going to rain, so I'm bringing an umbrella.", hint: "In which sentence does the second part not make sense as an aim?" },
+      { q: "Tom bought his ticket early so that he ______ get a good seat.", options: ["could", "can", "will", "must"], answer: 0, explanation: "The sentence is in the past (bought), so use the past form: could.", hint: "\"Bought\" is past. Which modal matches it?" },
+      { q: "We're taking a taxi so that we ______ arrive on time.", options: ["can", "could", "had", "were"], answer: 0, explanation: "The sentence is about now, so use the present form: can.", hint: "\"We're taking\" is about now. Which modal matches?" },
+      { q: "Rewrite: ‘I turned the music down because I didn't want to disturb the neighbours.’", options: ["I turned the music down so as not to disturb the neighbours.", "I turned the music down so that not disturb the neighbours.", "I turned the music down so not to disturb the neighbours.", "I turned the music down so as not disturb the neighbours."], answer: 0, explanation: "So as not to + V1. All four words are needed.", hint: "The full pattern has four words before the verb." },
+      { q: "Which sentence shows a result?", options: ["Kate was the most qualified applicant, so she got the job.", "Kate practised so that she could get the job.", "Kate applied early so as to get the job.", "Kate wrote a long letter so as not to lose the job."], answer: 0, explanation: "She got the job: it really happened. The others show her aims.", hint: "Which one tells you what actually happened?" },
+      { q: "Mia wears bright clothes when she cycles ______ be seen by drivers.", options: ["so as to", "so that", "so", "such as"], answer: 0, explanation: "Only a verb follows the gap (be), so use \"so as to\".", hint: "Is there a subject after the blank, or only a verb?" }
+    ]] },
+
+    must: { topic: "Must, have to, need to", sets: [[
+      { q: "You ______ touch the paintings. The guard will stop you.", options: ["must not", "don't have to", "don't need to", "needn't"], answer: 0, explanation: "The guard will stop you, so it isn't allowed: must not.", hint: "The guard will stop you. Is it a choice, or not allowed?" },
+      { q: "You ______ bring lunch on Friday. The school is giving everyone a free lunchbox.", options: ["don't have to", "must not", "had to", "must"], answer: 0, explanation: "It isn't necessary, but you may if you want. It isn't forbidden.", hint: "Would you be in trouble if you brought your own lunch?" },
+      { q: "‘You don't have to wear a jacket.’ What does this mean?", options: ["You can wear one if you want.", "You are not allowed to wear one.", "You must wear one.", "You wore one yesterday."], answer: 0, explanation: "\"Don't have to\" means it's your choice.", hint: "Does \"don't have to\" forbid something, or leave it up to you?" },
+      { q: "Yesterday I ______ stay at school until six for choir practice.", options: ["had to", "must", "have to", "musted"], answer: 0, explanation: "\"Must\" has no past form. Use \"had to\".", hint: "\"Yesterday\" is past. Does \"must\" have a past form?" },
+      { q: "Coach's rule: everyone on the team ______ wear the same shirt.", options: ["has to", "have to", "must to", "musts"], answer: 0, explanation: "A rule from someone else: have to. \"Everyone\" is singular, so \"has to\".", hint: "\"Everyone\" is singular, and \"must\" never takes \"to\" or -s." },
+      { q: "______ present our student ID at the charity sale?", options: ["Do we have to", "Have we to", "Must we to", "Do we must"], answer: 0, explanation: "Have to needs \"do\" in a question: Do we have to …?", hint: "\"Have to\" makes questions with which helping verb?" },
+      { q: "He must ______ the form today.", options: ["hand in", "to hand in", "hands in", "handing in"], answer: 0, explanation: "After \"must\", use V1.", hint: "What form always follows \"must\"?" },
+      { q: "Which sentence is NOT correct?", options: ["She doesn't need to come.", "She needn't come.", "She needs come.", "She needs to come."], answer: 2, explanation: "In a positive sentence, \"needs\" must have \"to\": She needs to come.", hint: "Only the \"needn't\" form drops \"to\"." },
+      { q: "‘We didn't need to queue, because Dad had already bought the tickets.’ What does this mean?", options: ["Queuing wasn't necessary.", "Queuing wasn't allowed.", "We had to queue.", "We wanted to queue."], answer: 0, explanation: "\"Didn't need to\" means it wasn't necessary.", hint: "Dad had the tickets. Was queuing banned, or just not necessary?" },
+      { q: "In the exam, you ______ use a dictionary, but you ______ answer Question 5, because it is optional.", options: ["must not / don't have to", "don't have to / must not", "must / have to", "have to / must"], answer: 0, explanation: "A dictionary isn't allowed: must not. Question 5 is a choice: don't have to.", hint: "Which part is forbidden, and which part is your choice?" }
+    ]] },
+
     pastPerfect: { topic: "Past perfect", sets: [[
       { q: "By the time the ambulance arrived, a passer-by ______ the injured cyclist first aid, which probably saved his life.", options: ["gave", "had given", "has given", "gives"], answer: 1, explanation: "The first aid was finished before the ambulance came. \"By the time\" + a past event points to had + V3.", hint: "Which happened first: the first aid or the ambulance arriving? \"By the time\" is a big clue." },
       { q: "‘When Mia walked into the hall, the speech had finished.’ What does this tell us?", options: ["Mia heard the whole speech.", "Mia heard the end of the speech.", "Mia missed the speech.", "The speech started when Mia walked in."], answer: 2, explanation: "\"Had finished\" means the speech ended before she walked in, so she missed all of it.", hint: "Did the speech end before or after Mia walked in?" },
@@ -277,13 +501,13 @@ window.CLY_S3_GRAMMAR = {
     linking: { topic: "Linking words", sets: [[
       { q: "The new phone has a brilliant camera. ______, its battery barely lasts a day.", options: ["Moreover", "However", "Therefore", "For instance"], answer: 1, explanation: "A good point, then a bad point: that's contrast. \"However\" starts the new sentence.", hint: "Is the second sentence adding a good point, or turning to a bad one?" },
       { q: "______ the heavy traffic, we arrived on time.", options: ["Although", "Despite", "However", "Even though"], answer: 1, explanation: "\"The heavy traffic\" is a noun phrase, not a clause, so you need \"Despite\". \"Although\" and \"Even though\" need a subject + verb.", hint: "Is \"the heavy traffic\" a noun or a full clause with a verb?" },
-      { q: "You can borrow my notes ______ you give them back by Friday.", options: ["unless", "in case", "as long as", "so as to"], answer: 2, explanation: "Giving them back is the condition for borrowing: as long as = only if.", hint: "Is giving the notes back a condition, a reason to be ready, or a purpose?" },
-      { q: "I always carry a power bank ______ my phone runs out of battery.", options: ["unless", "in case", "as long as", "so as"], answer: 1, explanation: "You carry it to be ready because the battery might run out: in case.", hint: "Do you carry it only if the battery runs out, or to be ready because it might?" },
+      { q: "You can borrow my notes ______ you give them back by Friday.", options: ["although", "in case", "as long as", "so as to"], answer: 2, explanation: "Giving them back is the condition for borrowing: as long as = only if.", hint: "Is giving the notes back a condition, a reason to be ready, or a purpose?" },
+      { q: "I always carry a power bank ______ my phone runs out of battery.", options: ["although", "in case", "as long as", "so as"], answer: 1, explanation: "You carry it to be ready because the battery might run out: in case.", hint: "Do you carry it only if the battery runs out, or to be ready because it might?" },
       { q: "Which sentence is correct?", options: ["Due to the typhoon, school was closed.", "Due to there was a typhoon, school was closed.", "Because of there was a typhoon, school was closed.", "Because the typhoon, school was closed."], answer: 0, explanation: "\"Due to\" and \"because of\" need a noun. \"Because\" needs a clause: Because there was a typhoon …", hint: "Which linkers take a noun, and which take a subject + verb?" },
       { q: "Which sentence is NOT correct?", options: ["Even though she studied hard, she failed the test.", "She studied hard, yet she failed the test.", "Although she studied hard, but she failed the test.", "She studied hard. However, she failed the test."], answer: 2, explanation: "\"Although\" and \"but\" both show contrast. Use one, not both.", hint: "Which sentence uses two contrast words for one idea?" },
       { q: "We booked the tickets a month early ______ get good seats.", options: ["so that", "in order to", "such as", "as a result"], answer: 1, explanation: "\"Get\" is a bare verb, so you need \"in order to\". \"So that\" needs a clause: so that we could get good seats.", hint: "Look at what comes after the blank: a verb on its own, or a subject + verb?" },
       { q: "Which sentence uses the linker correctly?", options: ["Many teenagers enjoy outdoor sports. Such as hiking and kayaking.", "Many teenagers enjoy outdoor sports, such as hiking and kayaking.", "Many teenagers enjoy outdoor sports. For example hiking and kayaking.", "Many teenagers enjoy outdoor sports, for instance, they go hiking and kayaking."], answer: 1, explanation: "\"Such as\" adds examples inside the same sentence. A and C leave a sentence with no verb, and D joins two sentences with only a comma.", hint: "Does each option end up with complete sentences, each with its own verb?" },
-      { q: "‘You won't pass ______ you start revising now.’ Which word means \"if you don't start revising now\"?", options: ["unless", "in case", "as long as", "provided that"], answer: 0, explanation: "\"Unless\" means \"if not\": you won't pass if you don't start now.", hint: "Which word already has \"not\" built into its meaning?" },
+      { q: "The flight was delayed ______ a typhoon, so we spent the night at the airport.", options: ["because of", "because", "therefore", "as a result"], answer: 0, explanation: "\"A typhoon\" is a noun, so you need \"because of\". \"Because\" needs a subject + verb.", hint: "Is \"a typhoon\" a noun or a clause with its own verb?" },
       { q: "In a chatty blog post: ‘The trip had a few problems: the bus was late and it rained. ______, we had a great time.’", options: ["In conclusion", "All in all", "Furthermore", "As a result"], answer: 1, explanation: "\"All in all\" weighs up the good and the bad and gives an overall view. \"In conclusion\" belongs at the end of a formal essay or speech.", hint: "You are weighing up good and bad in a friendly post. Which phrase sounds like everyday writing, not a formal essay?" }
     ]] }
   }

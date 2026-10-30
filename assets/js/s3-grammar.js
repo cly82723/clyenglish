@@ -107,7 +107,7 @@
     ["Cause", "because, since, as", "because of, due to", ""],
     ["Result", "so", "", "As a result, Therefore"],
     ["Purpose", "so that", "in order to / so as to + verb", ""],
-    ["Condition", "if, unless, as long as, in case", "", ""],
+    ["Condition", "if, as long as, in case", "", ""],
     ["Example", "", "such as, including", "For example, For instance"],
     ["Conclude", "", "", "All in all, Overall, In conclusion"]
   ];
@@ -123,7 +123,141 @@
       h("tbody", null, LINKERS.map(function (r) { return h("tr", null, h("th", { scope: "row" }, r[0]), cell(r[1], 0), cell(r[2], 1), cell(r[3], 2)); }))));
   }
 
+  // Indefinite pronouns: a row of five shows how many each word means. Round for people, square for things.
+  // on: how many are filled. any: all are dashed, because it doesn't matter which. use: where the word goes.
+  var CROWD = [
+    { people: "everyone / everybody", things: "everything", on: 5, means: "all of them", use: "+ ?", p: "Everyone enjoyed the film.", t: "Everything in the film was great." },
+    { people: "someone / somebody", things: "something", on: 1, means: "one, but I don't know which", use: "+ ?", p: "Someone took my seat.", t: "Something is missing." },
+    { people: "anyone / anybody", things: "anything", any: true, means: "it doesn't matter which", use: "+ – ?", p: "I don't know anyone here.", t: "There isn't anything to eat." },
+    { people: "no one / nobody", things: "nothing", on: 0, means: "zero", use: "–", p: "No one has seen it.", t: "I know nothing about it." },
+    { people: "none of my friends", things: "none of the films", on: 0, means: "zero from a group", use: "–", p: "None of my friends came.", t: "None of the films interests me." }
+  ];
+  var SIGN_NAMES = { "+": "positive", "–": "negative", "?": "question" };
+  function PronounCrowd() {
+    var kind = "people", wrap = h("div", { class: "figure" });
+    function draw() {
+      clear(wrap);
+      wrap.appendChild(h("ul", { class: "chips" }, [["people", "People"], ["things", "Things"]].map(function (k) {
+        return h("li", null, h("button", { type: "button", class: "chip", "aria-pressed": String(kind === k[0]), onclick: function () { kind = k[0]; draw(); wrap.querySelector("[aria-pressed='true']").focus(); } }, k[1]));
+      })));
+      wrap.appendChild(h("ul", { class: "dg-crowds" }, CROWD.map(function (r) {
+        var dots = [0, 1, 2, 3, 4].map(function (i) { return h("i", { class: "dg-dot" + (kind === "things" ? " dg-thing" : "") + (r.any ? " dg-any" : i < r.on ? " dg-on" : "") }); });
+        return h("li", null,
+          h("span", { class: "dg-dots", "aria-hidden": "true" }, dots),
+          h("span", { class: "dg-crowd-word" }, h("strong", null, r[kind]), h("small", null, r.means)),
+          h("span", { class: "dg-signs" }, r.use.split(" ").map(function (u) { return h("span", { class: "dg-sign", title: SIGN_NAMES[u] }, h("span", { "aria-hidden": "true" }, u), h("span", { class: "visually-hidden" }, SIGN_NAMES[u])); })),
+          h("em", { class: "dg-crowd-eg" }, kind === "people" ? r.p : r.t));
+      })));
+      wrap.appendChild(h("ul", { class: "legend" }, ["+ positive", "– negative", "? question"].map(function (t) { return h("li", null, t); })));
+      wrap.appendChild(h("p", { class: "dg-caption" }, "All of them take a ", h("strong", null, "singular verb"), ": ", h("em", null, "Everyone loves this film.")));
+    }
+    draw();
+    return wrap;
+  }
+
+  // Noun phrases: take the phrase out, and see whether the sentence still says who or what.
+  var PHRASES = [
+    { label: "Defining: it is needed", before: "Tourists visit the Indian palace", phrase: " Taj Mahal", after: " every year.", gone: "Which Indian palace? We can't tell, so the phrase must stay. No commas." },
+    { label: "Non-defining: it is extra", before: "The croissant", phrase: ", a famous French pastry,", after: " is my favourite breakfast.", gone: "We still know what is meant, so the phrase was extra. It goes between commas." }
+  ];
+  function NounPhraseTest() {
+    return h("div", { class: "figure" },
+      h("div", { class: "pairs" }, PHRASES.map(function (p) {
+        var out = false;
+        var phrase = h("span", { class: "dg-phrase" }, p.phrase);
+        var result = h("p", { class: "note-line", hidden: true }, p.gone);
+        var btn = h("button", { type: "button", class: "btn-quiet", "aria-pressed": "false", onclick: function () {
+          out = !out;
+          phrase.classList.toggle("dg-out", out);
+          result.hidden = !out;
+          btn.setAttribute("aria-pressed", String(out));
+          btn.textContent = out ? "Put it back" : "Take it out";
+        } }, "Take it out");
+        return h("div", { class: "dg-who" },
+          h("p", { class: "field-label" }, p.label),
+          h("p", { class: "dg-sentence" }, p.before, phrase, p.after),
+          btn, h("div", { "aria-live": "polite" }, result));
+      })),
+      h("p", { class: "dg-caption" }, "Needed: ", h("strong", null, "no commas"), ". Extra: ", h("strong", null, "a comma on both sides"), "."));
+  }
+
+  // Bare infinitives: each group of words leads straight to V1. Some need a person in between.
+  var BARE = [
+    ["Modal verbs", "can, could, may, might, must, should, will, would", false, "You must leave now."],
+    ["Short phrases", "need not, dare not, had better, would rather … than", false, "You had better stop."],
+    ["Make it happen", "make, let, have", true, "Mum made me tidy my room."],
+    ["Your senses", "see, hear, watch, notice, feel", true, "I heard her sing."]
+  ];
+  function BareInfinitive() {
+    return h("div", { class: "figure" },
+      h("p", { class: "dg-tiles" },
+        ["to go", "goes", "went", "going"].map(function (w) { return h("s", { class: "dg-tile dg-helper" }, w); }),
+        h("span", { class: "dg-tile dg-verb" }, "go")),
+      h("ul", { class: "dg-bare" }, BARE.map(function (r) {
+        return h("li", null,
+          h("p", { class: "field-label" }, r[0]),
+          h("p", { class: "dg-flow" },
+            h("span", { class: "dg-chip" }, r[1]),
+            r[2] ? [h("span", { class: "dg-arrow", "aria-hidden": "true" }, "+"), h("span", { class: "dg-chip dg-subject" }, "someone")] : null,
+            h("span", { class: "dg-arrow", "aria-hidden": "true" }, "→"),
+            h("span", { class: "dg-chip dg-action" }, "V1")),
+          h("p", { class: "note-line" }, r[3]));
+      })),
+      h("p", { class: "dg-caption" }, "One word can go both ways: ", h("em", null, "help me carry"), " and ", h("em", null, "help me to carry"), " are both correct."));
+  }
+
+  // So, so that, so as to: a result really happened (solid box); a purpose is only the aim (dashed box).
+  var SO_ROWS = [
+    { label: "So: the result", start: "It rained", word: ", so", end: "the match was cancelled.", aim: false, next: "+ subject + verb. It happened." },
+    { label: "So that: the aim", start: "I left early", word: "so that", end: "I could catch the bus.", aim: true, next: "+ subject + can / could. It was the plan." },
+    { label: "So as to: the aim", start: "I left early", word: "so as to", end: "catch the bus.", aim: true, next: "+ V1 only. It was the plan." }
+  ];
+  function SoChart() {
+    return h("div", { class: "figure" },
+      h("ul", { class: "dg-bare" }, SO_ROWS.map(function (r) {
+        return h("li", null,
+          h("p", { class: "field-label" }, r.label),
+          h("p", { class: "dg-flow" },
+            h("span", { class: "dg-chip" }, r.start),
+            h("span", { class: "dg-arrow" }, r.word, h("span", { "aria-hidden": "true" }, " →")),
+            h("span", { class: "dg-chip" + (r.aim ? " dg-aim" : " dg-subject") }, r.end)),
+          h("p", { class: "note-line" }, r.next));
+      })),
+      h("ul", { class: "legend" },
+        h("li", null, h("i", { class: "dg-key dg-subject" }), "it really happened"),
+        h("li", null, h("i", { class: "dg-key dg-aim" }), "only the aim: it may not have happened")));
+  }
+
+  // Must, have to, need to: who says so, then the two very different negatives.
+  var WHO_SAYS = [
+    ["must", "I feel it myself", "I must call Grandma."],
+    ["have to", "A rule or another person says so", "We have to wear a uniform."],
+    ["need to", "It is necessary now", "We need to leave now."]
+  ];
+  var sign = function (allowed) {
+    return s("svg", { viewBox: "0 0 44 44", class: "dg-icon " + (allowed ? "dg-icon-ok" : "dg-icon-no"), "aria-hidden": "true" },
+      s("circle", { cx: "22", cy: "22", r: "18" }),
+      allowed ? s("path", { d: "M13,23 L20,30 L32,15" }) : s("line", { x1: "10", y1: "34", x2: "34", y2: "10" }));
+  };
+  function MustChart() {
+    return h("div", { class: "figure" },
+      h("p", { class: "field-label" }, "Positive: who says so?"),
+      h("div", { class: "dg-steps" }, WHO_SAYS.map(function (w) {
+        return h("div", { class: "dg-step" }, h("p", { class: "dg-who-word" }, w[0]), h("p", { class: "note-line" }, w[1]), h("p", null, h("em", null, w[2])));
+      })),
+      h("p", { class: "field-label" }, "Negative: one \"not\", two meanings"),
+      h("div", { class: "pairs" },
+        h("div", { class: "dg-who" }, sign(false), h("p", { class: "dg-who-word dg-no" }, "must not"), h("p", { class: "note-line" }, "Not allowed. Don't do it."), h("p", null, h("em", null, "You must not touch the paintings."))),
+        h("div", { class: "dg-who" }, sign(true), h("p", { class: "dg-who-word dg-yes" }, "don't have to / don't need to"), h("p", { class: "note-line" }, "Not necessary. It's your choice."), h("p", null, h("em", null, "You don't have to come.")))),
+      h("p", { class: "dg-caption" }, "After ", h("strong", null, "must"), ", use V1 with no \"to\". For the past, use ", h("strong", null, "had to"), "."));
+  }
+
   window.CLY_S3_VISUALS = {
+    "pronoun-crowd": PronounCrowd,
+    "noun-phrase-test": NounPhraseTest,
+    "bare-infinitive": BareInfinitive,
+    "so-chart": SoChart,
+    "must-chart": MustChart,
     "past-perfect-timeline": PastPerfectTimeline,
     "present-participle": PresentParticiple,
     "past-participle": PastParticiple,

@@ -35,6 +35,11 @@ test("quiz questions have four different options and a valid answer, hint and ex
   })));
 });
 
+test("nothing on the S.3 page teaches or tests 'unless'", () => {
+  ["s3-grammar.html", "assets/js/s3-grammar.js", "assets/js/data/s3-grammar-data.js", "assets/js/data/s3-consolidation-data.js"].forEach(f =>
+    assert.ok(!/\bunless\b/i.test(fs.readFileSync(path.join(root, f), "utf8")), f));
+});
+
 test("every lesson diagram exists in s3-grammar.js", () => {
   const code = fs.readFileSync(path.join(root, "assets/js/s3-grammar.js"), "utf8");
   const visuals = code.slice(code.indexOf("window.CLY_S3_VISUALS"));

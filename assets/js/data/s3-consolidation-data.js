@@ -1,9 +1,76 @@
-/* CLY English: S.3 consolidation (Units 3 and 4). Sentence rewrites in the style of a graded grammar
+/* CLY English: S.3 consolidation (Units 1 to 4). Sentence rewrites in the style of a graded grammar
    worksheet, with original texts. The rest of each sentence is given and the student types the missing
    part (or, with whole: true, the whole new sentence). In answers, [a|b] is a choice and (x) is optional, so every correct version is accepted
    (see rewrite-check.js). kind: "present" or "past" makes the student choose the participle first. */
 var MIXED_TASK = "First choose: does each underlined sentence need a present participle phrase (the subject does it) or a past participle phrase (it is done to the subject, or the subject feels it)? Then type the phrase and its comma; the rest of the sentence is given.";
 window.CLY_S3_CONSOLIDATION = {
+  // Units 1 and 2: Part A and Part B practise one unit each; Part C mixes the two.
+  unit1A: {
+    title: "Our first film festival",
+    textType: "Blog post",
+    task: "Rewrite each underlined sentence using the grammar from Unit 1: indefinite pronouns, noun phrases and bare infinitives. Type the missing part; the rest of the sentence is given.",
+    paragraphs: [
+      ["Last term, our school held its first film festival. ", 1, " Luckily, we had a famous judge. ", 2],
+      ["My team decided to make a short comedy. ", 3, " ", 4, " I told my team, ", 5, " We filmed for three weekends. Everyone wanted a turn. ", 6],
+      ["On the big night, we were all very nervous. When we watched the film again, ", 7, " ", 8, " ", 9]
+    ],
+    items: {
+      1: { original: "There wasn't a single person at our school who had made a film before.", frame: "___ at our school had made a film before.", answers: ["[No one|Nobody]"], hint: "\"Not a single person\" means zero people. Which word means that?", why: "Not a single person → No one or Nobody. The verb stays positive, because the word is already negative." },
+      2: { original: "June Ma is a well-known film director. She agreed to judge the festival.", frame: "June Ma___ agreed to judge the festival.", answers: [", a well-known film director,"], hint: "We know who June Ma is, so the phrase is extra. Drop \"is\" and put commas on both sides.", why: "The phrase is extra information about June Ma, so it goes between two commas." },
+      3: { original: "Ms Ho forced us to write a full script first.", frame: "Ms Ho made us ___", answers: ["write a full script first."], hint: "Make + someone + which form of the verb?", why: "Make + someone + V1: made us write, with no \"to\"." },
+      4: { original: "We were allowed to borrow the school's camera by the IT teacher.", frame: "The IT teacher let us ___", answers: ["borrow the school's camera."], hint: "Let + someone + which form of the verb?", why: "Let + someone + V1: let us borrow, with no \"to\"." },
+      5: { original: "‘It is a good idea to start filming early.’", frame: "‘We had better ___’", answers: ["start filming early."], hint: "Which form follows \"had better\"?", why: "Had better + V1: had better start." },
+      6: { original: "I prefer acting to holding the camera.", frame: "I would rather ___", answers: ["act than hold the camera."], hint: "Would rather + V1 + than + V1. Both verbs lose their -ing.", why: "Would rather act than hold: both verbs are V1." },
+      7: { original: "There was nothing wrong with the sound.", frame: "There wasn't ___ with the sound.", answers: ["anything wrong"], hint: "\"Wasn't\" is already negative. Which word goes after a negative verb?", why: "Only one negative: wasn't + anything." },
+      8: { original: "The audience laughed, and we heard it from the back of the hall.", frame: "We heard the audience ___ from the back of the hall.", answers: ["laugh"], hint: "Hear + someone + which form of the verb?", why: "Hear + someone + V1: heard the audience laugh. It stays V1, even in a past sentence." },
+      9: { original: "One of the films was called Waffle Days. It won Best Film.", frame: "The film ___ won Best Film.", answers: ["Waffle Days"], hint: "There were many films, so the name tells us which one. Is it needed or extra?", why: "The name is needed to show which film, so it takes no commas." }
+    }
+  },
+
+  unit2B: {
+    title: "Our charity sale",
+    textType: "Article for the school magazine",
+    task: "Rewrite each underlined sentence using the grammar from Unit 2: so, so that, so as to, must, have to and need to. Type the missing part; the rest of the sentence is given.",
+    paragraphs: [
+      ["Our class wanted to help stray animals. ", 1, " ", 2, " Luckily, the school hall was free."],
+      ["We had a meeting to make the rules clear. ", 3, " ", 4, " ", 5, " ", 6],
+      ["On the day, the S.6 students were sitting a mock exam next door. ", 7, " ", 8, " ", 9]
+    ],
+    items: {
+      1: { original: "We held a charity sale because we wanted to raise money for them.", frame: "We held a charity sale ___", answers: ["[so as to|in order to] raise money for them.", "so that we [could|would] raise money for them."], hint: "This is the aim. Use \"so as to\" + verb, or \"so that\" + subject.", why: "Raising money was the aim: so as to raise, or so that we could raise." },
+      2: { original: "The weather was terrible. As a result, we moved the sale indoors.", frame: "The weather was terrible, ___", answers: ["so we moved the sale indoors."], hint: "Moving indoors is what happened as a result.", why: "It really happened, so use \"so\", with a comma before it." },
+      3: { original: "It isn't necessary for volunteers to bring their own tables.", frame: "Volunteers ___", answers: ["[don't have to|don't need to|needn't] bring their own tables."], hint: "It isn't necessary, but it isn't banned. Which negative means that?", why: "Not necessary → don't have to, don't need to or needn't." },
+      4: { original: "Selling food without a teacher's permission is not allowed.", frame: "You ___", answers: ["must not sell food without a teacher's permission."], hint: "It is forbidden. Which negative means that?", why: "Not allowed → must not + V1." },
+      5: { original: "We made posters because we wanted everyone to know about the sale.", frame: "We made posters so that ___", answers: ["everyone [would|could] know about the sale."], hint: "The sentence is in the past. \"So that\" + subject + which modal?", why: "A past sentence takes a past modal: so that everyone would (or could) know." },
+      6: { original: "The school's rule says that every stall needs a teacher.", frame: "Every stall ___", answers: ["[has to|must|needs to] have a teacher."], hint: "It's a rule from the school. \"Every stall\" is singular.", why: "A rule from someone else: has to. It is singular, so not \"have to\"." },
+      7: { original: "We spoke quietly because we didn't want to disturb them.", frame: "We spoke quietly ___", answers: ["so as not to disturb them.", "so that we [wouldn't|didn't] disturb them."], hint: "A negative aim. Where does \"not\" go in \"so as to\"?", why: "So as not to + V1. \"Not\" goes before \"to\"." },
+      8: { original: "At the end, it was necessary for us to carry everything upstairs by hand.", frame: "At the end, we ___", answers: ["[had to|needed to] carry everything upstairs by hand."], hint: "This is in the past. What is the past form of \"must\"?", why: "\"Must\" has no past form, so use \"had to\" or \"needed to\"." },
+      9: { original: "We raised a lot of money. As a result, the shelter bought food for six months.", frame: "We raised a lot of money, ___", answers: ["so the shelter bought food for six months."], hint: "Buying the food really happened. Which word gives a result?", why: "It really happened, so use \"so\"." }
+    }
+  },
+
+  unitsMixedC: {
+    title: "The hike to Sharp Peak",
+    textType: "Email to a friend",
+    task: "These sentences mix Units 1 and 2. Decide which grammar each one needs, then type the missing part. The rest of the sentence is given.",
+    paragraphs: [
+      ["Hi Sam, Last Sunday our class went hiking in Sai Kung. ", 1, " ", 2, " ", 3],
+      ["Our guide was very strict. ", 4, " ", 5, " It was a tough walk. ", 6],
+      ["We got back to the village by five. ", 7, " ", 8, " ", 9, " Next time, you should come too!"]
+    ],
+    items: {
+      1: { original: "Not a single person in my class had been there before.", frame: "___ in my class had been there before.", answers: ["[No one|Nobody]"], hint: "Which word means zero people? The verb stays positive.", why: "Not a single person → No one or Nobody." },
+      2: { original: "Sharp Peak is one of the toughest hikes in Sai Kung. It took us four hours.", frame: "Sharp Peak___ took us four hours.", answers: [", one of the toughest hikes in Sai Kung,"], hint: "Is the phrase needed or extra? Use it between commas, with no \"is\".", why: "The name already tells us which hike, so the phrase is extra: two commas." },
+      3: { original: "We got up at five because we wanted to avoid the heat.", frame: "We got up at five ___", answers: ["[so as to|in order to] avoid the heat.", "so that we [could|would] avoid the heat."], hint: "This is the aim. \"So as to\" + verb, or \"so that\" + subject.", why: "Avoiding the heat was the aim: so as to avoid, or so that we could avoid." },
+      4: { original: "He forced us to drink water every hour.", frame: "He made us ___", answers: ["drink water every hour."], hint: "Make + someone + which form of the verb?", why: "Make + someone + V1: made us drink." },
+      5: { original: "Swimming in the reservoir is not allowed.", frame: "You ___", answers: ["must not swim in the reservoir."], hint: "It's forbidden. Which negative means that?", why: "Not allowed → must not + V1." },
+      6: { original: "It wasn't necessary to carry a tent, because we came back the same day.", frame: "We ___ carry a tent, because we came back the same day.", answers: ["[didn't have to|didn't need to]"], hint: "It wasn't necessary, and this is in the past.", why: "Not necessary, in the past → didn't have to or didn't need to." },
+      7: { original: "My legs hurt a lot. As a result, I took a taxi home.", frame: "My legs hurt a lot, ___", answers: ["so I took a taxi home."], hint: "Taking a taxi really happened. Which word gives a result?", why: "It really happened, so use \"so\"." },
+      8: { original: "Mum saw that I limped through the door.", frame: "Mum saw me ___ through the door.", answers: ["limp"], hint: "See + someone + which form of the verb?", why: "See + someone + V1: saw me limp, for the whole action." },
+      9: { original: "I prefer to rest at home than to hike again this weekend.", frame: "I would rather ___", answers: ["rest at home than hike again this weekend."], hint: "Would rather + V1 + than + V1. Which \"to\"s must go?", why: "Would rather rest than hike: both verbs are V1." }
+    }
+  },
+
   presentA: {
     title: "Team Spark's robot diary",
     textType: "Blog post",

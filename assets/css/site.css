@@ -1710,6 +1710,36 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 .dg-tile.dg-wh { border-color: var(--sky); color: var(--sky); }
 .dg-tile.dg-end { min-width: 2.2em; text-align: center; font-weight: 800; }
 .dg-none { color: var(--ink-soft); }
+.dg-crowds { list-style: none; margin: 0 0 8px; padding: 0; }
+.dg-crowds li { display: grid; grid-template-columns: 7.5rem 1fr auto; gap: 4px 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.dg-dots { display: flex; gap: 5px; }
+.dg-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink-soft); background: var(--paper); }
+.dg-dot.dg-thing { border-radius: 4px; }
+.dg-dot.dg-on { background: var(--sky); border-color: var(--sky); }
+.dg-dot.dg-any { border-style: dashed; border-color: var(--sky); background: var(--chest); }
+.dg-crowd-word strong { display: block; font-family: var(--font-display); }
+.dg-crowd-word small { display: block; font-size: 0.9375rem; color: var(--ink-soft); }
+.dg-signs { display: flex; gap: 4px; }
+.dg-sign { min-width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid var(--edge); border-radius: 6px; font: 700 1rem/1 var(--font-display); }
+.dg-crowd-eg { grid-column: 2 / -1; }
+@media (max-width: 560px) {
+  .dg-crowds li { grid-template-columns: 1fr auto; }
+  .dg-dots { grid-column: 1 / -1; }
+  .dg-crowd-eg { grid-column: 1 / -1; }
+}
+.dg-phrase.dg-out { background: transparent; color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--avoid); text-decoration-thickness: 2px; font-weight: 400; }
+.dg-who .btn-quiet { margin-bottom: 8px; }
+.dg-bare { list-style: none; margin: 0 0 8px; padding: 0; }
+.dg-bare li { padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.dg-bare p { margin: 0 0 6px; }
+.dg-chip.dg-aim, .dg-key.dg-aim { border: 1.5px dashed var(--sky); background: var(--paper); }
+.dg-key { display: inline-block; }
+.figure svg.dg-icon { width: 44px; min-width: 0; margin-bottom: 6px; fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.dg-icon-no { stroke: var(--avoid); }
+.dg-icon-ok { stroke: var(--do); }
+.dg-who-word { font: 700 1.125rem/1.3 var(--font-display); margin: 0 0 4px !important; }
+.dg-who-word.dg-no { color: var(--avoid); }
+.dg-who-word.dg-yes { color: var(--do); }
 .dg-linkers td, .dg-linkers th[scope="row"] { vertical-align: top; }
 
 /* ---------- S.3 consolidation rewrites ---------- */
