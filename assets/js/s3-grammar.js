@@ -48,7 +48,7 @@
       h("p", { class: "note-line" }, p.rule));
   }
   var toCompare = function () {
-    return h("p", null, h("button", { type: "button", class: "link-btn", onclick: function () { CLY.go("participle-consolidation"); } }, "Compare the two kinds side by side"));
+    return h("p", null, h("button", { type: "button", class: "link-btn tap", onclick: function () { CLY.go("participle-consolidation"); } }, "Compare the two kinds side by side"));
   };
   function PresentParticiple() { return [h("div", { class: "figure dg-single" }, participleCard("present")), toCompare()]; }
   function PastParticiple() { return [h("div", { class: "figure dg-single" }, participleCard("past")), toCompare()]; }
@@ -469,4 +469,16 @@
   }
 
   window.CLY_S3_PRACTICE_SHEET = PracticeCloze;
+
+  // ---------- Each topic is long on a phone, so its top links straight to its parts ----------
+
+  document.querySelectorAll("#main > section").forEach(function (section) {
+    var parts = section.querySelectorAll(":scope > .part[id]");
+    if (parts.length < 2) return;
+    section.querySelector("h2").insertAdjacentElement("afterend", h("nav", { class: "topic-jumps", "aria-label": "In this topic" },
+      Array.prototype.map.call(parts, function (part) {
+        var title = part.querySelector(":scope > h3");
+        return h("a", { href: "#" + part.id }, title ? title.textContent : "Rules");
+      })));
+  });
 })();

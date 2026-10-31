@@ -1828,3 +1828,7 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
   .tenses-table th, .tenses-table td { padding: 2px 0; border: 0; }
   .tenses-table td::before { content: attr(data-label) ": "; color: var(--ink-soft); font-size: 0.875rem; }
 }
+/* Jump links at the top of each S.3 grammar topic. */
+.topic-jumps { display: flex; flex-wrap: wrap; gap: 0 18px; margin: -6px 0 14px; }
+.topic-jumps a { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-weight: 600; }
+.link-btn.tap { display: inline-flex; align-items: center; min-height: 44px; }

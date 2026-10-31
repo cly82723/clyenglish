@@ -102,7 +102,7 @@ tr.you > td { background: var(--chest); }
 
 /* ---------- Review: the marked paper ---------- */
 
-.review .answer { white-space: nowrap; margin: 0 2px; padding: 1px 6px; border-radius: 4px; border-bottom: 2px solid; }
+.review .answer { margin: 0 2px; padding: 1px 6px; border-radius: 4px; border-bottom: 2px solid; overflow-wrap: anywhere; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .review .answer.right { border-color: var(--do); }
 .review .answer.wrong { border-color: var(--avoid); }
 .review .answer sup { font: 700 0.875rem/1 var(--font-display); color: var(--sky); margin-right: 3px; }
@@ -149,3 +149,8 @@ tr.you > td { background: var(--chest); }
 @media (max-width: 420px) { .has-box .save-state { display: none; } }
 .how-to-list { margin: 0 0 12px; padding-left: 20px; }
 .how-to-list li { margin: 0 0 4px; }
+.has-box .time-note { order: 2; }
+.has-box .time-note:not(:empty) ~ .save-state { display: none; }
+/* The narrowest phones have no room for the words: the red clock says it, and screen readers still hear them. */
+@media (max-width: 370px) { .has-box .time-note { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } }
+@media (max-width: 340px) { .has-box .btn, .has-box .box-toggle { padding-left: 12px; padding-right: 12px; } }

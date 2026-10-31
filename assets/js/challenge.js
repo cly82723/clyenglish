@@ -391,7 +391,7 @@
         drain.style.transform = "scaleX(" + Math.max(0, Math.min(1, ms / LIMIT_MS)) + ")";
         bar.classList.toggle("short", ms <= 60000);
         WARN_AT_MS.forEach(function (at) {
-          if (ms <= at && !warned[at]) { warned[at] = true; timeNote.textContent = at <= 60000 ? "Last minute!" : minutes(at) + " left"; }
+          if (ms <= at && !warned[at]) { warned[at] = true; timeNote.textContent = at <= 60000 ? "Last minute!" : ch.format === "cloze" ? Math.ceil(at / 60000) + " min left" : minutes(at) + " left"; }
         });
         if (ms <= 0) handIn(true);
       }
@@ -509,9 +509,9 @@
 
   // ---------- Answers for a closed week ----------
 
-  function reviewAdvice(topics, perfect) {
+  function reviewAdvice(topics, perfect, format) {
     if (perfect) return "Full marks! Keep your skills sharp with a harder practice set.";
-    if (topics.length) return "The grammar you missed: " + topics.join(", ") + ". Read the explanations above, then practise " + (topics.length === 1 ? "it." : "them.");
+    if (topics.length) return "The grammar you missed: " + topics.join(format === "cloze" ? "; " : ", ") + ". Read the explanations above, then practise " + (topics.length === 1 ? "it." : "them.");
     return "Read the explanation under each cross, then try the practice cloze for the same tenses.";
   }
 
@@ -528,7 +528,7 @@
           h("p", { class: "tagline" }, FORMAT[d.challenge.format] + " · " + d.challenge.title),
           h("p", { class: "result-line" }, "You scored ", h("strong", null, score + " / " + total), "."),
           P.review(d.challenge, d.answers, right),
-          nextStep(reviewAdvice(P.missedTopics(d.challenge, right), score === total), d.challenge.format)));
+          nextStep(reviewAdvice(P.missedTopics(d.challenge, right), score === total, d.challenge.format), d.challenge.format)));
         window.scrollTo(0, 0);
       });
     }, function (err) { problem(err, function () { home("mine"); }); });

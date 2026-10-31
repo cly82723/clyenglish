@@ -52,3 +52,8 @@ test("the page has no Challenge or Three versions left", () => {
   assert.ok(!S3.cloze && !S3.proofreading);
   assert.ok(!/class="versions"/.test(fs.readFileSync(path.join(root, "grammar.html"), "utf8")), "S.4 grammar still has a Three versions box");
 });
+
+test("the S.3 tab stays on the S.3 grammar page, and vocab can still be reached from it", () => {
+  assert.ok(html.includes('<a href="s3-grammar.html" aria-current="page">S.3</a>'));
+  assert.ok(html.slice(html.indexOf("<footer")).includes("vocab.html#s3"), "footer link to S.3 vocab");
+});
