@@ -386,4 +386,87 @@
   }
 
   window.CLY_S3_REWRITE = Rewrite;
+
+  // ---------- Practice cloze: the weekly challenge's paper with no clock ----------
+
+  function PracticeCloze(root, set, store) {
+    var W = window.CLY_WORD_BOX, saved = (store && store.get()) || {};
+    var typed = saved.typed || {}, checked = !!saved.checked, showing = !!saved.showing;
+    var ids = Object.keys(set.blanks).map(Number), blanks = ids.map(function (id) { return set.blanks[id]; });
+    var names = function (list) { return list.map(function (b) { return b.verb; }); };
+    var boxed = blanks.filter(function (b) { return b.verb; });
+    var box = W.create({
+      bank: names(boxed.filter(function (b) { return !b.commas; })).concat(set.distractors || []).sort(),
+      phrases: names(boxed.filter(function (b) { return b.commas; })).concat(set.phraseDistractors || []).sort(),
+      commas: blanks.some(function (b) { return b.commas; }),
+      open: blanks.filter(function (b) { return !b.verb; }).map(function (b) { return b.topic; }).filter(function (t, i, all) { return all.indexOf(t) === i; })
+    }, W.RANGES);
+    var panel = box.panel(box.table()), wraps = {};
+    var score = h("p", { "aria-live": "polite" }), filled = h("p");
+    var answers = h("div", { "aria-live": "polite" }), actions = h("div", { class: "actions" });
+    var save = function () { if (store) store.set({ typed: typed, checked: checked, showing: showing }); };
+    var countFilled = function () { filled.textContent = ids.filter(function (id) { return (typed[id] || "").trim(); }).length + " / " + ids.length + " filled"; };
+
+    function check() {
+      checked = true;
+      var right = ids.filter(function (id) { var ok = W.isRight(set.blanks[id], typed[id]); wraps[id].mark(ok); return ok; }).length;
+      score.textContent = right === ids.length ? "All " + ids.length + " right. Well done!" : right + " / " + ids.length + " right. Change the ones with a cross and check again.";
+      save();
+      drawActions();
+    }
+    function drawAnswers() {
+      CLY.clear(answers);
+      if (!showing) return;
+      answers.appendChild(h("ul", { class: "marks" }, ids.map(function (id) {
+        var b = set.blanks[id];
+        return h("li", { class: W.isRight(b, typed[id]) ? "do" : "avoid" }, h("strong", null, id + ". " + b.answers.join(" / ")), " ", b.why);
+      })));
+    }
+    function drawActions() {
+      CLY.clear(actions);
+      actions.appendChild(h("button", { type: "button", class: "btn", onclick: check }, "Check my answers"));
+      if (checked && !showing) actions.appendChild(h("button", { type: "button", class: "btn-quiet", onclick: function () { showing = true; save(); drawAnswers(); drawActions(); } }, "Show the answers"));
+      actions.appendChild(h("button", { type: "button", class: "btn-quiet", onclick: function () {
+        if (store) store.clear();
+        CLY.clear(root);
+        PracticeCloze(root, set, store);
+        CLY.scrollTo(root);
+      } }, "Start again"));
+    }
+
+    var passage = h("div", { class: "passage" }, set.paragraphs.map(function (parts) {
+      return h("p", null, parts.map(function (part) {
+        if (typeof part !== "number") return part;
+        var f = CLY.blank(part, { label: "Blank " + part, oninput: function (e) {
+          typed[part] = e.target.value;
+          W.fitBlank(e.target);
+          f.mark(null);
+          countFilled();
+          save();
+        } });
+        wraps[part] = f;
+        f.input.value = typed[part] || "";
+        W.fitBlank(f.input);
+        f.input.addEventListener("focus", function () { panel.focused(f.input); });
+        return f;
+      }));
+    }));
+
+    root.appendChild(h("p", { class: "tagline" }, root.closest(".set-panel") ? set.textType : set.textType + ": " + set.title));
+    root.appendChild(h("p", null, "Fill in every blank using the word box. Tapping a word only crosses it off: type your answer in the blank."));
+    root.appendChild(W.examples({ commas: blanks.some(function (b) { return b.commas; }), choose: blanks.some(function (b) { return !b.verb; }) }));
+    root.appendChild(h("div", { class: "tip" }, h("p", { class: "field-label" }, "Word box"), box.table()));
+    root.appendChild(h("div", null,
+      h("div", { class: "practice-bar" }, filled, panel.button, panel.el),
+      passage));
+    root.appendChild(score);
+    root.appendChild(actions);
+    root.appendChild(answers);
+    countFilled();
+    drawActions();
+    drawAnswers();
+    if (checked) check();
+  }
+
+  window.CLY_S3_PRACTICE_SHEET = PracticeCloze;
 })();

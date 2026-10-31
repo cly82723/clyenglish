@@ -13,12 +13,15 @@
     practiceHref: "grammar.html#practice",
     practiceNote: "While you wait, practise the same kind of paper with hints and instant marking.",
     boxLabel: "Verb box",
-    boxHelp: "Tap a verb to cross it off once you've used it.",
+    boxHelp: "Tap a verb to cross it off once you've used it. Lost the box? Tap “Box” at the top.",
     clozeTask: "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb.",
     commaReminder: "",
     wordTable: false,       // the box as a table, grouped into verbs and phrases, instead of a row of chips
     wordRanges: {},         // { topic: { name, words } }: a whole group shown in the box when a set has blanks on that topic
-    clozeExamples: null,    // { verb, phrase, noCommas, choose }: worked examples, [sentence, answer]; each shows only when the set needs it
+    clozeHowTo: null,       // how the paper works, shown with worked examples before the clock starts
+    clozePracticeHref: "", // after a cloze, if different from practiceHref
+    clozePracticeNote: "",
+    practiceFirst: "",      // where to try the paper with no clock, linked before the clock starts
     proofTask: "Most lines have one mistake. Fix it by changing, adding or deleting one word. Some lines are correct: tap “No mistake” for those. A line with no mark scores nothing.",
     linesOutOf: false,      // "3 / 15 lines marked" instead of "3 lines marked"
     topics: [],             // [{ from: "YYYY-MM-DD" or "", names: [...] }]: what the league covers from that Monday on

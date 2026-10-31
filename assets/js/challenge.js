@@ -17,6 +17,7 @@
   var FORMAT = { cloze: "Cloze", proofreading: "Proofreading" };
 
   var league = null;
+  var paperFormat = "";        // the paper being done, so the result screen's next step matches it
   var playing = false;
   var saveNow = null;          // while playing: saves the answers at once (the test bar uses it before reloading)
   // Timers and listeners belong to one view and stop when the next view is drawn.
@@ -237,8 +238,19 @@
           h("button", { type: "button", class: "btn-quiet", onclick: show }, "Not yet"))));
       spot.querySelector(".btn").focus();
     }
+    // How the paper works, before the clock costs anything.
+    function howTo() {
+      if (me.week.format !== "cloze" || !S.clozeHowTo) return null;
+      return h("div", { class: "tip how-to" },
+        h("p", { class: "field-label" }, "How this paper works"),
+        h("ul", { class: "how-to-list" }, S.clozeHowTo.map(function (t) { return h("li", null, t); })),
+        window.CLY_WORD_BOX.examples({ commas: true, choose: true }),
+        S.practiceFirst ? h("p", null, h("a", { href: S.practiceFirst }, "Try a practice paper first, with no clock")) : null);
+    }
     function show() {
       clear(spot);
+      var guide = howTo();
+      if (guide) spot.appendChild(guide);
       spot.appendChild(h("p", { class: "ready-line" }, (me.week.format === "cloze" ? "15 blanks" : "15 lines") + " · 20 minutes · one go"));
       spot.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: ask }, "Start the challenge")));
     }
@@ -325,10 +337,13 @@
 
   function play(d) {
     var ch = d.challenge, answers = d.saved || {}, deadline = Date.now() + d.remainingMs;
+    paperFormat = ch.format;
     var savedState = "saved", pending = null, saving = false, done = false, hiddenAt = null, warned = {};
     view(function (el) {
       var left = h("span", { class: "left" }, clock(d.remainingMs));
       var status = h("span", { class: "save-state" }, "Saved");
+      // A cloze's narrow clock bar has no room for this, so a failed save gets a row of its own.
+      var saveAlert = ch.format === "cloze" ? h("p", { class: "save-alert", role: "alert" }) : null;
       // Seen and heard: "5 minutes left", then "Last minute!".
       var timeNote = h("span", { class: "time-note", "aria-live": "assertive" });
       // The confirm opens beside the Hand in that was pressed: in the clock bar, or under the paper.
@@ -341,6 +356,7 @@
         h("p", { class: "clock-meta" }, timeNote, done15, status),
         sheet.boxButton || null,
         h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(topSpot); } }, "Hand in"),
+        saveAlert,
         topSpot,
         sheet.boxPanel || null,
         h("span", { class: "time-drain", "aria-hidden": "true" }, drain));
@@ -360,10 +376,12 @@
           saving = false;
           if (JSON.stringify(answers) !== sent) { savedState = "changed"; return save(); }
           savedState = "saved"; status.textContent = "Saved";
+          if (saveAlert) saveAlert.textContent = "";
         }, function (err) {
           saving = false; savedState = "changed";
           if (err.signIn) return signIn(err.message);
           status.textContent = "Not saved: check your connection";
+          if (saveAlert) saveAlert.textContent = "Not saved: check your connection. We'll keep trying.";
           pending = after(10000, save);
         });
       }
@@ -428,7 +446,7 @@
         h("h2", { id: "paper-title" }, ch.title),
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
-          ? S.clozeTask
+          ? S.clozeTask.replace("{items}", ch.phrases && ch.phrases.length ? "verbs and phrases" : "verbs")
           : S.proofTask),
         ch.commas && S.commaReminder ? h("p", null, h("strong", null, S.commaReminder)) : null,
         sheet.el,
@@ -439,6 +457,8 @@
       countDone();
       saveNow = function () { return league.call("save", { answers: answers }); };
     }, true);
+    // A cloze opens at its first line, wherever the Start button was on the page.
+    if (ch.format === "cloze") window.scrollTo(0, root.getBoundingClientRect().top + window.scrollY);
   }
 
   // Said with the score: encouraging at every level, never a telling-off.
@@ -461,10 +481,11 @@
   }
 
   // One thing to do next, as every page on the site ends with.
-  function nextStep(text) {
+  function nextStep(text, format) {
+    var href = (format === "cloze" && S.clozePracticeHref) || S.practiceHref;
     return h("div", { class: "tip next-step" },
       h("p", { class: "field-label" }, "Next step"),
-      h("p", null, text, " ", h("a", { href: S.practiceHref }, "Go to " + S.form + " grammar practice")));
+      h("p", null, text, " ", h("a", { href: href }, "Go to " + S.form + " grammar practice")));
   }
 
   function result(r, timeUp) {
@@ -477,7 +498,7 @@
         h("p", { class: "result-line" }, cheer(r.score)),
         h("p", null, "Time taken: " + duration(r.timeSec) + "."),
         h("p", { class: "meta" }, "Answers come out on Monday. Please don't share yours before then, so it's fair for everyone."),
-        nextStep(S.practiceNote),
+        nextStep((paperFormat === "cloze" && S.clozePracticeNote) || S.practiceNote, paperFormat),
         h("div", { class: "actions" },
           h("button", { type: "button", class: "btn", onclick: function () { home("board", true); } }, "See the weekly board"))));
       el.querySelector("h2").setAttribute("tabindex", "-1");
@@ -507,7 +528,7 @@
           h("p", { class: "tagline" }, FORMAT[d.challenge.format] + " · " + d.challenge.title),
           h("p", { class: "result-line" }, "You scored ", h("strong", null, score + " / " + total), "."),
           P.review(d.challenge, d.answers, right),
-          nextStep(reviewAdvice(P.missedTopics(d.challenge, right), score === total))));
+          nextStep(reviewAdvice(P.missedTopics(d.challenge, right), score === total), d.challenge.format)));
         window.scrollTo(0, 0);
       });
     }, function (err) { problem(err, function () { home("mine"); }); });

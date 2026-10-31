@@ -15,7 +15,7 @@
 <link rel="icon" href="images/brand/cly-icon-16.png" sizes="16x16">
 <meta name="theme-color" content="#1f7a45">
 </head>
-<body data-cover="garden" class="league-words">
+<body data-cover="garden">
 <a class="skip" href="#main">Skip to the weekly challenge</a>
 
 <header class="cover">
@@ -44,6 +44,7 @@
     <a href="s3-grammar.html">S.3 grammar practice</a><a href="index.html">All forms</a>
   </nav>
 </footer>
+<script src="assets/js/word-box.js"></script>
 <script>
 window.CLY_CHALLENGE = {
   form: "S.3",
@@ -51,24 +52,17 @@ window.CLY_CHALLENGE = {
   tokenKey: "cly:s3-league-token",
   practiceHref: "s3-grammar.html",
   practiceNote: "While you wait, go over the same grammar with quizzes and rewrites.",
+  clozePracticeHref: "s3-grammar.html#practice-cloze",
+  clozePracticeNote: "While you wait, try a practice paper with no clock.",
+  practiceFirst: "s3-grammar.html#practice-cloze",
   boxLabel: "Word box",
-  boxHelp: "Tap a verb or phrase to cross it off. Lost the box? Tap “Words” at the top.",
+  boxHelp: "Tapping a {item} only crosses it off: type your answer in the blank. Lost the box? Tap “Box” at the top.",
   linesOutOf: true,
   proofTask: "Mark every line. Tap the wrong word and fix it, or tap “No mistake” if the line is correct. A line with no mark scores 0.",
-  clozeExamples: {
-    verb: ["Yesterday I ____ home late. (go)", "went"],
-    phrase: ["Tom yam ____ is spicy. (a Thai soup)", ", a Thai soup,"],
-    noCommas: ["My friend ____ is here. I have many friends. (Kit)", "Kit"],
-    choose: ["____ called me, but I don't know who.", "someone"]
-  },
-  clozeTask: "Fill in all 15 blanks using the word box. Verbs can be in any tense, or need “not”. 3 of the verbs and phrases are not used.",
+  clozeHowTo: ["Type your answer in each blank. Tapping a word in the box only crosses it off.", "Change a verb's form if you need to: any tense, or add “not”.", "For names and phrases, type the commas too if they are needed.", "3 words in the box are extra. Capital letters don't matter."],
+  clozeTask: "Fill in all 15 blanks using the word box. 3 of the {items} are extra.",
   wordTable: true,
-  wordRanges: {
-    "Indefinite pronouns": { name: "Indefinite pronouns", words: ["somebody", "someone", "something", "anybody", "anyone", "anything", "everybody", "everyone", "everything", "nobody", "no one"] },
-    "So, so that, so as to": { name: "So words", words: ["so", "so that", "so as to"] },
-    "Must, have to, need to": { name: "Must words", words: ["must", "have to", "need to"] },
-    "Linking words": { name: "Linking words", words: ["moreover", "furthermore", "in addition", "as well as", "however", "although", "even though", "yet", "on the other hand", "because", "since", "due to", "as a result", "therefore", "for example", "for instance", "such as", "including", "as long as", "provided that", "in case", "in order to", "so as to", "so that", "all in all", "overall", "in conclusion", "to sum up"] }
-  },
+  wordRanges: CLY_WORD_BOX.RANGES,
   commaReminder: "Names and phrases: type the commas too, if the phrase needs them.",
   topics: [
     { from: "", names: ["Indefinite pronouns", "Defining and non-defining noun phrases", "Bare infinitives", "So, so that, so as to", "Must, have to, need to", "Tenses (not the perfect continuous)", "Present and past participles"] },

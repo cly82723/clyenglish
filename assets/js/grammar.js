@@ -1189,6 +1189,7 @@
       Sets(el, "s3quiz:" + el.getAttribute("data-set"), quiz.sets, howMany, function (b, q, store) { McQuiz(b, q, topicKit(quiz.topic), store); });
     },
     s3visual: function (el) { el.appendChild(h("div", null, VISUALS[el.getAttribute("data-set")]())); },
+    s3practice: function (el) { Sets(el, "s3practice", window.CLY_S3_PRACTICE, titled, window.CLY_S3_PRACTICE_SHEET); },
     s3rewrite: function (el) {
       // an exercise is one set, or a list of sets with a switcher above it
       var key = el.getAttribute("data-set");

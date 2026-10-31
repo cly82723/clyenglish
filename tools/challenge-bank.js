@@ -16,9 +16,9 @@ const S3_MAX_TOPICS = 3;
 const NATURAL = "Natural English";
 const S3_MAX_NATURAL = 2;
 const MAX_ANSWER_CHARS = 60; // the web app cuts answers to this length (CONFIG in apps-script/Code.gs)
-// For these topics the box shows the whole group (wordRanges in s3-challenge.html), not the answers: students choose the word, so every right choice must be accepted.
+// For these topics the box shows the whole group (RANGES in assets/js/word-box.js), not the answers: students choose the word, so every right choice must be accepted.
 const S3_OPEN_TOPICS = ["Indefinite pronouns", "So, so that, so as to", "Must, have to, need to", "Linking words"];
-const S3_INDEFINITES = ["somebody", "someone", "no one", "nobody", "everyone", "everybody", "everything", "something", "anyone", "anybody", "anything"];
+const S3_INDEFINITES = ["somebody", "someone", "no one", "nobody", "everyone", "everybody", "everything", "something", "anyone", "anybody", "anything", "nothing"];
 const S3_SO_WORDS = ["so", "so that", "so as to"];
 const S3_DISTRACTORS = 3;
 const PERFECT_CONTINUOUS = /\b(has|have|had|hasn't|haven't|hadn't)\s+(not\s+)?been\s+\w+ing\b/i;

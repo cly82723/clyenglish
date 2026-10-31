@@ -176,3 +176,8 @@ test("a so answer outside the group shown in the box fails", () => {
   assert.ok(!r.ok);
   assert.match(r.out, /so as not to/);
 });
+
+test("nothing is on the list of indefinite pronouns", () => {
+  const r = run([clozeSet(["Tenses"], "", d => { openBlank(d, 2, "Indefinite pronouns", ["nothing"]); })], "s3");
+  assert.ok(r.ok, r.out);
+});

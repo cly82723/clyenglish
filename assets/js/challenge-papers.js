@@ -10,78 +10,33 @@
   // ---------- Cloze ----------
 
   function clozeSheet(ch, answers, changed) {
-    var crossed = {}, copies = {};
+    var W = window.CLY_WORD_BOX, box = W.create(ch, S.wordRanges);
+    var makeBox = function () { return S.wordTable ? box.table() : box.chips(); };
     var blanks = ch.paragraphs.reduce(function (n, parts) { return n + parts.filter(function (p) { return typeof p === "number"; }).length; }, 0);
-    // The box can be on the page twice (the list above the passage and the panel in the clock bar), so crossing off updates every copy.
-    function boxItem(v, cls) {
-      var b = h("button", { type: "button", class: cls, "aria-pressed": "false", onclick: function () {
-        crossed[v] = !crossed[v];
-        copies[v].forEach(function (c) {
-          c.classList.toggle("used", crossed[v]);
-          c.setAttribute("aria-pressed", String(crossed[v]));
-        });
-      } }, v);
-      (copies[v] = copies[v] || []).push(b);
-      return h("li", null, b);
-    }
-    function groupName(name, note) { return h("p", { class: "word-group-name" }, name, " ", h("span", { class: "word-group-note" }, note)); }
-    function wordGroup(name, note, items, wide) {
-      return items && items.length ? h("div", { class: "word-group" }, groupName(name, note),
-        h("ul", { class: "word-cells" + (wide ? " wide" : "") }, items.map(function (v) { return boxItem(v, "word-cell"); }))) : null;
-    }
-    // A whole group to choose from, so a word can be used again and isn't crossed off.
-    function wordRange(topic) {
-      var range = S.wordRanges[topic];
-      return range ? h("div", { class: "word-group" }, groupName(range.name, "choose the right one; you can use one again"),
-        h("ul", { class: "word-cells range" }, range.words.map(function (w) { return h("li", null, h("span", { class: "word-cell word-range" }, w)); }))) : null;
-    }
-    function wordTable() {
-      return h("div", { class: "word-table" },
-        wordGroup("Verbs", "use each one once, in the right form", ch.bank),
-        wordGroup("Names and phrases", ch.commas ? "use each one once, with commas if needed" : "use each one once", ch.phrases, true),
-        (ch.open || []).map(wordRange));
-    }
-    // Worked examples of only the kinds of blank in this paper.
-    function examples() {
-      var E = S.clozeExamples;
-      if (!E) return null;
-      var rows = [E.verb].concat(ch.commas ? [E.phrase, E.noCommas] : [], ch.open && ch.open.length ? [E.choose] : []);
-      return h("div", { class: "cloze-examples" }, h("p", { class: "field-label" }, "Examples"),
-        h("ul", null, rows.map(function (r) { return h("li", null, h("span", null, r[0]), h("strong", null, "→ " + r[1])); })));
-    }
-    var bank = S.wordTable ? wordTable() : h("ul", { class: "chips" }, ch.bank.map(function (v) { return boxItem(v, "chip"); }));
+    var bank = makeBox();
     // Once the student has scrolled to a blank the list is far away, so the clock bar can open the box over the passage.
-    var boxPanel = S.wordTable ? h("div", { class: "word-panel" }, wordTable()) : null;
-    var boxButton = S.wordTable ? h("button", { type: "button", class: "btn-quiet box-toggle", "aria-expanded": "false", onclick: function () { openBox(!boxPanel.classList.contains("open")); } }, "Words") : null;
-    function openBox(open) {
-      boxPanel.classList.toggle("open", open);
-      boxButton.setAttribute("aria-expanded", String(open));
-      boxButton.textContent = open ? "Close" : "Words";
-    }
-    // Starts short so sentences stay readable, and grows only as the student types, so a blank's size gives nothing away.
-    function fitBlank(input) {
-      if (S.wordTable) input.style.width = input.value.length > 12 ? (input.value.length + 3) + "ch" : "";
-    }
+    var panel = box.panel(makeBox());
+    var hasPhrases = ch.phrases && ch.phrases.length;
     var passage = h("div", { class: "passage" }, ch.paragraphs.map(function (parts) {
       return h("p", null, parts.map(function (part) {
         if (typeof part !== "number") return part;
-        var f = CLY.blank(part, { label: "Blank " + part, oninput: function (e) { answers[part] = e.target.value; fitBlank(e.target); changed(); } });
+        var f = CLY.blank(part, { label: "Blank " + part, oninput: function (e) { answers[part] = e.target.value; W.fitBlank(e.target); changed(); } });
         f.input.id = f.input.name = "blank-" + part;
         if (answers[part]) f.input.value = answers[part];
-        fitBlank(f.input);
-        // The panel would cover the blank being typed in, so tapping a blank closes it.
-        if (S.wordTable) f.input.addEventListener("focus", function () { openBox(false); });
+        W.fitBlank(f.input);
+        f.input.addEventListener("focus", function () { panel.focused(f.input); });
         return f;
       }));
     }));
     return {
-      el: [examples(), h("div", { class: "tip" },
-        h("p", { class: "field-label" }, S.boxLabel), bank,
-        h("p", null, S.boxHelp)), passage],
-      boxButton: boxButton,
-      boxPanel: boxPanel,
-      closeBox: S.wordTable ? function () { openBox(false); } : null,
-      progress: function () { return (blanks - empty()) + " / " + blanks + (S.wordTable ? "" : " filled"); },
+      el: [S.clozeHowTo ? h("details", { class: "tip" }, h("summary", { class: "field-label" }, "See examples"), W.examples({ commas: ch.commas, choose: ch.open && ch.open.length })) : null,
+        h("div", { class: "tip" },
+          h("p", { class: "field-label" }, S.boxLabel), bank,
+          h("p", null, S.boxHelp.replace("{item}", hasPhrases ? "verb or phrase" : "verb"))), passage],
+      boxButton: panel.button,
+      boxPanel: panel.el,
+      closeBox: function () { panel.open(false); },
+      progress: function () { return (blanks - empty()) + " / " + blanks; },
       handInNote: function () { var n = empty(); return n ? n + (n === 1 ? " blank is" : " blanks are") + " still empty." : "Every blank is filled."; }
     };
     function empty() {
