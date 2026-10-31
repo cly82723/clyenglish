@@ -10,7 +10,7 @@
   // ---------- Cloze ----------
 
   function clozeSheet(ch, answers, changed) {
-    var W = window.CLY_WORD_BOX, box = W.create(ch, S.wordRanges);
+    var W = window.CLY_WORD_BOX, box = W.create(ch, S.wordRanges, "cly:crossed:" + S.form + ":" + ch.title);
     var makeBox = function () { return S.wordTable ? box.table() : box.chips(); };
     var blanks = ch.paragraphs.reduce(function (n, parts) { return n + parts.filter(function (p) { return typeof p === "number"; }).length; }, 0);
     var bank = makeBox();
@@ -24,12 +24,13 @@
         f.input.id = f.input.name = "blank-" + part;
         if (answers[part]) f.input.value = answers[part];
         W.fitBlank(f.input);
+        W.setUpBlank(f.input, part, blanks, function () { return passage.querySelectorAll(".blank input"); });
         f.input.addEventListener("focus", function () { panel.focused(f.input); });
         return f;
       }));
     }));
     return {
-      el: [S.clozeHowTo ? h("details", { class: "tip" }, h("summary", { class: "field-label" }, "See examples"), W.examples({ commas: ch.commas, choose: ch.open && ch.open.length })) : null,
+      el: [S.clozeHowTo ? h("details", { class: "see-examples" }, h("summary", { class: "field-label" }, "See examples"), W.examples({ commas: ch.commas, choose: ch.open && ch.open.length })) : null,
         h("div", { class: "tip" },
           h("p", { class: "field-label" }, S.boxLabel), bank,
           h("p", null, S.boxHelp.replace("{item}", hasPhrases ? "verb or phrase" : "verb"))), passage],

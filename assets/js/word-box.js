@@ -40,19 +40,36 @@
     input.style.width = input.value.length > 12 ? (input.value.length + 3) + "ch" : "";
   }
 
+  // Enter goes to the next blank, and on the last one closes the phone's keyboard.
+  function setUpBlank(input, n, total, all) {
+    input.setAttribute("aria-label", "Blank " + n + " of " + total);
+    input.setAttribute("enterkeyhint", n === total ? "done" : "next");
+    input.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      var next = all()[n];
+      if (next) next.focus(); else input.blur();
+    });
+  }
+
   // ---------- The box ----------
 
   // The box can be on the page twice (the list above the passage and the panel), so crossing off updates every copy.
-  function create(ch, ranges) {
+  function create(ch, ranges, storeKey) {
     var h = CLY.h, crossed = {}, copies = {};
+    // Crossed-off words come back after a reload in the same tab. Private browsing can block this; the words then just start uncrossed.
+    try { crossed = JSON.parse(sessionStorage.getItem(storeKey)) || {}; } catch (e) { crossed = {}; }
+    function remember() { try { sessionStorage.setItem(storeKey, JSON.stringify(crossed)); } catch (e) { /* kept for this page only */ } }
     function item(v, cls) {
-      var b = h("button", { type: "button", class: cls, "aria-pressed": String(!!crossed[v]), onclick: function () {
+      var b = h("button", { type: "button", class: cls + (crossed[v] ? " used" : ""), "aria-pressed": String(!!crossed[v]), onclick: function (e) {
         crossed[v] = !crossed[v];
+        remember();
         copies[v].forEach(function (c) {
+          c.classList.toggle("instant", e.detail === 0);
           c.classList.toggle("used", crossed[v]);
           c.setAttribute("aria-pressed", String(crossed[v]));
         });
-      } }, v);
+      } }, cls === "word-cell" ? h("span", { class: "word-text" }, v) : v);
       (copies[v] = copies[v] || []).push(b);
       return h("li", null, b);
     }
@@ -62,13 +79,13 @@
     // Smallest group first, so the groups with few words are in view without scrolling the panel.
     function table() {
       var groups = [];
-      if (ch.bank && ch.bank.length) groups.push({ size: ch.bank.length, el: group("Verbs", "use each at most once, in the right form", cells(ch.bank, "")) });
-      if (ch.phrases && ch.phrases.length) groups.push({ size: ch.phrases.length, el: group("Names and phrases", ch.commas ? "use each at most once, with commas if needed" : "use each at most once", cells(ch.phrases, " wide")) });
+      if (ch.bank && ch.bank.length) groups.push({ size: ch.bank.length, el: group("Verbs", "use each at most once", cells(ch.bank, "")) });
+      if (ch.phrases && ch.phrases.length) groups.push({ size: ch.phrases.length, el: group("Names and phrases", ch.commas ? "use each at most once, add commas if needed" : "use each at most once", cells(ch.phrases, " wide")) });
       (ch.open || []).forEach(function (topic) {
         var range = ranges[topic];
         if (!range) return;
         // A group to choose from isn't crossed off, because a word can be used again.
-        groups.push({ size: range.words.length, el: group(range.name, "choose the right one; you can use one again",
+        groups.push({ size: range.words.length, el: group(range.name, "choose one; you can repeat it",
           h("ul", { class: "word-cells range" }, range.words.map(function (w) { return h("li", null, h("span", { class: "word-cell word-range" }, w)); }))) });
       });
       return h("div", { class: "word-table" }, groups.sort(function (a, b) { return a.size - b.size; }).map(function (g) { return g.el; }));
@@ -100,7 +117,8 @@
       if (view) view.addEventListener("resize", function () { if (isOpen()) { size(); keepInView(); } });
       return { button: button, el: el, open: open, focused: function (input) { lastBlank = input; keepInView(); } };
     }
-    return { table: table, chips: chips, panel: panel };
+    function forget() { try { sessionStorage.removeItem(storeKey); } catch (e) { /* nothing was kept */ } }
+    return { table: table, chips: chips, panel: panel, forget: forget };
   }
 
   // Worked examples; show says which kinds, and all kinds show when the paper isn't known yet.
@@ -109,5 +127,5 @@
     return h("ul", { class: "cloze-examples" }, rows.map(function (r) { return h("li", null, h("span", null, r[0]), h("strong", null, r[1])); }));
   }
 
-  window.CLY_WORD_BOX = { RANGES: RANGES, create: create, examples: examples, isRight: isRight, fitBlank: fitBlank };
+  window.CLY_WORD_BOX = { RANGES: RANGES, create: create, examples: examples, isRight: isRight, fitBlank: fitBlank, setUpBlank: setUpBlank };
 })();

@@ -400,10 +400,10 @@
       phrases: names(boxed.filter(function (b) { return b.commas; })).concat(set.phraseDistractors || []).sort(),
       commas: blanks.some(function (b) { return b.commas; }),
       open: blanks.filter(function (b) { return !b.verb; }).map(function (b) { return b.topic; }).filter(function (t, i, all) { return all.indexOf(t) === i; })
-    }, W.RANGES);
+    }, W.RANGES, "cly:crossed:practice:" + set.title);
     var panel = box.panel(box.table()), wraps = {};
-    var score = h("p", { "aria-live": "polite" }), filled = h("p");
-    var answers = h("div", { "aria-live": "polite" }), actions = h("div", { class: "actions" });
+    var score = h("p", { class: "practice-score", "aria-live": "polite" }), filled = h("p");
+    var answers = h("div", { class: "practice-answers", "aria-live": "polite" }), actions = h("div", { class: "actions" });
     var save = function () { if (store) store.set({ typed: typed, checked: checked, showing: showing }); };
     var countFilled = function () { filled.textContent = ids.filter(function (id) { return (typed[id] || "").trim(); }).length + " / " + ids.length + " filled"; };
 
@@ -411,6 +411,7 @@
       checked = true;
       var right = ids.filter(function (id) { var ok = W.isRight(set.blanks[id], typed[id]); wraps[id].mark(ok); return ok; }).length;
       score.textContent = right === ids.length ? "All " + ids.length + " right. Well done!" : right + " / " + ids.length + " right. Change the ones with a cross and check again.";
+      CLY.replay(score, "fresh");
       save();
       drawActions();
     }
@@ -428,6 +429,7 @@
       if (checked && !showing) actions.appendChild(h("button", { type: "button", class: "btn-quiet", onclick: function () { showing = true; save(); drawAnswers(); drawActions(); } }, "Show the answers"));
       actions.appendChild(h("button", { type: "button", class: "btn-quiet", onclick: function () {
         if (store) store.clear();
+        box.forget();
         CLY.clear(root);
         PracticeCloze(root, set, store);
         CLY.scrollTo(root);
@@ -447,6 +449,7 @@
         wraps[part] = f;
         f.input.value = typed[part] || "";
         W.fitBlank(f.input);
+        W.setUpBlank(f.input, part, ids.length, function () { return passage.querySelectorAll(".blank input"); });
         f.input.addEventListener("focus", function () { panel.focused(f.input); });
         return f;
       }));
@@ -456,7 +459,7 @@
     root.appendChild(h("p", null, "Fill in every blank using the word box. Tapping a word only crosses it off: type your answer in the blank."));
     root.appendChild(W.examples({ commas: blanks.some(function (b) { return b.commas; }), choose: blanks.some(function (b) { return !b.verb; }) }));
     root.appendChild(h("div", { class: "tip" }, h("p", { class: "field-label" }, "Word box"), box.table()));
-    root.appendChild(h("div", null,
+    root.appendChild(h("div", { class: "practice-sheet" },
       h("div", { class: "practice-bar" }, filled, panel.button, panel.el),
       passage));
     root.appendChild(score);

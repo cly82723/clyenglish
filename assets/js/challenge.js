@@ -76,7 +76,7 @@
     var fact = function (n, what) { return h("li", null, h("strong", null, n), h("span", null, what)); };
     return [
       h("p", { class: "lead" }, "One grammar challenge every week for " + S.form + ". Do your best, beat the clock and climb the league."),
-      h("ul", { class: "facts", "aria-label": "The challenge at a glance" }, fact("15", "marks"), fact("20", "minutes"), fact("1", "go a week"))
+      h("ul", { class: "facts", "aria-label": "The challenge at a glance" }, fact("15", "marks"), fact("20", "minutes"), fact("1", S.tryWord + " a week"))
     ];
   }
 
@@ -251,7 +251,7 @@
       clear(spot);
       var guide = howTo();
       if (guide) spot.appendChild(guide);
-      spot.appendChild(h("p", { class: "ready-line" }, (me.week.format === "cloze" ? "15 blanks" : "15 lines") + " · 20 minutes · one go"));
+      spot.appendChild(h("p", { class: "ready-line" }, me.week.format === "cloze" ? "15 blanks · 20 minutes · one " + S.tryWord : "15 lines · 20 minutes · one go"));
       spot.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: ask }, "Start the challenge")));
     }
     show();
@@ -293,7 +293,7 @@
       return table(caption, ["Place", "Student", "Score", "Time", "Points"], rows.map(function (r) {
         return h("tr", { class: r.you ? "you" : null },
           h("td", null, ordinal(r.place)), h("td", null, you(r, r.label)), h("td", null, r.score + " / 15"),
-          h("td", null, duration(r.timeSec)), h("td", null, String(r.points || "")));
+          h("td", null, duration(r.timeSec)), h("td", null, String(r.points || 0)));
       }));
     };
     var tookPart = function (n) { return h("p", { class: "took-part" }, n === 1 ? "1 student has taken part." : n + " students have taken part."); };
@@ -446,9 +446,8 @@
         h("h2", { id: "paper-title" }, ch.title),
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
-          ? S.clozeTask.replace("{items}", ch.phrases && ch.phrases.length ? "verbs and phrases" : "verbs")
+          ? S.clozeTask.replace("{items}", ch.phrases && ch.phrases.length ? "verbs and phrases" : "verbs") + (ch.commas && S.commaReminder ? " " + S.commaReminder : "")
           : S.proofTask),
-        ch.commas && S.commaReminder ? h("p", null, h("strong", null, S.commaReminder)) : null,
         sheet.el,
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(bottomSpot); } }, "Hand in")),
         bottomSpot));

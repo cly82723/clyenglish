@@ -16,6 +16,7 @@
     boxHelp: "Tap a verb to cross it off once you've used it. Lost the box? Tap “Box” at the top.",
     clozeTask: "Pick a verb from the box for each blank and write it in the right form. You might need any tense, the passive or “not”. You won't need every verb.",
     commaReminder: "",
+    tryWord: "go",          // "1 go a week"
     wordTable: false,       // the box as a table, grouped into verbs and phrases, instead of a row of chips
     wordRanges: {},         // { topic: { name, words } }: a whole group shown in the box when a set has blanks on that topic
     clozeHowTo: null,       // how the paper works, shown with worked examples before the clock starts
