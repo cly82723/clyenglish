@@ -273,17 +273,25 @@
     var chips = h("ul", { class: "chips" }, tabs.map(function (t) {
       return h("li", null, h("button", { type: "button", class: "chip", "data-tab": t[0], "aria-pressed": String(t[0] === tab), onclick: function () { pick(t[0]); } }, t[1]));
     }));
+    // The league can answer slowly, so an answer only shows if the student is still on that tab.
+    var current = null;
     function pick(name) {
+      current = name;
       chips.querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", String(c.getAttribute("data-tab") === name)); });
       clear(panel);
       if (name === "mine") return panel.appendChild(myResults(me));
       panel.appendChild(h("p", { class: "meta loading" }, "Loading…"));
       league.call(name).then(function (d) {
+        if (current !== name) return;
         clear(panel);
         panel.appendChild(name === "board" ? weekBoards(d) : leagueTable(d));
         if (loaded) { loaded(); loaded = null; }
       },
-        function (err) { if (err.signIn) return signIn(err.message); clear(panel); panel.appendChild(h("p", { class: "warn" }, err.message)); });
+        function (err) {
+          if (err.signIn) return signIn(err.message);
+          if (current !== name) return;
+          clear(panel); panel.appendChild(h("p", { class: "warn" }, err.message));
+        });
     }
     pick(tab);
     return h("section", { class: "boards", "aria-labelledby": "boards" }, h("h2", { id: "boards" }, "The league"), chips, panel);

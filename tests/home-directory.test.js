@@ -39,6 +39,14 @@ test("the start screen keeps the how-to in place: Start replaces itself, nothing
   assert.ok(/h\("div", null, spot, howTo\(\)\)/.test(ready), "the how-to must sit outside the spot that Start clears, and below it");
 });
 
+test("a late board or league answer can't replace the tab the student has moved to", () => {
+  const source = read("assets/js/challenge.js");
+  const boards = source.slice(source.indexOf("function boards("), source.indexOf("function table("));
+  assert.ok(/current = name/.test(boards), "pick must remember the chosen tab");
+  assert.strictEqual((boards.match(/current !== name\) return/g) || []).length, 2, "both the answer and the error must check it");
+  assert.ok(boards.indexOf("err.signIn") < boards.lastIndexOf("current !== name"), "a lost sign-in must still go to the sign-in screen");
+});
+
 test("proofreading papers keep their hand-in confirm exactly as it was", () => {
   const source = read("assets/js/challenge.js");
   const confirm = source.slice(source.indexOf("function confirmHandIn(spot)"), source.indexOf("function handIn(timeUp)"));
