@@ -55,7 +55,7 @@ window.CLY_TIPS = {
     { tip: "Things are expensive; prices are high.", wrong: "The price is very expensive.", right: "The price is very high.", href: "final.html#errors", where: "Common errors" },
     { tip: "\"Every\" is followed by a singular noun.", wrong: "Every students has a locker.", right: "Every student has a locker.", href: "final.html#errors", where: "Common errors" },
     { tip: "\"Lack\" as a verb has no \"of\".", wrong: "Students are lack of sleep.", right: "Students lack sleep.", href: "final.html#errors", where: "Common errors" },
-    { tip: "Wrong word form? Ask which part of speech the gap needs.", wrong: "He showed real generous.", right: "He showed real generosity.", href: "vocab.html#s1", where: "Vocab revision" },
+    { tip: "Wrong word form? Ask which part of speech the gap needs.", wrong: "He showed real generous.", right: "He showed real generosity.", href: "grammar.html#proofreading", where: "Proofreading" },
     { tip: "Fewer for things you can count; less for things you cannot.", wrong: "There are less students in the library today.", right: "There are fewer students in the library today.", href: "final.html#errors", where: "Common errors" },
     { tip: "No \"the\" when you talk about something in general.", wrong: "The life in Hong Kong is very busy.", right: "Life in Hong Kong is very busy.", href: "final.html#errors", where: "Common errors" },
     { tip: "\"The number of\" takes a singular verb.", wrong: "The number of students are rising every year.", right: "The number of students is rising every year.", href: "final.html#errors", where: "Common errors" },

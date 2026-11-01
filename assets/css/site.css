@@ -1157,12 +1157,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 /* the directory: every form, every guide, one tap away */
 .directory { margin: 36px 0 0; }
 .directory > h2 { font-size: var(--step-3); margin: 0 0 18px; }
-.directory .tracks { display: grid; grid-template-columns: minmax(0, auto) minmax(0, auto); gap: 0 40px; }
-.directory h3 {
-  font: 700 var(--step--1)/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--sky); margin: 0 0 4px; padding-bottom: 10px; border-bottom: 1px solid var(--ink);
-}
-.directory ul { list-style: none; margin: 0; padding: 0; }
+.directory ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
 .directory li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
 .directory .form-mark { width: 3.6em; margin-right: 6px; }
 .directory li a {
@@ -1279,7 +1274,6 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   .resume { margin-top: 20px; }
   .resume a { display: grid; }
   .directory { margin-top: 28px; }
-  .directory .tracks { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .levelup { margin-top: 36px; }
   .levelup-head { padding: 12px 16px; }
   .levelup-levels { padding: 16px 16px 4px; }
@@ -1586,7 +1580,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 }
 
 /* Labels read as words: no uppercase anywhere (DESIGN.md) */
-.index-title, .versions-title, .pager a small, .bubble-label, .resume small, .directory h3, .field-label, .ladder-panel .tag {
+.index-title, .versions-title, .pager a small, .bubble-label, .resume small, .field-label, .ladder-panel .tag {
   text-transform: none; letter-spacing: 0; font-size: 1rem;
 }
 .label dt, .summary dt, .slots .role, .index .index-group, .reality-ends, .rw-situation dt, .dg-tag, .figure .small {

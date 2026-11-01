@@ -136,7 +136,13 @@ tr.you > td { background: var(--chest); }
 
 /* ---------- The word box in the clock bar ---------- */
 
-.coverage { margin-top: 12px; }
+.coverage { margin: 24px 0 0; }
+.coverage ul { margin: 4px 0 0; }
+#paper-title { scroll-margin-top: 110px; }
+#paper-title:focus { outline: none; }
+/* Out of sight until a keyboard reaches it. */
+.skip-to-blanks:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip-to-blanks:focus { display: inline-block; margin: 0 0 12px; }
 #challenge .blank input { scroll-margin: 110px 0 24px; }
 .how-to { max-width: 68ch; margin: 20px 0 0; }
 .how-to p { margin: 0 0 8px; }
@@ -146,7 +152,8 @@ tr.you > td { background: var(--chest); }
 .has-box .btn { padding-left: 16px; padding-right: 16px; }
 .save-alert { flex: 1 0 100%; margin: 0; color: var(--avoid); font: 700 1rem/1.3 var(--font-display); }
 .save-alert:empty { display: none; }
-@media (max-width: 420px) { .has-box .save-state { display: none; } }
+/* On a phone the bar shows "Saved" but has no room for the failure message: the row below it says that instead. */
+@media (max-width: 420px) { .has-box:has(.save-alert:not(:empty)) .save-state { display: none; } }
 .how-to-list { margin: 0 0 12px; padding-left: 20px; }
 .how-to-list li { margin: 0 0 4px; }
 .has-box .time-note { order: 2; }

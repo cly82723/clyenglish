@@ -30,7 +30,9 @@
       }));
     }));
     return {
-      el: [S.clozeHowTo ? h("details", { class: "see-examples" }, h("summary", { class: "field-label" }, "See examples"), W.examples({ commas: ch.commas, choose: ch.open && ch.open.length })) : null,
+      // The word box can hold 18 or more tab stops, so keyboard students can jump straight to the writing.
+      el: [h("a", { class: "skip-to-blanks", href: "#" + passage.querySelector("input").id, onclick: function (e) { e.preventDefault(); passage.querySelector("input").focus(); } }, "Skip to the first blank"),
+        S.clozeHowTo ? h("details", { class: "see-examples" }, h("summary", { class: "field-label" }, "See examples"), W.examples({ commas: ch.commas, choose: ch.open && ch.open.length })) : null,
         h("div", { class: "tip" },
           h("p", { class: "field-label" }, S.boxLabel), bank,
           h("p", null, S.boxHelp.replace("{item}", hasPhrases ? "verb or phrase" : "verb"))), passage],

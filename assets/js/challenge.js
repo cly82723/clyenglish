@@ -89,7 +89,7 @@
         step("Do this week's challenge", "A cloze one week, proofreading the next. Each week runs Monday to Sunday."),
         step("Beat the clock", "You have 20 minutes. The clock keeps going if you leave, and your answers hand in by themselves."),
         step("Climb the league", "The top three each week get 3, 2 and 1 points. Same score? The faster time wins.")),
-      h("p", { class: "meta" }, "Play fair: switching to another app or tab is recorded. Answers come out every Monday."));
+      h("p", { class: "meta" }, "Play fair: your teacher can see if you leave the page for more than 3 seconds. Answers come out every Monday."));
   }
 
   function privacy() {
@@ -187,7 +187,9 @@
   function coverage(week) {
     var names = [];
     S.topics.forEach(function (t) { if (!t.from || t.from <= week) names = names.concat(t.names); });
-    return names.length ? h("p", { class: "meta coverage" }, h("strong", null, "What the league tests: "), names.join("; ") + ".") : null;
+    return names.length ? h("details", { class: "see-examples coverage" },
+      h("summary", { class: "field-label" }, "What the league tests"),
+      h("ul", { class: "how-to-list" }, names.map(function (name) { return h("li", null, name); }))) : null;
   }
 
   function thisWeek(me) {
@@ -197,8 +199,7 @@
       h("dl", { class: "label" },
         h("dt", null, "Week"), h("dd", null, weekName(w.id)),
         h("dt", null, "Challenge"), h("dd", null, w.format ? FORMAT[w.format] + " · " + w.title : "Not ready yet"),
-        h("dt", null, "Closes"), h("dd", null, "Sunday 23:59", s.active ? countdown(w.closesAt) : null)),
-      coverage(w.id));
+        h("dt", null, "Closes"), h("dd", null, "Sunday 23:59", s.active ? countdown(w.closesAt) : null)));
     if (!s.active) {
       var starts = s.start && s.start > w.id;
       box.appendChild(h("p", null, starts ? "The league starts on Monday " + day(Date.parse(s.start + "T00:00:00Z")) + ". See you then!"
@@ -214,6 +215,8 @@
     } else {
       box.appendChild(ready(me));
     }
+    var covers = coverage(w.id);
+    if (covers) box.appendChild(covers);
     return box;
   }
 
@@ -227,16 +230,24 @@
   }
 
   function ready(me) {
+    // Only this spot changes when Start is pressed, so the page doesn't jump and the warning stays on screen.
     var spot = h("div");
     function ask() {
       clear(spot);
-      spot.appendChild(h("div", { class: "confirm" },
-        h("p", null, h("strong", null, "Ready?"), " The clock starts when you press Start now, and it doesn't stop."),
-        h("p", null, "Stay on this page until you hand in: switching to another app or tab is recorded."),
+      var box = h("div", { class: "confirm", role: "alertdialog", "aria-label": "Start the challenge?", "aria-describedby": "start-clock start-stay", tabindex: "-1",
+        onkeydown: function (e) { if (e.key === "Escape") notYet(); } },
+        h("p", { id: "start-clock" }, h("strong", null, "Ready?"), " The clock starts when you press Start now, and it doesn't stop."),
+        h("p", { id: "start-stay" }, "Stay on this page until you hand in. Your teacher can see if you leave for more than 3 seconds."),
         h("div", { class: "actions" },
           h("button", { type: "button", class: "btn", onclick: start }, "Start now"),
-          h("button", { type: "button", class: "btn-quiet", onclick: show }, "Not yet"))));
-      spot.querySelector(".btn").focus();
+          h("button", { type: "button", class: "btn-quiet", onclick: notYet }, "Not yet")));
+      spot.appendChild(box);
+      box.focus({ preventScroll: true });
+      box.scrollIntoView({ block: "nearest", behavior: CLY.reduceMotion ? "auto" : "smooth" });
+    }
+    function notYet() {
+      show();
+      spot.querySelector(".btn").focus({ preventScroll: true });
     }
     // How the paper works, before the clock costs anything.
     function howTo() {
@@ -249,13 +260,11 @@
     }
     function show() {
       clear(spot);
-      var guide = howTo();
-      if (guide) spot.appendChild(guide);
       spot.appendChild(h("p", { class: "ready-line" }, me.week.format === "cloze" ? "15 blanks · 20 minutes · one " + S.tryWord : "15 lines · 20 minutes · one go"));
       spot.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: ask }, "Start the challenge")));
     }
     show();
-    return spot;
+    return h("div", null, spot, howTo());
   }
 
   function boards(me, tab, loaded) {
@@ -364,13 +373,14 @@
 
       function changed() {
         countDone();
-        savedState = "changed"; status.textContent = "Saving soon…";
+        // A cloze's clock bar is narrow on a phone, so its word stays short enough to clear the Box button.
+        savedState = "changed"; status.textContent = ch.format === "cloze" ? "Saving" : "Saving soon…";
         clearTimeout(pending);
         pending = after(SAVE_AFTER_MS, save);
       }
       function save() {
         if (saving || done || savedState !== "changed") return;
-        saving = true; savedState = "saving"; status.textContent = "Saving…";
+        saving = true; savedState = "saving"; status.textContent = ch.format === "cloze" ? "Saving" : "Saving…";
         var sent = JSON.stringify(answers);
         league.call("save", { answers: answers }).then(function () {
           saving = false;
@@ -396,14 +406,18 @@
         if (ms <= 0) handIn(true);
       }
       function confirmHandIn(spot) {
+        var cloze = ch.format === "cloze", opener = document.activeElement;
+        // Cloze only: handing in can't be undone, so focus starts on the safe choice and Esc backs out.
+        var keepWorking = function () { clear(spot); if (cloze && opener && opener.isConnected) opener.focus({ preventScroll: true }); };
         clear(topSpot); clear(bottomSpot);
         if (sheet.closeBox) sheet.closeBox();
-        spot.appendChild(h("div", { class: "confirm", role: "alertdialog", "aria-label": "Hand in now?" },
+        spot.appendChild(h("div", { class: "confirm", role: "alertdialog", "aria-label": "Hand in now?",
+          onkeydown: cloze ? function (e) { if (e.key === "Escape") keepWorking(); } : null },
           h("p", null, h("strong", null, "Hand in now?"), " You can't change your answers afterwards. " + sheet.handInNote()),
           h("div", { class: "actions" },
             h("button", { type: "button", class: "btn", onclick: function () { handIn(false); } }, "Hand in"),
-            h("button", { type: "button", class: "btn-quiet", onclick: function () { clear(spot); } }, "Keep working"))));
-        spot.querySelector(".btn").focus({ preventScroll: true });
+            h("button", { type: "button", class: "btn-quiet", onclick: keepWorking }, "Keep working"))));
+        spot.querySelector(cloze ? ".btn-quiet" : ".btn").focus({ preventScroll: true });
         spot.scrollIntoView({ block: "nearest", behavior: CLY.reduceMotion ? "auto" : "smooth" });
       }
       function handIn(timeUp) {
@@ -451,6 +465,15 @@
         sheet.el,
         h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(bottomSpot); } }, "Hand in")),
         bottomSpot));
+      // Cloze only: the clock has started, so say so, and put keyboard and screen-reader students at the top of the paper.
+      if (ch.format === "cloze") {
+        var started = h("p", { class: "visually-hidden", role: "status" });
+        el.appendChild(started);
+        var paperTitle = el.querySelector("#paper-title");
+        paperTitle.tabIndex = -1;
+        paperTitle.focus();
+        after(200, function () { started.textContent = "Clock started. " + minutes(d.remainingMs) + " left."; });
+      }
       every(250, tickClock);
       tickClock();
       countDone();
