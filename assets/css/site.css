@@ -1157,7 +1157,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 /* the directory: every form, every guide, one tap away */
 .directory { margin: 36px 0 0; }
 .directory > h2 { font-size: var(--step-3); margin: 0 0 18px; }
-.directory .tracks { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 0 40px; }
+.directory .tracks { display: grid; grid-template-columns: minmax(0, auto) minmax(0, auto); gap: 0 40px; }
 .directory h3 {
   font: 700 var(--step--1)/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--sky); margin: 0 0 4px; padding-bottom: 10px; border-bottom: 1px solid var(--ink);
