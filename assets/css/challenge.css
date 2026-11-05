@@ -44,6 +44,11 @@
 .confirm { margin: 18px 0; padding: 16px 20px; border: 1px solid var(--ink); border-radius: 12px; background: var(--paper); }
 .confirm p { margin: 0 0 6px; }
 .confirm .actions { margin: 14px 0 0; }
+/* The student's own streak, under this week: a quiet outline, filled with mint once there is one to keep. */
+.streak { margin: 20px 0 0; padding: 10px 14px; border: 1px solid var(--edge); border-radius: 12px; font: 600 1rem/1.4 var(--font-display); }
+.streak strong { font-weight: 800; }
+.streak.on { border-color: var(--leaf); background: var(--chest); }
+.streak.on strong { color: var(--leaf); }
 .took-part { margin: -14px 0 18px; color: var(--ink-soft); font: 600 1rem/1.3 var(--font-display); }
 .problem { background: var(--paper); border: 1px solid var(--avoid); }
 tr.you > td { background: var(--chest); }
@@ -131,7 +136,7 @@ tr.you > td { background: var(--chest); }
   .clock-bar { margin-left: calc(-1 * var(--gutter)); margin-right: calc(-1 * var(--gutter)); padding-left: var(--gutter); padding-right: var(--gutter); }
   /* The boards fit a phone without sideways scrolling: tighter cells, and the season table keeps Place, Student, Points and Weeks. */
   #challenge th, #challenge td { padding: 10px 8px; }
-  .season-table th:nth-child(n+4):nth-child(-n+6), .season-table td:nth-child(n+4):nth-child(-n+6) { display: none; }
+  .season-table th:nth-child(n+4):nth-child(-n+8), .season-table td:nth-child(n+4):nth-child(-n+8) { display: none; }
 }
 
 /* ---------- The word box in the clock bar ---------- */

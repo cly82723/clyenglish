@@ -88,7 +88,8 @@
         step("Sign in", "Type your school email. We'll email you a code."),
         step("Do this week's challenge", "A cloze one week, proofreading the next. Each week runs Monday to Sunday."),
         step("Beat the clock", "You have 20 minutes. The clock keeps going if you leave, and your answers hand in by themselves."),
-        step("Climb the league", "The top three each week get 3, 2 and 1 points. Same score? The faster time wins.")),
+        step("Climb the league", "The top five each week get 5, 4, 3, 2 and 1 points. Same score? The faster time wins."),
+        step("Keep your streak", "Do the challenge every week to build a streak. Miss a whole week and it starts again.")),
       h("p", { class: "meta" }, "Play fair: your teacher can see if you leave the page for more than 3 seconds. Answers come out every Monday."));
   }
 
@@ -215,9 +216,23 @@
     } else {
       box.appendChild(ready(me));
     }
+    var keepGoing = s.active ? streakNote(me.streak, a.status === "done") : null;
+    if (keepGoing) box.appendChild(keepGoing);
     var covers = coverage(w.id);
     if (covers) box.appendChild(covers);
     return box;
+  }
+
+  // Weeks in a row the student has handed in, and what keeps it going. Only they see it.
+  // No streak from the web app (an older version still deployed) means nothing is shown.
+  function streakNote(st, doneThisWeek) {
+    if (!st) return null;
+    var n = st.current, next;
+    if (n > 0) next = (doneThisWeek ? "Come back next Monday" : "Do this week's challenge") + " to make it " + (n + 1) + ".";
+    else if (st.best > 0) next = "Do this week's challenge to start a new one. Your best is " + plural(st.best, "week") + ".";
+    else next = "Do the challenge every week to build one.";
+    return h("p", { class: "streak" + (n > 0 ? " on" : "") },
+      h("strong", null, n > 0 ? "Streak: " + plural(n, "week") + " in a row." : "Streak: none yet."), " ", h("span", null, next));
   }
 
   // Kept up to date while the page is open, so it never says "1 day" on Sunday night.
@@ -317,17 +332,18 @@
     var out = [h("h3", null, "This week · " + weekName(d.thisWeek.id))];
     out.push(d.thisWeek.rows.length ? [board(d.thisWeek.rows, "This week's board"), tookPart(d.thisWeek.entrants)] : h("p", null, "Nobody has finished this week's challenge yet. Be the first!"));
     if (d.lastWeek.rows.length) out.push(h("h3", null, "Final board · " + weekName(d.lastWeek.id)), board(d.lastWeek.rows, "Final board for " + weekName(d.lastWeek.id)), tookPart(d.lastWeek.entrants));
-    out.push(h("p", { class: "meta" }, "Best score first. Same score? The faster time wins. Points: 3 for 1st, 2 for 2nd, 1 for 3rd. You see the top three and your own score; nobody else sees yours."));
+    out.push(h("p", { class: "meta" }, "Best score first. Same score? The faster time wins. Points: 5 for 1st, 4 for 2nd, 3 for 3rd, 2 for 4th, 1 for 5th. You see the top five and your own score; nobody else sees yours."));
     return h("div", null, out);
   }
 
   function leagueTable(d) {
     if (!d.weeks) return h("p", null, "The table starts once the first week of the season closes.");
     return h("div", { class: "season-table" },
-      table("Season league table", ["Place", "Student", "Points", "1st", "2nd", "3rd", "Weeks"], d.rows.map(function (r) {
+      table("Season league table", ["Place", "Student", "Points", "1st", "2nd", "3rd", "4th", "5th", "Weeks"], d.rows.map(function (r) {
+        var finishes = [r.firsts, r.seconds, r.thirds, r.fourths, r.fifths].map(function (n) { return h("td", null, String(n || 0)); });
         return h("tr", { class: r.you ? "you" : null },
           h("td", null, ordinal(r.place)), h("td", null, you(r, r.label)), h("td", null, h("strong", null, String(r.points))),
-          h("td", null, String(r.firsts)), h("td", null, String(r.seconds)), h("td", null, String(r.thirds)), h("td", null, String(r.played)));
+          finishes, h("td", null, String(r.played)));
       })),
       h("p", { class: "meta" }, "After " + d.weeks + (d.weeks === 1 ? " week" : " weeks") + ". Students with the same points share a place, so there can be joint winners. You see everyone with points, and your own row."));
   }
@@ -335,8 +351,10 @@
   function myResults(me) {
     if (!me.history.length) return h("p", null, "Your results appear here after each week closes. Only you can see this list.");
     var best = Math.max.apply(null, me.history.map(function (r) { return r.score; }));
+    var st = me.streak;
     return h("div", null,
       h("p", { class: "result-line" }, "Personal best: ", h("strong", null, best + " / 15")),
+      st ? h("p", { class: "result-line" }, "Streak: ", h("strong", null, plural(st.current, "week")), " · Best streak: ", h("strong", null, plural(st.best, "week"))) : null,
       table("My results", ["Week", "Score", "Place", "Points", "Answers"], me.history.slice().reverse().map(function (r) {
         return h("tr", null, h("td", null, weekName(r.week)), h("td", null, r.score + " / 15"),
           h("td", null, ordinal(r.place) + " of " + r.entrants), h("td", null, String(r.points)),

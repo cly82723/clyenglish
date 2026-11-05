@@ -6,7 +6,7 @@
 var HKT_OFFSET_MS = 8 * 60 * 60 * 1000;
 var DAY_MS = 24 * 60 * 60 * 1000;
 var WEEK_MS = 7 * DAY_MS;
-var LEAGUE_POINTS = [3, 2, 1];
+var LEAGUE_POINTS = [5, 4, 3, 2, 1]; // 1st to 5th each week; the board shows every place that earns points
 
 // ---------- Weeks (Monday 00:00 to Sunday 23:59, Hong Kong time) ----------
 
@@ -150,24 +150,44 @@ function rankWeek(attempts) {
     .map(function (a) { return Object.assign(a, { points: LEAGUE_POINTS[a.place - 1] || 0 }); });
 }
 
+// How many times a student finished in each points-earning place, as fields on a league row.
+var FINISHES = ["firsts", "seconds", "thirds", "fourths", "fifths"];
+
 // weeks: { weekId: rankedAttempts }. Students level on points share a place (joint winners);
-// 1st, 2nd and 3rd places only order the table, they never split a tie.
+// 1st to 5th places only order the table, they never split a tie.
 function leagueTable(weeks) {
   var rows = {};
   Object.keys(weeks).forEach(function (w) {
     weeks[w].forEach(function (a) {
-      var r = rows[a.key] || (rows[a.key] = { key: a.key, points: 0, firsts: 0, seconds: 0, thirds: 0, played: 0 });
+      var r = rows[a.key];
+      if (!r) {
+        r = rows[a.key] = { key: a.key, points: 0, played: 0 };
+        FINISHES.forEach(function (f) { r[f] = 0; });
+      }
       r.points += a.points;
       r.played += 1;
-      if (a.place === 1) r.firsts += 1;
-      if (a.place === 2) r.seconds += 1;
-      if (a.place === 3) r.thirds += 1;
+      if (FINISHES[a.place - 1]) r[FINISHES[a.place - 1]] += 1;
     });
   });
   var sorted = Object.keys(rows).map(function (k) { return rows[k]; }).sort(function (a, b) {
-    return b.points - a.points || b.firsts - a.firsts || b.seconds - a.seconds || b.thirds - a.thirds || (a.key < b.key ? -1 : 1);
+    var byFinishes = 0;
+    FINISHES.some(function (f) { byFinishes = b[f] - a[f]; return byFinishes !== 0; });
+    return b.points - a.points || byFinishes || (a.key < b.key ? -1 : 1);
   });
   return sharePlaces(sorted, function (p, r) { return p.points === r.points; });
+}
+
+// weeks: the weeks a student handed in (Monday ids). current counts back from this week if it is done, or from last week
+// if not, so a streak stays alive until a whole week is missed. best is the longest run this season.
+function streak(weeks, thisWeek, doneThisWeek) {
+  var played = {};
+  weeks.forEach(function (w) { played[w] = true; });
+  if (doneThisWeek) played[thisWeek] = true;
+  var before = function (w) { return weekId(weekStartMs(w) - 1); };
+  var runTo = function (w) { var n = 0; while (played[w]) { n += 1; w = before(w); } return n; };
+  var best = 0;
+  Object.keys(played).forEach(function (w) { best = Math.max(best, runTo(w)); });
+  return { current: runTo(doneThisWeek ? thisWeek : before(thisWeek)), best: best };
 }
 
 // Time taken counts from the server's start time and never beyond the limit.
@@ -182,5 +202,5 @@ function visibleRows(ranked, myKey) {
 if (typeof module !== "undefined") {
   module.exports = { weekId: weekId, weekStartMs: weekStartMs, weekEndMs: weekEndMs, isClosed: isClosed, formatDue: formatDue,
     normalise: normalise, markCloze: markCloze, markProofreading: markProofreading, mark: mark, publicChallenge: publicChallenge,
-    rankWeek: rankWeek, leagueTable: leagueTable, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows };
+    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows };
 }

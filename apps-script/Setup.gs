@@ -51,13 +51,13 @@ function confirmWipe() {
 function showLeagueTable() {
   var nowMs = Date.now(), sn = season(nowMs), byEmail = labels(), weeks = {};
   closedSeasonWeeks(sn, nowMs).forEach(function (w) { weeks[w] = rankingFor(w, sn, nowMs, byEmail); });
-  var rows = leagueTable(weeks).map(function (r) { return [r.place, byEmail[r.key], r.key, r.points, r.firsts, r.seconds, r.thirds, r.played]; });
+  var rows = leagueTable(weeks).map(function (r) { return [r.place, byEmail[r.key], r.key, r.points, r.firsts, r.seconds, r.thirds, r.fourths, r.fifths, r.played]; });
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName("League") || ss.insertSheet("League");
   sh.clear();
-  sh.appendRow(["Place", "Student", "Email", "Points", "1st", "2nd", "3rd", "Weeks played"]);
-  sh.getRange(1, 1, 1, 8).setFontWeight("bold");
-  if (rows.length) sh.getRange(2, 1, rows.length, 8).setValues(rows);
+  sh.appendRow(["Place", "Student", "Email", "Points", "1st", "2nd", "3rd", "4th", "5th", "Weeks played"]);
+  sh.getRange(1, 1, 1, 10).setFontWeight("bold");
+  if (rows.length) sh.getRange(2, 1, rows.length, 10).setValues(rows);
   sh.appendRow([]);
   sh.appendRow(["Updated " + Utilities.formatDate(new Date(), "Asia/Hong_Kong", "d MMM yyyy HH:mm") + " · " + Object.keys(weeks).length + " closed weeks. Level points are joint places."]);
   ss.setActiveSheet(sh);

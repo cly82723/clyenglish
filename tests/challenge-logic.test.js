@@ -77,21 +77,46 @@ test("public challenge holds no answers", () => {
   assert.ok(!/am>have|to>|>of/.test(JSON.stringify(p)));
 });
 
-test("weekly ranking: score, then time; exact ties share points", () => {
+test("weekly ranking: score, then time; the top five get 5 to 1 points; exact ties share points", () => {
   const ranked = L.rankWeek([
     { key: "4A-1", score: 12, timeMs: 500 }, { key: "4A-2", score: 14, timeMs: 900 },
-    { key: "4A-3", score: 12, timeMs: 400 }, { key: "4A-4", score: 12, timeMs: 400 }, { key: "4A-5", score: 3, timeMs: 1 }
+    { key: "4A-3", score: 12, timeMs: 400 }, { key: "4A-4", score: 12, timeMs: 400 }, { key: "4A-5", score: 3, timeMs: 1 },
+    { key: "4A-6", score: 10, timeMs: 100 }, { key: "4A-7", score: 9, timeMs: 100 }
   ]);
   assert.deepStrictEqual(ranked.map(a => [a.key, a.place, a.points]),
-    [["4A-2", 1, 3], ["4A-3", 2, 2], ["4A-4", 2, 2], ["4A-1", 4, 0], ["4A-5", 5, 0]]);
+    [["4A-2", 1, 5], ["4A-3", 2, 4], ["4A-4", 2, 4], ["4A-1", 4, 2], ["4A-6", 5, 1], ["4A-7", 6, 0], ["4A-5", 7, 0]]);
 });
 
 test("league: points add up and level points are joint", () => {
   const table = L.leagueTable({
-    w1: [{ key: "A", place: 1, points: 3 }, { key: "B", place: 2, points: 2 }, { key: "C", place: 3, points: 1 }],
-    w2: [{ key: "B", place: 1, points: 3 }, { key: "A", place: 2, points: 2 }, { key: "D", place: 4, points: 0 }]
+    w1: [{ key: "A", place: 1, points: 5 }, { key: "B", place: 2, points: 4 }, { key: "C", place: 3, points: 3 }],
+    w2: [{ key: "B", place: 1, points: 5 }, { key: "A", place: 2, points: 4 }, { key: "D", place: 6, points: 0 }]
   });
-  assert.deepStrictEqual(table.map(r => [r.key, r.points, r.place]), [["A", 5, 1], ["B", 5, 1], ["C", 1, 3], ["D", 0, 4]]);
+  assert.deepStrictEqual(table.map(r => [r.key, r.points, r.place]), [["A", 9, 1], ["B", 9, 1], ["C", 3, 3], ["D", 0, 4]]);
+});
+
+test("league: 4th and 5th places are counted and order the table after 1st to 3rd", () => {
+  // All on 4 points, so all share 1st place; the order goes by 3rds, then 4ths, then 5ths.
+  const table = L.leagueTable({
+    w1: [{ key: "B", place: 4, points: 2 }, { key: "A", place: 5, points: 1 }, { key: "C", place: 5, points: 1 }],
+    w2: [{ key: "B", place: 4, points: 2 }, { key: "A", place: 4, points: 2 }, { key: "C", place: 3, points: 3 }],
+    w3: [{ key: "A", place: 5, points: 1 }]
+  });
+  assert.deepStrictEqual(table.map(r => [r.key, r.points, r.thirds, r.fourths, r.fifths, r.place]),
+    [["C", 4, 1, 0, 1, 1], ["B", 4, 0, 2, 0, 1], ["A", 4, 0, 1, 2, 1]]);
+});
+
+test("streak: weeks in a row, still alive until a week is missed", () => {
+  // Played the last three weeks and not yet this week: still a 3-week streak.
+  assert.deepStrictEqual(L.streak(["2026-11-02", "2026-11-09", "2026-11-16"], "2026-11-23", false), { current: 3, best: 3 });
+  // Doing this week's challenge adds to it.
+  assert.deepStrictEqual(L.streak(["2026-11-16", "2026-11-02", "2026-11-09"], "2026-11-23", true), { current: 4, best: 4 });
+  // Missed last week: the streak is gone, the best is kept.
+  assert.deepStrictEqual(L.streak(["2026-11-02", "2026-11-09"], "2026-11-23", false), { current: 0, best: 2 });
+  assert.deepStrictEqual(L.streak(["2026-11-02", "2026-11-09"], "2026-11-23", true), { current: 1, best: 2 });
+  assert.deepStrictEqual(L.streak([], "2026-11-02", false), { current: 0, best: 0 });
+  // Across a month and a year end.
+  assert.deepStrictEqual(L.streak(["2026-12-21", "2026-12-28"], "2027-01-04", true), { current: 3, best: 3 });
 });
 
 test("time taken is capped at the limit", () => {

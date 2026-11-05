@@ -20,15 +20,16 @@ Agreed with the user on 2026-10-28. This is the spec for the S.4 weekly grammar 
 ## Ranking
 
 - Each week is ranked by score, with time taken breaking ties.
-- League points: 1st 3, 2nd 2, 3rd 1.
+- League points: 1st 5, 2nd 4, 3rd 3, 4th 2, 5th 1 (changed 2026-11-05 from 3, 2, 1). Level on points, the table is ordered by 1sts, then 2nds, down to 5ths, but they still share the place.
 - Students level on points at the end of the season are joint winners, so there may be more than three prize-winners.
 - The season ends on the date the teacher types into the sheet's "Season" tab; the standings freeze then.
 
 ## What students see
 
-- A live weekly board showing the top three places by class-number (e.g. "4C-12"), score and time, plus the student's own row, and how many took part. Other students' scores are never shown (changed 2026-10-28, so weaker students aren't exposed).
+- A live weekly board showing the top five places by class-number (e.g. "4C-12"), score and time, plus the student's own row, and how many took part. Other students' scores are never shown (changed 2026-10-28, so weaker students aren't exposed).
 - The season league table: everyone with points, plus the student's own row.
 - Their own personal best and weekly rank, visible only to them.
+- Their own streak (added 2026-11-05): weeks in a row they handed in, and their best streak this season. It stays alive until a whole week is missed, and shows under "This week" and in My results. Nobody else sees it.
 - During the week they see only their score. Answers and explanations appear after the week closes.
 
 ## Switching tab or app

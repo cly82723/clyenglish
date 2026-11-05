@@ -14,6 +14,7 @@ function me(user, body, nowMs) {
   var attempt = myAttempt(week, user.email);
   if (attempt && challenge) finishExpired(week, challenge, nowMs);
   if (attempt) attempt = myAttempt(week, user.email);
+  var past = history(user.email, sn, nowMs);
   return {
     email: user.email,
     student: { cls: student.Class, number: student.Number, label: studentKey(student) },
@@ -21,7 +22,9 @@ function me(user, body, nowMs) {
     week: { id: week, closesAt: weekEndMs(week), format: challenge ? challenge.format : null, title: challenge ? challenge.title : null },
     attempt: attemptSummary(attempt, nowMs),
     limitMs: CONFIG.TIME_LIMIT_MS,
-    history: history(user.email, sn, nowMs)
+    history: past,
+    // Only the student sees their streak; it is never on the board or in the league.
+    streak: streak(past.map(function (h) { return h.week; }), week, !!(attempt && attempt.Submitted))
   };
 }
 
@@ -97,7 +100,7 @@ function submit(user, body, nowMs) {
   return { score: Number(done.Score), outOf: 15, timeSec: Number(done["Time (s)"]) };
 }
 
-// This week's board so far, and last week's final one: the top three places and the student's own row.
+// This week's board so far, and last week's final one: the top five places and the student's own row.
 function board(user, body, nowMs) {
   var p = playing(body, nowMs), sn = p.sn, week = p.week;
   var byEmail = labels();
@@ -114,7 +117,8 @@ function league(user, body, nowMs) {
   closedSeasonWeeks(sn, nowMs).forEach(function (w) { weeks[w] = rankingFor(w, sn, nowMs, byEmail); });
   var table = leagueTable(weeks);
   return { weeks: Object.keys(weeks).length, entrants: table.length, rows: visibleRows(table, user.email).map(function (r) {
-    return { label: byEmail[r.key], points: r.points, played: r.played, firsts: r.firsts, seconds: r.seconds, thirds: r.thirds, place: r.place, you: r.key === user.email };
+    return { label: byEmail[r.key], points: r.points, played: r.played, firsts: r.firsts, seconds: r.seconds, thirds: r.thirds,
+      fourths: r.fourths, fifths: r.fifths, place: r.place, you: r.key === user.email };
   }) };
 }
 

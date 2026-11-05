@@ -219,14 +219,17 @@ test("weekly board ranks by score then time, and shows labels not emails", () =>
   play("b@kings.edu.hk", "4B", 2, full, 300);
   play("c@kings.edu.hk", "4C", 3, { 1: "are held" }, 100);
   const b = s.call("a@kings.edu.hk", "board").data.thisWeek.rows;
-  assert.deepStrictEqual(b.map(r => [r.label, r.place, r.points, r.you]), [["4B-2", 1, 3, false], ["4A-1", 2, 2, true], ["4C-3", 3, 1, false]]);
+  assert.deepStrictEqual(b.map(r => [r.label, r.place, r.points, r.you]), [["4B-2", 1, 5, false], ["4A-1", 2, 4, true], ["4C-3", 3, 3, false]]);
   assert.ok(!JSON.stringify(b).includes("@"));
-  // A fourth student's score is shown only to them; classmates just see that four took part.
+  // The top five are on the board; a sixth student's score is shown only to them, and classmates just see that six took part.
   play("d@kings.edu.hk", "4D", 4, {}, 50);
+  play("e@kings.edu.hk", "4E", 5, {}, 60);
+  play("f@kings.edu.hk", "4F", 6, {}, 70);
   const seenByA = s.call("a@kings.edu.hk", "board").data.thisWeek;
-  assert.deepStrictEqual([seenByA.entrants, seenByA.rows.map(r => r.label)], [4, ["4B-2", "4A-1", "4C-3"]]);
-  assert.deepStrictEqual(s.call("d@kings.edu.hk", "board").data.thisWeek.rows.map(r => [r.label, r.you]),
-    [["4B-2", false], ["4A-1", false], ["4C-3", false], ["4D-4", true]]);
+  assert.deepStrictEqual([seenByA.entrants, seenByA.rows.map(r => [r.label, r.points])],
+    [6, [["4B-2", 5], ["4A-1", 4], ["4C-3", 3], ["4D-4", 2], ["4E-5", 1]]]);
+  assert.deepStrictEqual(s.call("f@kings.edu.hk", "board").data.thisWeek.rows.map(r => [r.label, r.you]),
+    [["4B-2", false], ["4A-1", false], ["4C-3", false], ["4D-4", false], ["4E-5", false], ["4F-6", true]]);
 });
 
 test("league counts closed weeks only; disqualified attempts drop out", () => {
@@ -241,10 +244,33 @@ test("league counts closed weeks only; disqualified attempts drop out", () => {
   assert.strictEqual(s.call("a@kings.edu.hk", "league").data.weeks, 0);
   s.at("2026-11-09T09:00:00+08:00");
   let rows = s.call("a@kings.edu.hk", "league").data.rows;
-  assert.deepStrictEqual(rows.map(r => [r.label, r.points]), [["4A-1", 3], ["4A-2", 2]]);
+  assert.deepStrictEqual(rows.map(r => [r.label, r.points]), [["4A-1", 5], ["4A-2", 4]]);
   s.ctx.updateRow("Attempts", 2, { Disqualified: "yes" });
   rows = s.call("a@kings.edu.hk", "league").data.rows;
-  assert.deepStrictEqual(rows.map(r => [r.label, r.points]), [["4A-2", 3]]);
+  assert.deepStrictEqual(rows.map(r => [r.label, r.points]), [["4A-2", 5]]);
+});
+
+test("streak: counts weeks handed in, one after another, and only the student sees it", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  const playWeek = monday => {
+    s.at(monday + "T10:00:00+08:00");
+    s.call("amy@kings.edu.hk", "start");
+    s.at(monday + "T10:05:00+08:00");
+    s.call("amy@kings.edu.hk", "submit", { answers: {} });
+  };
+  s.at("2026-11-03T10:00:00+08:00");
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 0, best: 0 });
+  playWeek("2026-11-03");
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 1, best: 1 });
+  playWeek("2026-11-10");
+  // Week 3, not done yet: the streak of 2 is still alive.
+  s.at("2026-11-17T10:00:00+08:00");
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 2, best: 2 });
+  // Week 3 skipped: by week 4 it has gone, and the best stays.
+  s.at("2026-11-24T10:00:00+08:00");
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 0, best: 2 });
+  assert.ok(!JSON.stringify(s.call("amy@kings.edu.hk", "board").data).includes("streak"));
 });
 
 test("week 2 with no approved set takes the proofreading backup", () => {

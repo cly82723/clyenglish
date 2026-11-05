@@ -86,7 +86,7 @@
       if (!r.ok) throw new Error(r.status);
       return r.text();
     }).then(function (src) {
-      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows };")();
+      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows, streak: streak };")();
     }).catch(function () { throw { message: "Test mode couldn't load the marking rules. Open the page from the website or a local server, not as a file." }; });
   }
 
@@ -157,7 +157,10 @@
           email: ME.email, student: { cls: ME.cls, number: ME.number, label: ME.key },
           season: { start: week(), end: "", active: true },
           week: { id: week(), closesAt: rules.weekEndMs(week()), format: st.format, title: challenge().title },
-          attempt: summary(), limitMs: LIMIT_MS, history: history()
+          attempt: summary(), limitMs: LIMIT_MS, history: history(),
+          // After "Close the week", the test week counts as last week, so the streak shows as still alive.
+          streak: st.closed ? rules.streak(history().map(function (r) { return r.week; }), rules.weekId(rules.weekEndMs(week())), false)
+            : rules.streak([], week(), summary().status === "done")
         };
       },
       start: function () {
@@ -190,7 +193,8 @@
       league: function () {
         if (!st.closed) return { weeks: 0, entrants: 0, rows: [] };
         return { weeks: 1, entrants: ranked().length, rows: rules.visibleRows(ranked(), ME.key).map(function (r) {
-          return { label: r.key, points: r.points, played: 1, firsts: r.place === 1 ? 1 : 0, seconds: r.place === 2 ? 1 : 0, thirds: r.place === 3 ? 1 : 0, place: r.place, you: r.key === ME.key };
+          return { label: r.key, points: r.points, played: 1, firsts: r.place === 1 ? 1 : 0, seconds: r.place === 2 ? 1 : 0, thirds: r.place === 3 ? 1 : 0,
+            fourths: r.place === 4 ? 1 : 0, fifths: r.place === 5 ? 1 : 0, place: r.place, you: r.key === ME.key };
         }) };
       },
       review: function () {
