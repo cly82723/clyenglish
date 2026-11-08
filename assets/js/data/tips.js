@@ -28,7 +28,9 @@ window.CLY_TIPS = {
     { tip: "Let the first sentence of a paragraph announce its job.", wrong: "Students also have many other problems.", right: "A second, less visible problem is the lack of sleep.", href: "part-b.html#crei", where: "CREI paragraphs" },
     { tip: "In a letter, say why you are writing in the first line.", wrong: "I am writing this letter because I have something to say.", right: "I am writing to complain about the noise from the building site opposite our school.", href: "part-b.html#letter", where: "Letter features" },
     { tip: "Open a speech by speaking to the audience directly.", wrong: "Today I want to talk about recycling.", right: "How many plastic bottles did you throw away this week?", href: "part-b.html#patterns-speech", where: "Speech patterns" },
-    { tip: "In a formal letter, make a request politely, not bluntly.", wrong: "Give me my money back now.", right: "I would be grateful if you could arrange a refund at your earliest convenience.", href: "part-b.html#patterns-letter", where: "Letter patterns" }
+    { tip: "In a formal letter, make a request politely, not bluntly.", wrong: "Give me my money back now.", right: "I would be grateful if you could arrange a refund at your earliest convenience.", href: "part-b.html#patterns-letter", where: "Letter patterns" },
+    { tip: "Back a claim with evidence, not \"people say\".", wrong: "People say that students have too much homework.", right: "A school survey found that over half of S4 students spend more than three hours on homework each night.", href: "part-b.html#crei", where: "CREI paragraphs" },
+    { tip: "In a proposal, tell the reader what they gain.", wrong: "The school should hold a book fair.", right: "A book fair would let students buy affordable novels without leaving the campus.", href: "part-b.html#patterns-proposal", where: "Proposal patterns" }
   ],
   grammar: [
     { tip: "Find the time words first. They choose the tense for you.", wrong: "I have finished the paper yesterday.", right: "I finished the paper yesterday.", href: "grammar.html#tenses", where: "Tenses" },
@@ -59,7 +61,9 @@ window.CLY_TIPS = {
     { tip: "Fewer for things you can count; less for things you cannot.", wrong: "There are less students in the library today.", right: "There are fewer students in the library today.", href: "final.html#errors", where: "Common errors" },
     { tip: "No \"the\" when you talk about something in general.", wrong: "The life in Hong Kong is very busy.", right: "Life in Hong Kong is very busy.", href: "final.html#errors", where: "Common errors" },
     { tip: "\"The number of\" takes a singular verb.", wrong: "The number of students are rising every year.", right: "The number of students is rising every year.", href: "final.html#errors", where: "Common errors" },
-    { tip: "Use \"an\" before a vowel sound, not just a vowel letter.", wrong: "She is a honest student.", right: "She is an honest student.", href: "final.html#errors", where: "Common errors" }
+    { tip: "Use \"an\" before a vowel sound, not just a vowel letter.", wrong: "She is a honest student.", right: "She is an honest student.", href: "final.html#errors", where: "Common errors" },
+    { tip: "\"Suggest\" is followed by V-ing, never \"to\".", wrong: "She suggested to take the MTR.", right: "She suggested taking the MTR.", href: "grammar.html#gerunds", where: "Gerunds" },
+    { tip: "\"Despite\" never takes \"of\".", wrong: "Despite of the typhoon signal, we went to school.", right: "Despite the typhoon signal, we went to school.", href: "final.html#errors", where: "Common errors" }
   ],
   vocab: [
     { tip: "alleviate + pressure / a burden / anxiety", wrong: "Cancelling a test would reduce stress.", right: "Cancelling one test would alleviate the pressure on S6 students.", href: "part-b.html#vocab-education", where: "Education words" },
@@ -86,6 +90,8 @@ window.CLY_TIPS = {
     { tip: "raise + awareness of / about an issue", wrong: "The campaign told people about recycling.", right: "The campaign raised awareness of recycling among residents of Sham Shui Po.", href: "part-b.html#vocab-environment", where: "Environment words" },
     { tip: "foster + a sense of belonging / teamwork", wrong: "Joining a school team makes students feel that they belong.", right: "Joining a school team fosters a sense of belonging.", href: "part-b.html#vocab-youth", where: "Youth & society words" },
     { tip: "tackle + a problem / an issue / a shortage", wrong: "The government should deal with the housing problem.", right: "The government should tackle the housing shortage in Sham Shui Po.", href: "part-b.html#vocab-youth", where: "Youth & society words" },
-    { tip: "implement + a policy / a plan / measures", wrong: "The school started a new rule about homework.", right: "The school implemented a new homework policy last term.", href: "part-b.html#vocab-education", where: "Education words" }
+    { tip: "implement + a policy / a plan / measures", wrong: "The school started a new rule about homework.", right: "The school implemented a new homework policy last term.", href: "part-b.html#vocab-education", where: "Education words" },
+    { tip: "pose + a threat / a risk / a challenge", wrong: "Cyberbullying is dangerous to teenagers.", right: "Cyberbullying poses a serious threat to teenagers' mental health.", href: "part-b.html#vocab-technology", where: "Technology words" },
+    { tip: "strike a balance + between ... and ...", wrong: "Students need to study and rest equally.", right: "Students need to strike a balance between study and rest.", href: "part-b.html#vocab-health", where: "Health words" }
   ]
 };
