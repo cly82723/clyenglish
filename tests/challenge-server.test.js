@@ -456,6 +456,35 @@ test("the timeline records when answers arrive, and the Check flag never reaches
   assert.ok(!JSON.stringify(s.call("amy@kings.edu.hk", "me").data).includes("quiet"));
 });
 
+test("the Weekly tab shows each week newest first, students in class order, and leaves Attempts alone", () => {
+  const s = league();
+  s.enrol("cat@kings.edu.hk", "4B", 3);
+  s.enrol("amy@kings.edu.hk", "4A", 12);
+  s.enrol("ben@kings.edu.hk", "4A", 2);
+  s.at("2026-11-03T10:00:00+08:00");
+  s.call("cat@kings.edu.hk", "start");
+  s.at("2026-11-03T10:05:00+08:00");
+  s.call("cat@kings.edu.hk", "submit", { answers: { 1: "are held" } });
+  at(s, "10:00:00");
+  ["amy", "ben"].forEach(x => s.call(x + "@kings.edu.hk", "start", { pledged: true }));
+  s.call("amy@kings.edu.hk", "away", { ms: 5000 });
+  s.call("amy@kings.edu.hk", "away", { ms: 70000 });
+  at(s, "10:04:10");
+  s.call("amy@kings.edu.hk", "submit", { answers: {} });
+  const before = JSON.stringify(s.sheets.Attempts.rows);
+  s.ctx.showWeeklyAttempts();
+  assert.strictEqual(JSON.stringify(s.sheets.Attempts.rows), before);
+  const rows = s.sheets.Weekly.rows.map(r => r.slice(0, 7).map(String));
+  assert.deepStrictEqual(rows[0].slice(0, 2), ["Week of 16–22 Nov", "Cloze · Backup cloze"]);
+  assert.strictEqual(rows[0][4], "0 counted · 1 not counted · 1 in progress");
+  assert.deepStrictEqual(rows[1], ["Class", "No.", "Score", "Time", "Status", "Switches", "Away"]);
+  assert.deepStrictEqual(rows[2], ["4A", "2", "", "", "In progress", "0", ""]);
+  assert.deepStrictEqual(rows[3], ["4A", "12", "0", "4:10", "Not counted", "2", "1:15"]);
+  assert.deepStrictEqual(rows[5].slice(0, 2), ["Week of 2–8 Nov", "Cloze · Mock exams"]);
+  assert.deepStrictEqual(rows[7], ["4B", "3", "1", "5:00", "Counted", "0", ""]);
+  assert.strictEqual(s.ctx.weekLabel("2026-11-30"), "30 Nov – 6 Dec");
+});
+
 test("an older sheet with no header for the new columns still reads them", () => {
   const s = league();
   s.enrol("amy@kings.edu.hk", "4C", 12);
