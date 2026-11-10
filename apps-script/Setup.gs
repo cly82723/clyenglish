@@ -14,6 +14,7 @@ function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   ss.setSpreadsheetTimeZone("Asia/Hong_Kong");
   Object.keys(TABS).forEach(sheet);
+  addMissingHeaders();
   if (readRows("Season").length === 0) {
     appendRow("Season", { Setting: "Season start", Value: "", Notes: "Type the first day of the league, e.g. 2026-11-02. Week 1 is a cloze." });
     appendRow("Season", { Setting: "Season end", Value: "", Notes: "Type the last day. Standings freeze after this date." });

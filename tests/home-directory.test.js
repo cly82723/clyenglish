@@ -29,7 +29,8 @@ test("students are told plainly that the teacher can see them leave the page", (
   const source = read("assets/js/challenge.js");
   assert.ok(!source.includes("is recorded"), "the old wording is still there");
   assert.ok(source.includes("Your teacher can see if you leave for more than 3 seconds."));
-  assert.ok(/MIN_AWAY_MS:\s*3000/.test(read("apps-script/Code.gs")), "the warning says 3 seconds, so the server must agree");
+  assert.ok(/MIN_AWAY_MS\s*=\s*3000/.test(read("apps-script/Logic.gs")), "the warning says 3 seconds, so the server must agree");
+  assert.ok(source.includes("Glances under 3 seconds don't count."), "the switch-rule warning names the same 3 seconds");
 });
 
 test("the start screen keeps the how-to in place: Start replaces itself, nothing above it collapses", () => {

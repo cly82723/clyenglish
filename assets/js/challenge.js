@@ -62,6 +62,23 @@
   var ordinal = function (n) { var s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
   var minutes = function (ms) { var m = Math.ceil(ms / 60000); return m + (m === 1 ? " minute" : " minutes"); };
   var plural = function (n, word) { return n + " " + word + (n === 1 ? "" : "s"); };
+  // "14 seconds", "1 min 23 s": time away from the page.
+  function awayFor(sec) {
+    var s = Math.max(0, Math.round(sec));
+    return s < 60 ? plural(s, "second") : Math.floor(s / 60) + " min" + (s % 60 ? " " + (s % 60) + " s" : "");
+  }
+  var times = function (n) { return n === 1 ? "once" : n + " times"; };
+
+  // What a student is told about leaving the page: { kind: "warned" | "out", lead, rest }, or null.
+  // during: the clock is still running, so a disqualified student is told they can finish for practice.
+  function awayNote(a, during) {
+    if (!a) return null;
+    if (a.byTeacher) return { kind: "out", lead: "Not counted:", rest: " your teacher has marked this attempt so it won't count on the board or the league." };
+    if (a.disqualified) return { kind: "out", lead: "Disqualified:", rest: " you " + (during ? "have left" : "left") + " this page " + times(a.switches) + " (" + awayFor(a.awaySec) + " in total). "
+      + (during ? "You can finish for practice, but this attempt won't count on the board or the league." : "This week's attempt won't count on the board or the league.") };
+    if (a.switches >= 1 && during) return { kind: "warned", lead: "Warning:", rest: " you left this page for " + awayFor(a.awaySec) + ". That was your one allowed switch. If you leave again, you'll be disqualified." };
+    return null;
+  }
   // "3 days", "5 hours", "12 minutes": how long until the week closes, in its biggest unit.
   function closesIn(ms) {
     var hours = Math.floor(ms / 36e5);
@@ -207,11 +224,16 @@
         : s.start ? "The season has ended. Well done to everyone who took part." : "The league hasn't started yet."));
     } else if (!w.format) {
       box.appendChild(h("p", null, "This week's challenge isn't ready yet. Please check back soon."));
+    } else if (a.status === "done" && a.away) {
+      var out = awayNote(a.away, false);
+      box.appendChild(h("p", { class: "not-counted", role: "status" }, h("strong", null, out.lead), out.rest));
+      box.appendChild(h("p", { class: "meta" }, "Answers and explanations appear after the week closes on Sunday night."));
     } else if (a.status === "done") {
       box.appendChild(h("p", { class: "result-line" }, "Your score: ", h("strong", null, a.score + " / 15"), " in " + duration(a.timeSec) + "."));
       box.appendChild(h("p", { class: "meta" }, "Answers and explanations appear after the week closes on Sunday night."));
     } else if (a.status === "open") {
       box.appendChild(h("p", null, "You've started. ", h("strong", null, minutes(a.remainingMs) + " left"), " on your clock."));
+      if (a.away && a.away.disqualified) { var gone = awayNote(a.away, true); box.appendChild(h("p", { class: "not-counted" }, h("strong", null, gone.lead), gone.rest)); }
       box.appendChild(h("div", { class: "actions" }, h("button", { type: "button", class: "btn", onclick: start }, "Carry on")));
     } else {
       box.appendChild(ready(me));
@@ -249,12 +271,20 @@
     var spot = h("div");
     function ask() {
       clear(spot);
+      // Under the switch rule, Start waits for the promise to be ticked (the league checks it too).
+      var rules = me.rules;
+      var go = h("button", { type: "button", class: "btn", disabled: !!rules, onclick: function () { start(true); } }, "Start now");
+      var pledge = rules ? h("label", { class: "pledge" },
+        h("input", { type: "checkbox", id: "start-pledge", onchange: function (e) { go.disabled = !e.target.checked; } }),
+        h("span", null, "I'll do this on my own, without AI, translation apps, or help from anyone. I know that leaving this page more than once will disqualify me.")) : null;
       var box = h("div", { class: "confirm", role: "alertdialog", "aria-label": "Start the challenge?", "aria-describedby": "start-clock start-stay", tabindex: "-1",
         onkeydown: function (e) { if (e.key === "Escape") notYet(); } },
         h("p", { id: "start-clock" }, h("strong", null, "Ready?"), " The clock starts when you press Start now, and it doesn't stop."),
-        h("p", { id: "start-stay" }, "Stay on this page until you hand in. Your teacher can see if you leave for more than 3 seconds."),
-        h("div", { class: "actions" },
-          h("button", { type: "button", class: "btn", onclick: start }, "Start now"),
+        h("p", { id: "start-stay" }, rules
+          ? "Stay on this page until you hand in. You may leave it once; the second time, your attempt won't count. Glances under 3 seconds don't count."
+          : "Stay on this page until you hand in. Your teacher can see if you leave for more than 3 seconds."),
+        pledge,
+        h("div", { class: "actions" }, go,
           h("button", { type: "button", class: "btn-quiet", onclick: notYet }, "Not yet")));
       spot.appendChild(box);
       box.focus({ preventScroll: true });
@@ -350,12 +380,16 @@
 
   function myResults(me) {
     if (!me.history.length) return h("p", null, "Your results appear here after each week closes. Only you can see this list.");
-    var best = Math.max.apply(null, me.history.map(function (r) { return r.score; }));
+    // A week that didn't count is listed, so its answers can be read, but it never sets a personal best.
+    var counted = me.history.filter(function (r) { return !r.disqualified; });
+    var best = counted.length ? Math.max.apply(null, counted.map(function (r) { return r.score; })) : null;
     var st = me.streak;
     return h("div", null,
-      h("p", { class: "result-line" }, "Personal best: ", h("strong", null, best + " / 15")),
+      best != null ? h("p", { class: "result-line" }, "Personal best: ", h("strong", null, best + " / 15")) : null,
       st ? h("p", { class: "result-line" }, "Streak: ", h("strong", null, plural(st.current, "week")), " · Best streak: ", h("strong", null, plural(st.best, "week"))) : null,
       table("My results", ["Week", "Score", "Place", "Points", "Answers"], me.history.slice().reverse().map(function (r) {
+        if (r.disqualified) return h("tr", null, h("td", null, weekName(r.week)), h("td", { colspan: "3" }, "Not counted"),
+          h("td", null, h("button", { type: "button", class: "link-btn", onclick: function () { review(r.week); } }, "See answers")));
         return h("tr", null, h("td", null, weekName(r.week)), h("td", null, r.score + " / 15"),
           h("td", null, ordinal(r.place) + " of " + r.entrants), h("td", null, String(r.points)),
           h("td", null, h("button", { type: "button", class: "link-btn", onclick: function () { review(r.week); } }, "See answers")));
@@ -365,16 +399,26 @@
 
   // ---------- The challenge ----------
 
-  function start() {
+  // pledged: the student ticked the promise (a first start); carrying on an attempt needs no tick.
+  function start(pledged) {
     loading("Opening the challenge…");
-    league.call("start").then(play, function (err) { problem(err, function () { home(); }); });
+    league.call("start", pledged === true ? { pledged: true } : {}).then(play, function (err) { problem(err, function () { home(); }); });
   }
 
   function play(d) {
     var ch = d.challenge, answers = d.saved || {}, deadline = Date.now() + d.remainingMs;
     paperFormat = ch.format;
-    var savedState = "saved", pending = null, saving = false, done = false, hiddenAt = null, warned = {};
+    var savedState = "saved", pending = null, saving = false, done = false, leftAt = null, warned = {};
+    // Under the switch rule the page warns and disqualifies as the league does; the league's own count wins when it answers.
+    var rules = d.rules || null, away = d.away || { switches: 0, awaySec: 0, disqualified: false };
     view(function (el) {
+      var awayBox = h("p", { class: "away-note", role: "alert" });
+      function drawAway() {
+        var note = rules || away.byTeacher ? awayNote(away, true) : null;
+        awayBox.className = "away-note" + (note ? " " + note.kind : "");
+        clear(awayBox);
+        if (note) awayBox.append(h("strong", null, note.lead), note.rest);
+      }
       var left = h("span", { class: "left" }, clock(d.remainingMs));
       var status = h("span", { class: "save-state" }, "Saved");
       // A cloze's narrow clock bar has no room for this, so a failed save gets a row of its own.
@@ -392,6 +436,7 @@
         sheet.boxButton || null,
         h("button", { type: "button", class: "btn", onclick: function () { confirmHandIn(topSpot); } }, "Hand in"),
         saveAlert,
+        awayBox,
         topSpot,
         sheet.boxPanel || null,
         h("span", { class: "time-drain", "aria-hidden": "true" }, drain));
@@ -404,12 +449,17 @@
         clearTimeout(pending);
         pending = after(SAVE_AFTER_MS, save);
       }
-      function save() {
-        if (saving || done || savedState !== "changed") return;
+      // force: save even with nothing new, so the league knows when the page was last open.
+      // A forced save asked for while another is on its way goes as soon as that one is back.
+      var forceNext = false;
+      function save(force) {
+        if (saving && force === true) { forceNext = true; return; }
+        if (saving || done || (savedState !== "changed" && force !== true)) return;
         saving = true; savedState = "saving"; status.textContent = ch.format === "cloze" ? "Saving" : "Saving…";
         var sent = JSON.stringify(answers);
         league.call("save", { answers: answers }).then(function () {
           saving = false;
+          if (forceNext) { forceNext = false; return save(true); }
           if (JSON.stringify(answers) !== sent) { savedState = "changed"; return save(); }
           savedState = "saved"; status.textContent = "Saved";
           if (saveAlert) saveAlert.textContent = "";
@@ -449,8 +499,13 @@
       function handIn(timeUp) {
         if (done) return;
         done = true;
+        // Still in another window when time ran out: that time away is reported before the answers go in.
+        var stillAway = leftAt != null ? Date.now() - leftAt : 0;
+        leftAt = null;
         view(function (v) { v.appendChild(h("p", { class: "meta loading" }, timeUp ? "Time's up! Handing in your answers…" : "Handing in…")); });
-        league.call("submit", { answers: answers }).then(function (r) { result(r, timeUp); }, function (err) {
+        (stillAway ? league.call("away", { ms: stillAway }).catch(function () { return null; }) : Promise.resolve())
+          .then(function () { return league.call("submit", { answers: answers }); })
+          .then(function (r) { result(r, timeUp); }, function (err) {
           if (err.signIn) return signIn(err.message);
           view(function (v) {
             v.appendChild(h("div", { class: "tip problem", role: "alert" },
@@ -465,14 +520,35 @@
         loading("Handing in…");
         league.call("submit", { answers: answers }).then(result, function (err) { problem(err, function () { home(); }); });
       }
-      // Switching tab or app: the time away is reported when the page comes back, and answers are saved on the way out.
-      listen(document, "visibilitychange", function () {
-        if (document.hidden) { hiddenAt = Date.now(); if (savedState === "changed") save(); return; }
-        if (hiddenAt == null) return;
-        var ms = Date.now() - hiddenAt;
-        hiddenAt = null;
-        league.call("away", { ms: ms }).catch(function () { /* the server still has the time from the clock */ });
-      });
+      // Switching tab or app, or clicking into another window beside the paper: the time away is reported when the
+      // student comes back. Answers are saved on the way out; when the page hides it saves anyway, so a closed tab
+      // that is reopened later is timed from that moment.
+      function leave() {
+        if (done) return;
+        if (leftAt == null) leftAt = Date.now();
+        if (document.hidden) save(true); else if (savedState === "changed") save();
+      }
+      function back() {
+        if (done || leftAt == null || document.hidden || !document.hasFocus()) return;
+        var ms = Date.now() - leftAt;
+        leftAt = null;
+        if (rules && ms >= rules.minAwayMs) {
+          away = { switches: away.switches + 1, awaySec: Math.round(away.awaySec + ms / 1000), byTeacher: false };
+          away.disqualified = away.switches > rules.maxSwitches;
+          drawAway();
+        }
+        league.call("away", { ms: ms }).then(function (r) {
+          if (done || !r || !r.away) return;
+          away = r.away;
+          drawAway();
+        }, function () { /* the page's own count stands; the league still has the time from the clock */ });
+      }
+      listen(document, "visibilitychange", function () { if (document.hidden) leave(); else back(); });
+      listen(window, "blur", leave);
+      listen(window, "focus", back);
+      // Some phone browsers send no focus event on the way back: touching or typing on the paper also ends the time away.
+      listen(document, "pointerdown", back);
+      listen(document, "keydown", back);
       // Leaving mid-challenge (a cover tab, the footer, closing the tab) asks first. The clock would keep running.
       listen(window, "beforeunload", function (e) {
         if (done) return;
@@ -482,6 +558,7 @@
       });
 
       el.appendChild(bar);
+      drawAway();
       el.appendChild(h("section", { class: "paper", "aria-labelledby": "paper-title" },
         h("h2", { id: "paper-title" }, ch.title),
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
@@ -537,6 +614,7 @@
   }
 
   function result(r, timeUp) {
+    if (r.disqualified) return notCounted(r, timeUp);
     view(function (el) {
       var score = h("strong", null, "0");
       el.appendChild(h("section", { class: "handed-in" },
@@ -552,6 +630,24 @@
       el.querySelector("h2").setAttribute("tabindex", "-1");
       el.querySelector("h2").focus();
       countUp(score, r.score);
+    });
+  }
+
+  // Handed in after being disqualified: how long they were away, and no score until the answers come out.
+  function notCounted(r, timeUp) {
+    var out = awayNote(r.away, false) || { lead: "Not counted.", rest: "" };
+    view(function (el) {
+      el.appendChild(h("section", { class: "handed-in" },
+        h("h2", null, "Handed in (not counted)"),
+        timeUp ? h("p", { class: "time-up" }, "Time ran out, so your answers were handed in for you.") : null,
+        h("p", { class: "not-counted" }, h("strong", null, out.lead), out.rest),
+        h("p", null, "Time taken: " + duration(r.timeSec) + "."),
+        h("p", { class: "meta" }, "Answers come out on Monday, so you can see which of yours were right. Next week is a fresh start: stay on the page and it counts."),
+        nextStep((paperFormat === "cloze" && S.clozePracticeNote) || S.practiceNote, paperFormat),
+        h("div", { class: "actions" },
+          h("button", { type: "button", class: "btn", onclick: function () { home("board", true); } }, "See the weekly board"))));
+      el.querySelector("h2").setAttribute("tabindex", "-1");
+      el.querySelector("h2").focus();
     });
   }
 

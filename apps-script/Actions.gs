@@ -22,26 +22,33 @@ function me(user, body, nowMs) {
     week: { id: week, closesAt: weekEndMs(week), format: challenge ? challenge.format : null, title: challenge ? challenge.title : null },
     attempt: attemptSummary(attempt, nowMs),
     limitMs: CONFIG.TIME_LIMIT_MS,
+    rules: switchRule(week),
     history: past,
-    // Only the student sees their streak; it is never on the board or in the league.
-    streak: streak(past.map(function (h) { return h.week; }), week, !!(attempt && attempt.Submitted))
+    // Only the student sees their streak; it is never on the board or in the league. A week that didn't count doesn't keep it going.
+    streak: streak(past.filter(function (h) { return !h.disqualified; }).map(function (h) { return h.week; }), week,
+      !!(attempt && attempt.Submitted && !isTrue(attempt.Disqualified)))
   };
 }
 
+// A disqualified attempt shows how long the student was away, never its score.
 function attemptSummary(a, nowMs) {
   if (!a) return { status: "none" };
+  if (a.Submitted && isTrue(a.Disqualified)) return { status: "done", away: awayOf(a), timeSec: Number(a["Time (s)"]) };
   if (a.Submitted) return { status: "done", score: Number(a.Score), timeSec: Number(a["Time (s)"]) };
-  return { status: "open", remainingMs: Math.max(0, deadlineOf(a) - nowMs) };
+  return { status: "open", remainingMs: Math.max(0, deadlineOf(a) - nowMs), away: awayOf(a) };
 }
 
 // The student's own score and place in each closed week; only they see this.
+// A disqualified week is listed without a score, so its answers can still be read.
 function history(email, sn, nowMs) {
   var byEmail = labels();
   return closedSeasonWeeks(sn, nowMs).map(function (w) {
     var ranked = rankingFor(w, sn, nowMs, byEmail);
     var mine = ranked.filter(function (r) { return r.key === email; })[0];
-    return { week: w, score: mine ? mine.score : null, place: mine ? mine.place : null, points: mine ? mine.points : 0, entrants: ranked.length };
-  }).filter(function (h) { return h.score !== null; });
+    if (mine) return { week: w, score: mine.score, place: mine.place, points: mine.points, entrants: ranked.length };
+    var own = myAttempt(w, email);
+    return own && own.Submitted && isTrue(own.Disqualified) ? { week: w, disqualified: true, entrants: ranked.length } : null;
+  }).filter(Boolean);
 }
 
 // Starts the timer, or carries on an attempt already started (the clock keeps running while away).
@@ -56,13 +63,19 @@ function start(user, body, nowMs) {
     finishExpired(week, challenge, nowMs);
     throw new UserError("Your 20 minutes are up. Your saved answers have been marked.");
   }
+  var rules = switchRule(week);
   if (attempt) {
-    updateRow("Attempts", attempt._row, { Reopened: Number(attempt.Reopened || 0) + 1 });
+    // Closing the page and coming back is a switch too: away since the page last saved or reported in.
+    var gone = nowMs - msOf(attempt["Last seen"] || attempt.Started);
+    var seen = rules ? awayFields(attempt, gone, nowMs) : { "Last seen": new Date(nowMs) };
+    updateRow("Attempts", attempt._row, Object.assign({ Reopened: Number(attempt.Reopened || 0) + 1 }, seen));
   } else {
-    appendRow("Attempts", { Week: week, Email: user.email, Class: student.Class, Number: student.Number, Started: new Date(nowMs), Switches: 0, "Away (s)": 0, Reopened: 0 });
-    attempt = myAttempt(week, user.email);
+    if (rules && body.pledged !== true) throw new UserError("Please tick the promise before you start.");
+    appendRow("Attempts", { Week: week, Email: user.email, Class: student.Class, Number: student.Number, Started: new Date(nowMs), Switches: 0, "Away (s)": 0, Reopened: 0, "Last seen": new Date(nowMs) });
   }
-  return { challenge: publicChallenge(challenge), remainingMs: Math.max(0, deadlineOf(attempt) - nowMs), saved: parseAnswers(attempt.Answers) };
+  attempt = myAttempt(week, user.email);
+  return { challenge: publicChallenge(challenge), remainingMs: Math.max(0, deadlineOf(attempt) - nowMs), saved: parseAnswers(attempt.Answers),
+    rules: rules, away: awayOf(attempt) };
 }
 
 function openAttempt(user, body, nowMs) {
@@ -76,17 +89,18 @@ function save(user, body, nowMs) {
   var attempt = openAttempt(user, body, nowMs);
   if (nowMs > deadlineOf(attempt) + CONFIG.LATE_GRACE_MS) return { saved: false };
   var challenge = challengeFor(dayString(attempt.Week), season(nowMs));
-  updateRow("Attempts", attempt._row, { Answers: JSON.stringify(cleanAnswers(challenge, body.answers)) });
+  var answers = cleanAnswers(challenge, body.answers);
+  updateRow("Attempts", attempt._row, { Answers: JSON.stringify(answers), Timeline: timelineWith(attempt, answers, nowMs), "Last seen": new Date(nowMs) });
   return { saved: true };
 }
 
-// The page reports each time it comes back after being hidden; short glances are ignored.
+// The page reports each time it comes back after being hidden or left for another window; short glances are ignored.
 function away(user, body, nowMs) {
   var ms = Math.min(Number(body.ms) || 0, CONFIG.TIME_LIMIT_MS);
-  if (ms < CONFIG.MIN_AWAY_MS) return { counted: false };
   var attempt = openAttempt(user, body, nowMs);
-  updateRow("Attempts", attempt._row, { Switches: Number(attempt.Switches || 0) + 1, "Away (s)": Math.round(Number(attempt["Away (s)"] || 0) + ms / 1000) });
-  return { counted: true };
+  var fields = awayFields(attempt, ms, nowMs);
+  updateRow("Attempts", attempt._row, fields);
+  return { counted: "Switches" in fields, away: awayOf(Object.assign({}, attempt, fields)) };
 }
 
 function submit(user, body, nowMs) {
@@ -97,6 +111,7 @@ function submit(user, body, nowMs) {
   // after it, only the answers saved before time ran out count.
   var answers = tooLate ? parseAnswers(attempt.Answers) : cleanAnswers(challenge, body.answers);
   var done = finishAttempt(attempt, challenge, answers, Math.min(nowMs, deadlineOf(attempt)), nowMs);
+  if (isTrue(done.Disqualified)) return { disqualified: true, away: awayOf(done), outOf: 15, timeSec: Number(done["Time (s)"]) };
   return { score: Number(done.Score), outOf: 15, timeSec: Number(done["Time (s)"]) };
 }
 

@@ -347,3 +347,125 @@ test("outside the season nobody can start", () => {
   assert.match(s.call("amy@kings.edu.hk", "start").error, /not running/);
 });
 
+// ---------- The switch rule (from the week of 16 Nov 2026) ----------
+
+const RULE_WEEK = "2026-11-17";
+const at = (s, hhmmss) => s.at(RULE_WEEK + "T" + hhmmss + "+08:00");
+const attemptOf = (s, email) => s.ctx.readRows("Attempts").find(r => r.Email === email);
+
+test("under the switch rule a first start needs the promise ticked; carrying on doesn't", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  at(s, "10:00:00");
+  assert.match(s.call("amy@kings.edu.hk", "start").error, /tick the promise/);
+  const started = s.call("amy@kings.edu.hk", "start", { pledged: true });
+  assert.ok(started.ok, started.error);
+  assert.deepStrictEqual(started.data.rules, { maxSwitches: 1, minAwayMs: 3000 });
+  assert.deepStrictEqual(started.data.away, { switches: 0, awaySec: 0, disqualified: false, byTeacher: false });
+  at(s, "10:00:02");
+  assert.ok(s.call("amy@kings.edu.hk", "start").ok);
+});
+
+test("one switch is allowed; the second disqualifies, and the score is never shown", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  s.enrol("ben@kings.edu.hk", "4C", 13);
+  at(s, "10:00:00");
+  s.call("amy@kings.edu.hk", "start", { pledged: true });
+  s.call("ben@kings.edu.hk", "start", { pledged: true });
+  assert.strictEqual(s.call("amy@kings.edu.hk", "away", { ms: 2000 }).data.counted, false);
+  const first = s.call("amy@kings.edu.hk", "away", { ms: 14000 }).data;
+  assert.deepStrictEqual([first.counted, first.away.switches, first.away.awaySec, first.away.disqualified], [true, 1, 14, false]);
+  const second = s.call("amy@kings.edu.hk", "away", { ms: 69000 }).data;
+  assert.deepStrictEqual([second.away.switches, second.away.awaySec, second.away.disqualified, second.away.byTeacher], [2, 83, true, false]);
+  assert.strictEqual(attemptOf(s, "amy@kings.edu.hk").Disqualified, "yes");
+  // Amy can still finish, but the hand-in gives no score and she's off the board.
+  at(s, "10:05:00");
+  const done = s.call("amy@kings.edu.hk", "submit", { answers: { 1: "are held", 2: "aren't given" } }).data;
+  assert.deepStrictEqual([done.disqualified, "score" in done, done.away.switches, done.timeSec], [true, false, 2, 300]);
+  s.call("ben@kings.edu.hk", "submit", { answers: { 1: "are held" } });
+  assert.deepStrictEqual(s.call("ben@kings.edu.hk", "board").data.thisWeek.rows.map(r => r.label), ["4C-13"]);
+  const mine = s.call("amy@kings.edu.hk", "me").data.attempt;
+  assert.deepStrictEqual([mine.status, "score" in mine, mine.away.disqualified], ["done", false, true]);
+  // Clearing the cell reinstates her.
+  s.ctx.updateRow("Attempts", attemptOf(s, "amy@kings.edu.hk")._row, { Disqualified: "" });
+  assert.deepStrictEqual(s.call("ben@kings.edu.hk", "board").data.thisWeek.rows.map(r => r.label), ["4C-12", "4C-13"]);
+});
+
+test("closing the page and reopening counts as a switch, timed from the last save", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  at(s, "10:00:00");
+  s.call("amy@kings.edu.hk", "start", { pledged: true });
+  at(s, "10:03:00");
+  s.call("amy@kings.edu.hk", "save", { answers: { 1: "are held" } });
+  at(s, "10:04:30");
+  const back = s.call("amy@kings.edu.hk", "start").data;
+  assert.deepStrictEqual([back.away.switches, back.away.awaySec, back.away.disqualified], [1, 90, false]);
+  // A quick reload doesn't count.
+  at(s, "10:04:32");
+  assert.strictEqual(s.call("amy@kings.edu.hk", "start").data.away.switches, 1);
+  at(s, "10:06:00");
+  assert.strictEqual(s.call("amy@kings.edu.hk", "start").data.away.disqualified, true);
+  assert.strictEqual(attemptOf(s, "amy@kings.edu.hk").Reopened, 3);
+});
+
+test("before the rule's first week, switches are counted but never disqualify, and no promise is needed", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  s.at("2026-11-10T10:00:00+08:00");
+  const started = s.call("amy@kings.edu.hk", "start");
+  assert.ok(started.ok, started.error);
+  assert.strictEqual(started.data.rules, null);
+  s.call("amy@kings.edu.hk", "away", { ms: 8000 });
+  s.call("amy@kings.edu.hk", "away", { ms: 8000 });
+  const a = attemptOf(s, "amy@kings.edu.hk");
+  assert.deepStrictEqual([a.Switches, a.Disqualified], [2, ""]);
+  s.at("2026-11-10T10:09:00+08:00");
+  assert.strictEqual(s.call("amy@kings.edu.hk", "start").data.away.switches, 2, "a reopen isn't a switch before the rule");
+});
+
+test("a week that didn't count is listed without a score and doesn't keep the streak going", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  at(s, "10:00:00");
+  s.call("amy@kings.edu.hk", "start", { pledged: true });
+  s.call("amy@kings.edu.hk", "away", { ms: 5000 });
+  s.call("amy@kings.edu.hk", "away", { ms: 5000 });
+  s.call("amy@kings.edu.hk", "submit", { answers: { 1: "are held" } });
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 0, best: 0 });
+  s.at("2026-11-24T10:00:00+08:00");
+  const me = s.call("amy@kings.edu.hk", "me").data;
+  assert.deepStrictEqual(me.history, [{ week: "2026-11-16", disqualified: true, entrants: 0 }]);
+  assert.ok(s.call("amy@kings.edu.hk", "review", { week: "2026-11-16" }).ok, "the answers can still be read");
+});
+
+test("the timeline records when answers arrive, and the Check flag never reaches the student", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  at(s, "10:00:00");
+  s.call("amy@kings.edu.hk", "start", { pledged: true });
+  at(s, "10:01:00");
+  s.call("amy@kings.edu.hk", "save", { answers: { 1: "are held" } });
+  at(s, "10:03:00");
+  s.call("amy@kings.edu.hk", "submit", { answers: { 1: "are held", 2: "aren't given" } });
+  const amy = attemptOf(s, "amy@kings.edu.hk");
+  assert.deepStrictEqual(JSON.parse(amy.Timeline), [[60, ["1"]], [180, ["2"]]]);
+  assert.strictEqual(amy.Check, "", "2/15 is never flagged as fast");
+  s.ctx.updateRow("Attempts", amy._row, { Check: "quiet 4:30" });
+  assert.ok(!JSON.stringify(s.call("amy@kings.edu.hk", "me").data).includes("quiet"));
+});
+
+test("an older sheet with no header for the new columns still reads them", () => {
+  const s = league();
+  s.enrol("amy@kings.edu.hk", "4C", 12);
+  const head = s.sheets.Attempts.rows[0];
+  head.splice(head.indexOf("Answers") + 1);
+  at(s, "10:00:00");
+  s.call("amy@kings.edu.hk", "start", { pledged: true });
+  at(s, "10:02:00");
+  assert.strictEqual(s.call("amy@kings.edu.hk", "start").data.away.awaySec, 120);
+  s.ctx.addMissingHeaders();
+  assert.strictEqual(JSON.stringify(s.sheets.Attempts.rows[0].slice(-3)), JSON.stringify(["Last seen", "Timeline", "Check"]));
+});
+

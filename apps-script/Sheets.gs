@@ -4,7 +4,8 @@
 var TABS = {
   Season: ["Setting", "Value", "Notes"],
   Students: ["Email", "Class", "Number"],
-  Attempts: ["Week", "Email", "Class", "Number", "Started", "Submitted", "Score", "Time (s)", "Switches", "Away (s)", "Reopened", "Late", "Disqualified", "Answers"],
+  Attempts: ["Week", "Email", "Class", "Number", "Started", "Submitted", "Score", "Time (s)", "Switches", "Away (s)", "Reopened", "Late", "Disqualified", "Answers",
+    "Last seen", "Timeline", "Check"], // added Nov 2026: always after Answers, so older sheets keep their columns
   Challenges: ["Week", "Format", "Status", "Title", "Data"],
   Sessions: ["Token hash", "Email", "Created"]
 };
@@ -31,7 +32,8 @@ function readRows(name) {
 
 function readSheetRows(name) {
   var values = sheet(name).getDataRange().getValues();
-  var headers = values[0];
+  // A column added after the sheet was made may not have its header typed yet; it is still read by position.
+  var headers = values[0].map(function (h, j) { return h === "" && TABS[name] && TABS[name][j] ? TABS[name][j] : h; });
   return values.slice(1).map(function (v, i) {
     var row = { _row: i + 2 };
     headers.forEach(function (h, j) { row[h] = v[j]; });
@@ -51,6 +53,16 @@ function updateRow(name, rowNumber, fields) {
   Object.keys(fields).forEach(function (h) {
     var col = TABS[name].indexOf(h) + 1;
     if (col > 0) sh.getRange(rowNumber, col).setValue(fields[h]);
+  });
+}
+
+// Types any missing headers at the end of each tab's header row (for sheets made before a column was added).
+function addMissingHeaders() {
+  Object.keys(TABS).forEach(function (name) {
+    var sh = sheet(name), want = TABS[name];
+    var have = sh.getDataRange().getValues()[0] || [];
+    want.forEach(function (h, j) { if (have[j] !== h && !have[j]) sh.getRange(1, j + 1).setValue(h); });
+    sh.getRange(1, 1, 1, want.length).setFontWeight("bold");
   });
 }
 

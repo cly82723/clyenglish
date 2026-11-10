@@ -190,6 +190,50 @@ function streak(weeks, thisWeek, doneThisWeek) {
   return { current: runTo(doneThisWeek ? thisWeek : before(thisWeek)), best: best };
 }
 
+// ---------- Leaving the page ----------
+
+var MIN_AWAY_MS = 3000;   // shorter switches (a glance at a notification) are ignored
+var MAX_SWITCHES = 1;     // one switch is allowed; the next one disqualifies
+var QUIET_GAP_MS = 4 * 60 * 1000, BURST_MS = 60 * 1000, BURST_ANSWERS = 5;
+var FAST_SCORE = 14, FAST_MS = 5 * 60 * 1000;
+
+// One time away added to a { switches, awaySec } record. Returns a new record; short glances leave it as it was.
+function countAway(record, ms) {
+  var r = { switches: Number(record.switches) || 0, awaySec: Number(record.awaySec) || 0, counted: false };
+  if (!(ms >= MIN_AWAY_MS)) return r;
+  return { switches: r.switches + 1, awaySec: Math.round(r.awaySec + ms / 1000), counted: true };
+}
+
+function overSwitchLimit(switches) { return Number(switches) > MAX_SWITCHES; }
+
+// The blanks or lines given a new, non-empty answer between two saves.
+function answerChanges(before, after) {
+  return Object.keys(after || {}).filter(function (id) {
+    var a = after[id];
+    if (a == null || a === "" || (typeof a === "object" && !a.type)) return false;
+    return JSON.stringify(a) !== JSON.stringify((before || {})[id]);
+  });
+}
+
+// events: [[secondsSinceStart, [ids]], ...] oldest first. A note for the teacher, or "" if nothing looks odd.
+// Students never see it. The quiet gap is counted between answers, so reading the passage first never sets it off.
+function timingCheck(events, score, timeMs) {
+  var notes = [];
+  var at = function (sec) { var s = Math.round(sec); return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60); };
+  for (var k = 1; k < events.length; k++) {
+    var gapMs = (events[k][0] - events[k - 1][0]) * 1000;
+    if (gapMs < QUIET_GAP_MS) continue;
+    var ids = {};
+    for (var j = k; j < events.length && (events[j][0] - events[k][0]) * 1000 <= BURST_MS; j++) {
+      events[j][1].forEach(function (id) { ids[id] = true; });
+    }
+    var n = Object.keys(ids).length;
+    if (n >= BURST_ANSWERS) { notes.push("quiet " + at(gapMs / 1000) + ", then " + n + " answers in 1 min (at " + at(events[k][0]) + ")"); break; }
+  }
+  if (Number(score) >= FAST_SCORE && Number(timeMs) < FAST_MS) notes.push(score + "/15 in " + at(timeMs / 1000));
+  return notes.join("; ");
+}
+
 // Time taken counts from the server's start time and never beyond the limit.
 function timeTaken(startedMs, submittedMs, limitMs) { return Math.max(0, Math.min(submittedMs - startedMs, limitMs)); }
 
@@ -202,5 +246,7 @@ function visibleRows(ranked, myKey) {
 if (typeof module !== "undefined") {
   module.exports = { weekId: weekId, weekStartMs: weekStartMs, weekEndMs: weekEndMs, isClosed: isClosed, formatDue: formatDue,
     normalise: normalise, markCloze: markCloze, markProofreading: markProofreading, mark: mark, publicChallenge: publicChallenge,
-    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows };
+    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
+    countAway: countAway, overSwitchLimit: overSwitchLimit, answerChanges: answerChanges, timingCheck: timingCheck,
+    MIN_AWAY_MS: MIN_AWAY_MS, MAX_SWITCHES: MAX_SWITCHES };
 }

@@ -74,10 +74,13 @@ A classmate who types someone else's email gets nowhere without access to that i
   - If a backup has already gone live for a week, a set you approve later for that same week is ignored, so nobody is marked against a different passage. Give it a later Monday instead.
   - `Data`: the challenge content. I prepare this for you; you don't need to edit it by hand.
 - **Attempts tab**: one row per student per week.
-  - `Switches` and `Away (s)`: how many times they left the page for more than 3 seconds, and for how long in total.
+  - `Switches` and `Away (s)`: how many times they left the page for 3 seconds or more, and for how long in total. Leaving counts whether they switch tab or app, click into another window beside the paper, or close the page and open it again (timed from when it was last open).
   - `Reopened`: how many times they closed and reopened the challenge.
   - `Late`: their answers arrived after the 20 minutes.
-  - To disqualify an attempt, type `yes` in **Disqualified**. It drops out of the board and the league.
+  - **Disqualified**: from the week of 16 November, the league types `yes` here by itself on a student's second switch. They are told at once, can finish for practice, see no score, and drop out of the board and the league. To disqualify an attempt yourself, type `yes`. To reinstate one (say a phone locked by itself), clear the cell.
+  - `Last seen` and `Timeline`: when the page was last open, and when each answer came in. The league uses these; you can ignore them.
+  - **Check**: a note for you only, written at hand-in, when the timing looks odd: a quiet spell of 4 minutes or more between answers followed by 5 or more answers within a minute, or 14 or 15 out of 15 in under 5 minutes. It never disqualifies anyone and students never see it. Look at it alongside the student before deciding anything.
+- **Before 16 November**: switches are counted as before, but nobody is disqualified and there's no promise to tick. The rule starts by itself that Monday.
 - **Sessions tab**: one row per signed-in device. You can ignore it. Deleting a row signs that device out. It never holds anything that could be used to sign in.
 - **CLY League → Show league table**: writes the season table, with emails, into a **League** tab, so you know who to give prizes to.
 - **31 August**: the Students, Attempts, League and Sessions tabs are cleared automatically. Challenges and season dates are kept. **CLY League → Delete all student data now** does the same thing straight away.

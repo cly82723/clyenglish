@@ -180,3 +180,26 @@ test("an S.4 challenge gets no new fields", () => {
   assert.strictEqual("phrases" in pub, false);
   assert.strictEqual("open" in pub, false);
 });
+
+test("leaving the page: glances under 3 seconds are free, the second real switch is over the limit", () => {
+  assert.deepStrictEqual(L.countAway({ switches: 0, awaySec: 0 }, 2999), { switches: 0, awaySec: 0, counted: false });
+  const once = L.countAway({ switches: 0, awaySec: 0 }, 14400);
+  assert.deepStrictEqual(once, { switches: 1, awaySec: 14, counted: true });
+  assert.strictEqual(L.overSwitchLimit(once.switches), false);
+  assert.strictEqual(L.overSwitchLimit(L.countAway(once, 3000).switches), true);
+});
+
+test("answer changes ignore cleared blanks and unmarked lines", () => {
+  assert.deepStrictEqual(L.answerChanges({ 1: "a" }, { 1: "a", 2: "b", 3: "" }), ["2"]);
+  assert.deepStrictEqual(L.answerChanges({ 0: { type: "ok" } }, { 0: { type: "ok" }, 1: { type: "replace", at: 2, word: "x" }, 2: {} }), ["1"]);
+});
+
+test("timing check: a quiet spell between answers then five in a minute, or 14+ in under 5 minutes", () => {
+  const rush = [[30, ["1"]], [300, ["2", "3"]], [320, ["4"]], [350, ["5", "6"]], [900, ["7"]]];
+  assert.strictEqual(L.timingCheck(rush, 9, 900000), "quiet 4:30, then 5 answers in 1 min (at 5:00)");
+  // Reading the passage first is never a quiet spell: the gap only counts after the first answer.
+  assert.strictEqual(L.timingCheck([[300, ["1", "2", "3", "4", "5"]]], 9, 600000), "");
+  assert.strictEqual(L.timingCheck([[30, ["1"]]], 14, 299000), "14/15 in 4:59");
+  assert.strictEqual(L.timingCheck([[30, ["1"]]], 13, 200000), "");
+  assert.strictEqual(L.timingCheck([[30, ["1"]]], 15, 300000), "", "exactly 5 minutes is not under 5");
+});

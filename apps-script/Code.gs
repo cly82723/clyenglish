@@ -11,7 +11,8 @@ var CONFIG = {
   CODES_PER_HOUR: 5,
   TIME_LIMIT_MS: 20 * 60 * 1000,
   LATE_GRACE_MS: 60 * 1000, // network delay allowed after the auto-submit at 20 minutes
-  MIN_AWAY_MS: 3000,        // shorter switches (a notification glance) are ignored
+  // From this week on, a second switch away from the page disqualifies (the 3-second grace and the limit are in Logic.gs).
+  SWITCH_RULE_FROM: "2026-11-16",
   MAX_ANSWER_CHARS: 60
 };
 
@@ -84,12 +85,47 @@ function myAttempt(week, email) {
 
 function deadlineOf(attempt) { return msOf(attempt.Started) + CONFIG.TIME_LIMIT_MS; }
 
+// The switch rule for a week: what the page needs to warn the student, or null before the rule began.
+function switchRule(week) {
+  return week >= CONFIG.SWITCH_RULE_FROM ? { maxSwitches: MAX_SWITCHES, minAwayMs: MIN_AWAY_MS } : null;
+}
+
+// What the student is told about leaving the page. byTeacher: disqualified by hand, not for switching.
+function awayOf(attempt) {
+  var switches = Number(attempt.Switches) || 0, dq = isTrue(attempt.Disqualified);
+  return { switches: switches, awaySec: Number(attempt["Away (s)"]) || 0, disqualified: dq,
+    byTeacher: dq && !overSwitchLimit(switches) };
+}
+
+// Fields that record time away, and disqualify once the limit is passed in a week the rule covers.
+function awayFields(attempt, ms, nowMs) {
+  var next = countAway({ switches: attempt.Switches, awaySec: attempt["Away (s)"] }, ms);
+  var fields = { "Last seen": new Date(nowMs) };
+  if (!next.counted) return fields;
+  fields.Switches = next.switches;
+  fields["Away (s)"] = next.awaySec;
+  if (switchRule(dayString(attempt.Week)) && overSwitchLimit(next.switches)) fields.Disqualified = "yes";
+  return fields;
+}
+
+function parseTimeline(s) { try { var t = JSON.parse(s || "[]"); return Array.isArray(t) ? t : []; } catch (e) { return []; } }
+
+// The Timeline cell with this save's new answers added, in seconds since the start. Never seen by students.
+function timelineWith(attempt, answers, nowMs) {
+  var ids = answerChanges(parseAnswers(attempt.Answers), answers);
+  var events = parseTimeline(attempt.Timeline);
+  if (ids.length) events = events.concat([[Math.round((nowMs - msOf(attempt.Started)) / 1000), ids]]);
+  return JSON.stringify(events);
+}
+
 // submittedMs is the time that counts (never past the deadline); arrivedMs is when the answers really came in.
 function finishAttempt(attempt, challenge, answers, submittedMs, arrivedMs) {
   var result = mark(challenge, answers);
-  var fields = { Submitted: new Date(submittedMs), Score: result.score,
-    "Time (s)": timeTaken(msOf(attempt.Started), submittedMs, CONFIG.TIME_LIMIT_MS) / 1000,
-    Late: arrivedMs > deadlineOf(attempt) ? "late" : "", Answers: JSON.stringify(answers) };
+  var timeline = timelineWith(attempt, answers, Math.min(arrivedMs, deadlineOf(attempt)));
+  var timeMs = timeTaken(msOf(attempt.Started), submittedMs, CONFIG.TIME_LIMIT_MS);
+  var fields = { Submitted: new Date(submittedMs), Score: result.score, "Time (s)": timeMs / 1000,
+    Late: arrivedMs > deadlineOf(attempt) ? "late" : "", Answers: JSON.stringify(answers),
+    Timeline: timeline, Check: timingCheck(parseTimeline(timeline), result.score, timeMs) };
   updateRow("Attempts", attempt._row, fields);
   return Object.assign(attempt, fields);
 }

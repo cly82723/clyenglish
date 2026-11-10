@@ -46,7 +46,8 @@
   function call(action, extra) {
     // A plain string body is sent as text/plain, so the browser skips the CORS preflight Apps Script can't answer.
     var body = JSON.stringify(Object.assign({ action: action, token: token }, extra));
-    return fetch(WEB_APP, { method: "POST", body: body })
+    // A save sent as the page closes still arrives (keepalive), so a reopen is timed from it.
+    return fetch(WEB_APP, { method: "POST", body: body, keepalive: action === "save" })
       .then(function (res) { return res.json().catch(function () { throw { message: GARBLED }; }); }, function () { throw { message: OFFLINE, offline: true }; })
       .then(function (r) {
         if (!r || typeof r.ok !== "boolean") throw { message: GARBLED };
@@ -86,7 +87,7 @@
       if (!r.ok) throw new Error(r.status);
       return r.text();
     }).then(function (src) {
-      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows, streak: streak };")();
+      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows, streak: streak, countAway: countAway, overSwitchLimit: overSwitchLimit, MAX_SWITCHES: MAX_SWITCHES, MIN_AWAY_MS: MIN_AWAY_MS };")();
     }).catch(function () { throw { message: "Test mode couldn't load the marking rules. Open the page from the website or a local server, not as a file." }; });
   }
 
@@ -124,17 +125,30 @@
     }
     function ranked() {
       var a = st.attempt, rows = OTHERS.slice();
-      if (a && a.submitted) rows.push({ key: ME.key, score: a.score, timeMs: a.timeMs });
+      if (a && a.submitted && !a.dq) rows.push({ key: ME.key, score: a.score, timeMs: a.timeMs });
       return rules.rankWeek(rows);
     }
     var boardRow = function (r) { return { label: r.key, score: r.score, timeSec: r.timeMs / 1000, place: r.place, points: r.points, you: r.key === ME.key }; };
+    // Test mode always plays under the switch rule, so it can be tried before the week it starts.
+    var RULES = { maxSwitches: rules.MAX_SWITCHES, minAwayMs: rules.MIN_AWAY_MS };
+    var awayOf = function (a) { return { switches: a.switches, awaySec: a.awaySec, disqualified: a.dq, byTeacher: false }; };
+    function leftFor(ms) {
+      var a = st.attempt, next = rules.countAway({ switches: a.switches, awaySec: a.awaySec }, ms);
+      a.lastSeen = now();
+      if (!next.counted) return false;
+      a.switches = next.switches; a.awaySec = next.awaySec;
+      if (rules.overSwitchLimit(a.switches)) a.dq = true;
+      return true;
+    }
     function summary() {
       var a = st.attempt;
       if (!a) return { status: "none" };
+      if (a.submitted && a.dq) return { status: "done", away: awayOf(a), timeSec: a.timeMs / 1000 };
       if (a.submitted) return { status: "done", score: a.score, timeSec: a.timeMs / 1000 };
-      return { status: "open", remainingMs: Math.max(0, deadline() - now()) };
+      return { status: "open", remainingMs: Math.max(0, deadline() - now()), away: awayOf(a) };
     }
     function history() {
+      if (st.closed && st.attempt && st.attempt.dq) return [{ week: week(), disqualified: true, entrants: OTHERS.length }];
       var mine = st.closed && ranked().filter(function (r) { return r.key === ME.key; })[0];
       return mine ? [{ week: week(), score: mine.score, place: mine.place, points: mine.points, entrants: OTHERS.length + 1 }] : [];
     }
@@ -157,30 +171,40 @@
           email: ME.email, student: { cls: ME.cls, number: ME.number, label: ME.key },
           season: { start: week(), end: "", active: true },
           week: { id: week(), closesAt: rules.weekEndMs(week()), format: st.format, title: challenge().title },
-          attempt: summary(), limitMs: LIMIT_MS, history: history(),
+          attempt: summary(), limitMs: LIMIT_MS, rules: RULES, history: history(),
           // After "Close the week", the test week counts as last week, so the streak shows as still alive.
-          streak: st.closed ? rules.streak(history().map(function (r) { return r.week; }), rules.weekId(rules.weekEndMs(week())), false)
-            : rules.streak([], week(), summary().status === "done")
+          // A week that didn't count doesn't keep the streak going.
+          streak: st.closed ? rules.streak(history().filter(function (r) { return !r.disqualified; }).map(function (r) { return r.week; }), rules.weekId(rules.weekEndMs(week())), false)
+            : rules.streak([], week(), summary().status === "done" && !st.attempt.dq)
         };
       },
-      start: function () {
+      start: function (b) {
         if (st.closed) fail("This week has closed. Press “Start again” in the test bar.");
         finishIfExpired();
         if (st.attempt && st.attempt.submitted) fail("You have already done this week's challenge.");
-        if (!st.attempt) st.attempt = { started: now(), answers: {} };
-        return { challenge: rules.publicChallenge(challenge()), remainingMs: Math.max(0, deadline() - now()), saved: st.attempt.answers };
+        if (st.attempt) leftFor(now() - st.attempt.lastSeen);
+        else if (b.pledged !== true) fail("Please tick the promise before you start.");
+        else st.attempt = { started: now(), answers: {}, switches: 0, awaySec: 0, dq: false, lastSeen: now() };
+        return { challenge: rules.publicChallenge(challenge()), remainingMs: Math.max(0, deadline() - now()), saved: st.attempt.answers,
+          rules: RULES, away: awayOf(st.attempt) };
       },
       save: function (b) {
         if (!st.attempt || st.attempt.submitted) fail("There is no challenge in progress.");
         if (now() > deadline() + GRACE_MS) return { saved: false };
         st.attempt.answers = b.answers || {};
+        st.attempt.lastSeen = now();
         return { saved: true };
       },
-      away: function () { return { counted: true }; },
+      away: function (b) {
+        if (!st.attempt || st.attempt.submitted) fail("There is no challenge in progress.");
+        var counted = leftFor(Math.min(Number(b.ms) || 0, LIMIT_MS));
+        return { counted: counted, away: awayOf(st.attempt) };
+      },
       submit: function (b) {
         var a = st.attempt;
         if (!a || a.submitted) fail("There is no challenge in progress.");
         finish(now() > deadline() + GRACE_MS ? a.answers : (b.answers || {}), Math.min(now(), deadline()));
+        if (a.dq) return { disqualified: true, away: awayOf(a), outOf: 15, timeSec: a.timeMs / 1000 };
         return { score: a.score, outOf: 15, timeSec: a.timeMs / 1000 };
       },
       board: function () {
