@@ -255,7 +255,7 @@ test("streak: counts weeks handed in, one after another, and only the student se
   s.enrol("amy@kings.edu.hk", "4C", 12);
   const playWeek = monday => {
     s.at(monday + "T10:00:00+08:00");
-    s.call("amy@kings.edu.hk", "start");
+    s.call("amy@kings.edu.hk", "start", { pledged: true });
     s.at(monday + "T10:05:00+08:00");
     s.call("amy@kings.edu.hk", "submit", { answers: {} });
   };
@@ -347,7 +347,7 @@ test("outside the season nobody can start", () => {
   assert.match(s.call("amy@kings.edu.hk", "start").error, /not running/);
 });
 
-// ---------- The switch rule (from the week of 16 Nov 2026) ----------
+// ---------- The switch rule (from the week of 9 Nov 2026) ----------
 
 const RULE_WEEK = "2026-11-17";
 const at = (s, hhmmss) => s.at(RULE_WEEK + "T" + hhmmss + "+08:00");
@@ -413,7 +413,7 @@ test("closing the page and reopening counts as a switch, timed from the last sav
 test("before the rule's first week, switches are counted but never disqualify, and no promise is needed", () => {
   const s = league();
   s.enrol("amy@kings.edu.hk", "4C", 12);
-  s.at("2026-11-10T10:00:00+08:00");
+  s.at("2026-11-03T10:00:00+08:00");
   const started = s.call("amy@kings.edu.hk", "start");
   assert.ok(started.ok, started.error);
   assert.strictEqual(started.data.rules, null);
@@ -421,7 +421,7 @@ test("before the rule's first week, switches are counted but never disqualify, a
   s.call("amy@kings.edu.hk", "away", { ms: 8000 });
   const a = attemptOf(s, "amy@kings.edu.hk");
   assert.deepStrictEqual([a.Switches, a.Disqualified], [2, ""]);
-  s.at("2026-11-10T10:09:00+08:00");
+  s.at("2026-11-03T10:09:00+08:00");
   assert.strictEqual(s.call("amy@kings.edu.hk", "start").data.away.switches, 2, "a reopen isn't a switch before the rule");
 });
 

@@ -12,7 +12,7 @@ var CONFIG = {
   TIME_LIMIT_MS: 20 * 60 * 1000,
   LATE_GRACE_MS: 60 * 1000, // network delay allowed after the auto-submit at 20 minutes
   // From this week on, a second switch away from the page disqualifies (the 3-second grace and the limit are in Logic.gs).
-  SWITCH_RULE_FROM: "2026-11-16",
+  SWITCH_RULE_FROM: "2026-11-09",
   MAX_ANSWER_CHARS: 60
 };
 
