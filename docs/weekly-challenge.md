@@ -35,6 +35,7 @@ Agreed with the user on 2026-10-28. This is the spec for the S.4 weekly grammar 
 ## Switching tab or app
 
 - Detected with the page visibility API. Switches under 3 seconds are ignored; longer ones are counted and flagged in the sheet.
+- On computers a lost window focus also counts (a second window beside the paper). On iPads and phones only a hidden page counts, because the pop-up keyboard, autofill and Scribble take focus without leaving the page (false switches found 14 Nov 2026). Known gap: Split View / Slide Over on an iPad is not caught.
 - Nobody is disqualified automatically; the teacher decides.
 - The start screen warns that leaving the page is recorded.
 

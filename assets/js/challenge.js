@@ -520,6 +520,10 @@
         loading("Handing in…");
         league.call("submit", { answers: answers }).then(result, function (err) { problem(err, function () { home(); }); });
       }
+      // iPadOS Safari calls itself a Mac, so it is caught by its touch points; a touchscreen laptop with a mouse is not.
+      var touchFirst = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (/Mac/.test(navigator.platform) && navigator.maxTouchPoints > 1) ||
+        (window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
       // Switching tab or app, or clicking into another window beside the paper: the time away is reported when the
       // student comes back. Answers are saved on the way out; when the page hides it saves anyway, so a closed tab
       // that is reopened later is timed from that moment.
@@ -529,7 +533,8 @@
         if (document.hidden) save(true); else if (savedState === "changed") save();
       }
       function back() {
-        if (done || leftAt == null || document.hidden || !document.hasFocus()) return;
+        if (done || leftAt == null || document.hidden) return;
+        if (!touchFirst && !document.hasFocus()) return;
         var ms = Date.now() - leftAt;
         leftAt = null;
         if (rules && ms >= rules.minAwayMs) {
@@ -544,7 +549,9 @@
         }, function () { /* the page's own count stands; the league still has the time from the clock */ });
       }
       listen(document, "visibilitychange", function () { if (document.hidden) leave(); else back(); });
-      listen(window, "blur", leave);
+      // iPads and phones lose window focus without leaving the page (the pop-up keyboard, autofill, Scribble), and
+      // hasFocus() can stay false while the keyboard is up. There only a hidden page counts as a switch.
+      if (!touchFirst) listen(window, "blur", leave);
       listen(window, "focus", back);
       // Some phone browsers send no focus event on the way back: touching or typing on the paper also ends the time away.
       listen(document, "pointerdown", back);
