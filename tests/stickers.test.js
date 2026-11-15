@@ -4,79 +4,115 @@ const assert = require("node:assert");
 const path = require("node:path");
 
 const S = require(path.join(__dirname, "..", "assets", "js", "stickers.js"));
+const week = (id, score, points) => ({ week: id, score, points: points || 0 });
 
-test("stamps count every week that counted, and this week once it is handed in", () => {
+test("counted weeks leave out disqualified ones and add this week once it is handed in", () => {
   // Arrange
-  const history = [{ week: "2026-11-02" }, { week: "2026-11-09", disqualified: true }, { week: "2026-11-16" }];
+  const history = [week("2026-11-09", 9), { week: "2026-11-02", disqualified: true }, week("2026-10-26", 7, 3)];
 
-  // Act and assert
-  assert.strictEqual(S.countStamps(history, "2026-11-23", false), 2);
-  assert.strictEqual(S.countStamps(history, "2026-11-23", true), 3);
-  assert.strictEqual(S.countStamps([], "2026-11-23", false), 0);
-  assert.strictEqual(S.countStamps(undefined, "2026-11-23", true), 1);
+  // Act
+  const before = S.countedWeeks(history, "2026-11-16", null);
+  const after = S.countedWeeks(history, "2026-11-16", { score: 12 });
+
+  // Assert
+  assert.deepStrictEqual(before.map((w) => w.week), ["2026-10-26", "2026-11-09"]);
+  assert.deepStrictEqual(after[2], { week: "2026-11-16", score: 12, points: 0 });
+  assert.strictEqual(S.countedWeeks(undefined, "2026-11-16", null).length, 0);
 });
 
-test("a week already in the history is not stamped twice", () => {
-  assert.strictEqual(S.countStamps([{ week: "2026-11-16" }], "2026-11-16", true), 1);
+test("a week already in the history is not counted twice", () => {
+  assert.strictEqual(S.countedWeeks([week("2026-11-16", 9)], "2026-11-16", { score: 9 }).length, 1);
 });
 
-test("the first counted week earns the first-challenge sticker straight away", () => {
-  assert.deepStrictEqual(S.leagueIds(0), []);
-  assert.deepStrictEqual(S.leagueIds(1), ["league-first"]);
+test("the first counted week earns the first-challenge badge and nothing else", () => {
+  assert.deepStrictEqual(S.leagueIds([]), []);
+  assert.deepStrictEqual(S.leagueIds([week("2026-11-02", 8)]), ["first-challenge"]);
 });
 
-test("every second counted week earns the next sticker in the fox's school year", () => {
-  assert.deepStrictEqual(S.leagueIds(2), ["league-first", "year-1"]);
-  assert.deepStrictEqual(S.leagueIds(3), ["league-first", "year-1"]);
-  assert.deepStrictEqual(S.leagueIds(5), ["league-first", "year-1", "year-2"]);
-  assert.strictEqual(S.leagueIds(24).length, 1 + S.SERIES_LENGTH);
+test("a missed week followed by a challenge is a comeback", () => {
+  assert.ok(!S.leagueIds([week("2026-11-02", 8), week("2026-11-09", 8)]).includes("comeback"));
+  assert.ok(S.leagueIds([week("2026-11-02", 8), week("2026-11-16", 8)]).includes("comeback"));
 });
 
-test("after twelve stickers the series starts again in gold", () => {
-  const ids = S.leagueIds(28);
-  assert.deepStrictEqual(ids.slice(-2), ["year-1-gold", "year-2-gold"]);
+test("climber is a higher score than the week before; personal best needs two earlier weeks to beat", () => {
+  const two = S.leagueIds([week("2026-11-02", 8), week("2026-11-09", 10)]);
+  assert.ok(two.includes("climber"));
+  assert.ok(!two.includes("personal-best"));
+  const three = S.leagueIds([week("2026-11-02", 10), week("2026-11-09", 8), week("2026-11-16", 11)]);
+  assert.ok(three.includes("personal-best"));
+  const notBest = S.leagueIds([week("2026-11-02", 10), week("2026-11-09", 8), week("2026-11-16", 10)]);
+  assert.ok(notBest.includes("climber"));
+  assert.ok(!notBest.includes("personal-best"));
 });
 
-test("a missed week does not take away progress to the next sticker", () => {
-  assert.strictEqual(S.stampsToNext(0), 1);
-  assert.strictEqual(S.stampsToNext(1), 1);
-  assert.strictEqual(S.stampsToNext(2), 2);
-  assert.strictEqual(S.stampsToNext(7), 1);
+test("full marks and a top-five finish are read from the score and the points", () => {
+  assert.ok(S.leagueIds([week("2026-11-02", 15)]).includes("full-marks"));
+  assert.ok(!S.leagueIds([week("2026-11-02", 14)]).includes("full-marks"));
+  assert.ok(S.leagueIds([week("2026-11-02", 9, 2)]).includes("top-five"));
+  assert.ok(!S.leagueIds([week("2026-11-02", 9, 0)]).includes("top-five"));
 });
 
-test("practice stickers come from finished sets, days visited, steps read and vocab", () => {
+test("one streak badge is held at a time, by weeks in a row", () => {
+  assert.strictEqual(S.streakId(0), null);
+  assert.strictEqual(S.streakId(1), "streak-alive");
+  assert.strictEqual(S.streakId(4), "streak-alive");
+  assert.strictEqual(S.streakId(5), "streak-5");
+  assert.strictEqual(S.streakId(9), "streak-5");
+  assert.strictEqual(S.streakId(10), "streak-10");
+  assert.strictEqual(S.streakId(15), "streak-15");
+  assert.strictEqual(S.streakId(40), "streak-15");
+});
+
+test("weeks to the next streak badge count down to 5, 10 and 15", () => {
+  assert.deepStrictEqual([0, 3, 5, 9, 10, 14, 15, 20].map(S.weeksToNextStreak), [5, 2, 5, 1, 5, 1, 0, 0]);
+});
+
+test("a streak stays alive to the end of the next week the student can still hand in", () => {
+  const monday = Date.parse("2026-11-16T00:00:00Z"), day = 864e5;
+  assert.strictEqual(S.streakEnds("2026-11-16", false), monday + 7 * day);
+  assert.strictEqual(S.streakEnds("2026-11-16", true), monday + 14 * day);
+});
+
+test("days in a row are found whatever order they were saved in", () => {
+  assert.strictEqual(S.hasRun([3, 1, 2], 3), true);
+  assert.strictEqual(S.hasRun([1, 2, 4, 5], 3), false);
+  assert.strictEqual(S.hasRun([1, 1, 2, 2, 3], 3), true);
+  assert.strictEqual(S.hasRun([], 3), false);
+});
+
+test("practice badges come from finished sets, days visited, steps read and tips seen", () => {
   assert.deepStrictEqual(S.practiceIds({}), []);
   assert.deepStrictEqual(S.practiceIds({ setsDone: { a: 1 } }), ["first-set"]);
   assert.deepStrictEqual(S.practiceIds({ setsDone: { a: 4, b: 3, c: 3 } }), ["first-set", "ten-sets"]);
   assert.deepStrictEqual(S.practiceIds({ setsDone: { a: 5 } }), ["first-set", "whole-exercise"]);
-  assert.deepStrictEqual(S.practiceIds({ vocabDone: true }), ["vocab"]);
-  assert.deepStrictEqual(S.practiceIds({ days: [1, 2, 3, 4] }), []);
-  assert.deepStrictEqual(S.practiceIds({ days: [1, 2, 3, 4, 9] }), ["five-days"]);
+  assert.deepStrictEqual(S.practiceIds({ days: [1, 3, 5, 7] }), []);
+  assert.deepStrictEqual(S.practiceIds({ days: [1, 3, 5, 7, 9] }), ["five-days"]);
+  assert.deepStrictEqual(S.practiceIds({ days: [4, 5, 6] }), ["three-in-a-row"]);
   assert.deepStrictEqual(S.practiceIds({ stepsRead: ["0", "1", "2", "3"] }), []);
-  assert.deepStrictEqual(S.practiceIds({ stepsRead: ["0", "1", "2", "3", "4"] }), ["part-b-steps"]);
+  assert.deepStrictEqual(S.practiceIds({ stepsRead: ["0", "1", "2", "3", "4"] }), ["step-by-step"]);
+  assert.deepStrictEqual(S.practiceIds({ tips: [1, 2, 3, 4, 5, 6, 7, 8, 9] }), []);
+  assert.deepStrictEqual(S.practiceIds({ tips: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }), ["tip-collector"]);
 });
 
-test("the first stamp brings a sticker, then every second one", () => {
-  assert.deepStrictEqual([1, 2, 3, 4, 5, 6].map(S.bringsSticker), [true, true, false, true, false, true]);
-  assert.strictEqual(S.bringsSticker(0), false);
+test("an item is added once, and the list it was given is left alone", () => {
+  const days = [10, 11];
+  assert.deepStrictEqual(S.addOnce(days, 11), [10, 11]);
+  assert.deepStrictEqual(S.addOnce(days, 12), [10, 11, 12]);
+  assert.deepStrictEqual(days, [10, 11]);
 });
 
-test("what another tab saved is kept when this tab saves", () => {
+test("what another tab saved is kept when this tab saves, and the later streak wins", () => {
   // Arrange
-  const mine = { earned: { "first-set": 10 }, days: [10], steps: ["Step 0"], vocab: false };
-  const saved = { earned: { vocab: 11 }, days: [10, 11], steps: ["Step 1"], vocab: true };
+  const mine = { earned: { "first-set": 10 }, days: [10], steps: ["Step 0"], final: ["a"], tips: [1], streak: { n: 3, ends: 200 } };
+  const saved = { earned: { climber: 11 }, days: [10, 11], steps: ["Step 1"], final: ["b"], tips: [2], streak: { n: 2, ends: 100 } };
 
   // Act
   const both = S.merge(mine, saved);
 
   // Assert
-  assert.deepStrictEqual(both, { earned: { vocab: 11, "first-set": 10 }, days: [10, 11], steps: ["Step 0", "Step 1"], vocab: true });
+  assert.deepStrictEqual(both, {
+    earned: { climber: 11, "first-set": 10 }, days: [10, 11], steps: ["Step 0", "Step 1"], final: ["a", "b"], tips: [1, 2], streak: { n: 3, ends: 200 }
+  });
+  assert.deepStrictEqual(S.merge({ ...mine, streak: null }, saved).streak, { n: 2, ends: 100 });
   assert.deepStrictEqual(mine.days, [10]);
-});
-
-test("a day is counted once, and the list it was given is left alone", () => {
-  const days = [10, 11];
-  assert.deepStrictEqual(S.addDay(days, 11), [10, 11]);
-  assert.deepStrictEqual(S.addDay(days, 12), [10, 11, 12]);
-  assert.deepStrictEqual(days, [10, 11]);
 });

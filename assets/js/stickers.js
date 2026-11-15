@@ -1,66 +1,137 @@
-/* CLY English — fox stickers. Earned by showing up and finishing things, kept in this browser only.
+/* CLY English — badges. Earned by showing up, finishing things and keeping the weekly challenge going.
    The sheet lives on the home page ([data-stickers]); every other page only awards and announces.
-   League stickers are worked out from the league's own history, so they come back after a change of phone. */
+   Practice badges are kept in this browser only. League badges are worked out from the league's own history,
+   so they come back after a change of phone. A streak badge is held, not kept: it goes when a week is missed. */
 (function () {
   "use strict";
 
-  var SERIES_LENGTH = 12;      // "the fox's school year": one league sticker for every second counted week
-  var WEEKS_PER_STICKER = 2;
-  var DAYS_FOR_STICKER = 5;
-  var SETS_FOR_STICKER = 10;
+  var DAY_MS = 864e5;
+  var DAYS_FOR_BADGE = 5;
+  var DAYS_IN_A_ROW = 3;
+  var SETS_FOR_BADGE = 10;
   var SETS_PER_EXERCISE = 5;
   var PART_B_STEPS = 5;
+  var TIPS_FOR_BADGE = 10;
+  var FULL_MARKS = 15;
+  var STREAK_STEPS = [5, 10, 15];   // weeks in a row that change the streak badge
   var TOAST_MS = 5000;
   var TOAST_FADE_MS = 400;
   var KEY = "cly:stickers";
 
   /* ---------- What earns what: plain functions, tested in tests/stickers.test.js ---------- */
 
-  // Counted weeks: every closed week that wasn't disqualified, plus this week once it is handed in and counts.
-  function countStamps(history, thisWeek, doneAndCounted) {
-    var weeks = (history || []).filter(function (r) { return !r.disqualified; }).map(function (r) { return r.week; });
-    if (doneAndCounted && weeks.indexOf(thisWeek) < 0) weeks = weeks.concat([thisWeek]);
-    return weeks.length;
+  function dayOf(week) { return Math.round(Date.parse(week + "T00:00:00Z") / DAY_MS); }
+
+  // The weeks that counted, oldest first: every closed week that wasn't disqualified, plus this week once it is
+  // handed in and counts (done: { score }). Each is { week, score, points }.
+  function countedWeeks(history, thisWeek, done) {
+    var weeks = (history || []).filter(function (r) { return !r.disqualified; })
+      .map(function (r) { return { week: r.week, score: r.score, points: r.points || 0 }; });
+    if (done && !weeks.some(function (w) { return w.week === thisWeek; })) weeks = weeks.concat([{ week: thisWeek, score: done.score, points: 0 }]);
+    return weeks.sort(function (a, b) { return dayOf(a.week) - dayOf(b.week); });
   }
-  // The league stickers a number of stamps is worth: the first-entry sticker, then one per two stamps.
-  function leagueIds(stamps) {
-    var ids = stamps >= 1 ? ["league-first"] : [];
-    var series = Math.floor(stamps / WEEKS_PER_STICKER);
-    for (var k = 1; k <= series; k++) ids.push("year-" + ((k - 1) % SERIES_LENGTH + 1) + (k > SERIES_LENGTH ? "-gold" : ""));
+  // League badges that are kept for good, from those weeks.
+  function leagueIds(weeks) {
+    var ids = {}, best = -1;
+    weeks.forEach(function (w, i) {
+      var prev = weeks[i - 1];
+      ids["first-challenge"] = true;
+      if (prev && dayOf(w.week) - dayOf(prev.week) > 7) ids.comeback = true;          // a week was missed in between
+      if (prev && w.score > prev.score) ids.climber = true;                           // higher than the week before
+      if (i > 1 && w.score > best) ids["personal-best"] = true;                       // higher than every earlier week
+      if (w.score === FULL_MARKS) ids["full-marks"] = true;
+      if (w.points > 0) ids["top-five"] = true;
+      best = Math.max(best, w.score);
+    });
+    return Object.keys(ids);
+  }
+  // The streak badge held for a number of weeks in a row, or null for none.
+  function streakId(n) {
+    if (!(n >= 1)) return null;
+    var reached = STREAK_STEPS.filter(function (s) { return n >= s; });
+    return reached.length ? "streak-" + reached[reached.length - 1] : "streak-alive";
+  }
+  // Weeks in a row still needed for the next streak badge; 0 once the last one is held.
+  function weeksToNextStreak(n) {
+    var next = STREAK_STEPS.filter(function (s) { return s > n; })[0];
+    return next ? next - n : 0;
+  }
+  // A streak is alive until the end of the next week the student could still hand in.
+  function streakEnds(week, doneThisWeek) { return Date.parse(week + "T00:00:00Z") + (doneThisWeek ? 14 : 7) * DAY_MS; }
+  function hasRun(days, length) {
+    var sorted = days.slice().sort(function (a, b) { return a - b; }), run = 1;
+    for (var i = 1; i < sorted.length; i++) {
+      run = sorted[i] === sorted[i - 1] + 1 ? run + 1 : sorted[i] === sorted[i - 1] ? run : 1;
+      if (run >= length) return true;
+    }
+    return length <= 1 && sorted.length > 0;
+  }
+  // Practice and visiting badges from what the pages already keep.
+  function practiceIds(facts) {
+    var ids = [], sets = facts.setsDone || {}, total = 0, whole = false, days = facts.days || [];
+    Object.keys(sets).forEach(function (name) { total += sets[name]; if (sets[name] >= SETS_PER_EXERCISE) whole = true; });
+    if (total >= 1) ids.push("first-set");
+    if (total >= SETS_FOR_BADGE) ids.push("ten-sets");
+    if (whole) ids.push("whole-exercise");
+    if (days.length >= DAYS_FOR_BADGE) ids.push("five-days");
+    if (hasRun(days, DAYS_IN_A_ROW)) ids.push("three-in-a-row");
+    if ((facts.stepsRead || []).length >= PART_B_STEPS) ids.push("step-by-step");
+    if ((facts.tips || []).length >= TIPS_FOR_BADGE) ids.push("tip-collector");
     return ids;
   }
-  // Weeks until the next sticker: the very first counted week brings the first-challenge sticker.
-  function stampsToNext(stamps) { return stamps < 1 ? 1 : WEEKS_PER_STICKER - (stamps % WEEKS_PER_STICKER); }
-  // Does the nth stamp bring a sticker? The first one does, then every second one.
-  function bringsSticker(n) { return n === 1 || (n > 0 && n % WEEKS_PER_STICKER === 0); }
+  function addOnce(list, item) { return list.indexOf(item) < 0 ? list.concat([item]) : list; }
   function union(a, b) { return a.concat(b.filter(function (x) { return a.indexOf(x) < 0; })); }
   // Two tabs open at once: what the other tab saved is kept, never written over.
   function merge(mine, saved) {
-    return { earned: Object.assign({}, saved.earned, mine.earned), days: union(mine.days, saved.days), steps: union(mine.steps, saved.steps), vocab: mine.vocab || saved.vocab };
+    var streak = !saved.streak || (mine.streak && mine.streak.ends >= saved.streak.ends) ? mine.streak : saved.streak;
+    return {
+      earned: Object.assign({}, saved.earned, mine.earned), days: union(mine.days, saved.days), steps: union(mine.steps, saved.steps),
+      final: union(mine.final, saved.final), tips: union(mine.tips, saved.tips), streak: streak || null
+    };
   }
-  // Practice stickers from what the pages already keep: finished sets per exercise, days visited, steps read.
-  function practiceIds(facts) {
-    var ids = [], sets = facts.setsDone || {}, total = 0, whole = false;
-    Object.keys(sets).forEach(function (name) { total += sets[name]; if (sets[name] >= SETS_PER_EXERCISE) whole = true; });
-    if (total >= 1) ids.push("first-set");
-    if (total >= SETS_FOR_STICKER) ids.push("ten-sets");
-    if (whole) ids.push("whole-exercise");
-    if (facts.vocabDone) ids.push("vocab");
-    if ((facts.days || []).length >= DAYS_FOR_STICKER) ids.push("five-days");
-    if ((facts.stepsRead || []).length >= PART_B_STEPS) ids.push("part-b-steps");
-    return ids;
-  }
-  function addDay(days, day) { return days.indexOf(day) < 0 ? days.concat([day]) : days; }
 
-  var pure = { countStamps: countStamps, leagueIds: leagueIds, stampsToNext: stampsToNext, bringsSticker: bringsSticker, merge: merge, practiceIds: practiceIds, addDay: addDay, SERIES_LENGTH: SERIES_LENGTH };
+  var pure = {
+    countedWeeks: countedWeeks, leagueIds: leagueIds, streakId: streakId, weeksToNextStreak: weeksToNextStreak, streakEnds: streakEnds,
+    hasRun: hasRun, practiceIds: practiceIds, addOnce: addOnce, merge: merge
+  };
   if (typeof module !== "undefined" && module.exports) { module.exports = pure; return; }
 
-  /* ---------- The sticker sheet: one fox, a prop and a colour each ---------- */
+  /* ---------- The badges ---------- */
 
-  var INK = "#1d2a3a", FOX = "#f2711c", GLOW = "#ffc98f", LEAF = "#1f7a45", SKY = "#1a64c4", WHITE = "#fff", GOLD = "#e0a92e";
+  // id, name, how it is earned, stand-in backing colour, stand-in prop.
+  // A badge with a drawing in images/stickers/ is listed in DRAWN; the rest show a simple stand-in fox until theirs is drawn.
+  var BADGES = [
+    ["streak-alive", "Flawless streak", "Do the weekly challenge every week. You hold this until you reach 5 weeks in a row.", "#e8f5ec", "flame"],
+    ["streak-5", "5 weeks in a row", "Do the weekly challenge 5 weeks in a row.", "#ffe4c8", "star"],
+    ["streak-10", "10 weeks in a row", "Do the weekly challenge 10 weeks in a row.", "#dce8f7", "medal"],
+    ["streak-15", "15 weeks in a row", "Do the weekly challenge 15 weeks in a row.", "#6b4596", "crown"],
+    ["first-challenge", "First challenge", "Hand in your first weekly challenge.", "#dcefe2", "flag"],
+    ["comeback", "Comeback", "Miss a week, then come back and do the next challenge.", "#dce8f7", "sun"],
+    ["personal-best", "Personal best", "Beat your own best score in the weekly challenge.", "#6b4596", "star"],
+    ["climber", "Climber", "Score higher than you did the week before.", "#dce8f7", "steps"],
+    ["full-marks", "Full marks", "Score 15 out of 15 in a weekly challenge.", "#ffe4c8", "tick"],
+    ["top-five", "Top five", "Finish a week in the top five. It shows after the week closes.", "#1a64c4", "medal"],
+    ["first-set", "First set", "Finish one practice set.", "#dcefe2", "tick"],
+    ["ten-sets", "Ten sets", "Finish ten practice sets.", "#dce8f7", "book"],
+    ["whole-exercise", "Whole exercise", "Finish all five sets of one exercise.", "#ffe4c8", "medal"],
+    ["second-try", "Second try", "Get an answer wrong, read the hint, and fix it.", "#dce8f7", "pencil"],
+    ["checklist-done", "Checklist done", "Tick every item on the weekly self-study checklist.", "#e8f5ec", "tick"],
+    ["step-by-step", "Step by step", "Read all five steps of the Part B guide.", "#e8f5ec", "steps"],
+    ["final-lap", "Final lap", "Read every section of the S.6 final reminders.", "#6b4596", "flag"],
+    ["to-the-top", "To the top", "Climb the home-page sentence from Level 2 to Level 5**.", "#1a64c4", "flag"],
+    ["tip-collector", "Tip collector", "Read ten of the fox's tips.", "#ffe4c8", "bulb"],
+    ["five-days", "Five days", "Open CLY English on five different days.", "#fff1e3", "calendar"],
+    ["three-in-a-row", "Three in a row", "Open CLY English three days running.", "#dce8f7", "sun"]
+  ];
+  var DRAWN = ["streak-alive", "streak-15", "personal-best", "step-by-step", "final-lap", "five-days"];
+  var BY_ID = {};
+  BADGES.forEach(function (b) { BY_ID[b[0]] = b; });
+  function isStreak(id) { return id.indexOf("streak-") === 0; }
+
+  var INK = "#1d2a3a", FOX = "#f2711c", GLOW = "#ffc98f", LEAF = "#1f7a45", SKY = "#1a64c4", WHITE = "#fff";
   var line = ' stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"';
   var bare = ' fill="none"' + line;
-  // each prop is drawn in a 22px box, placed at the fox's shoulder
+  // each stand-in prop is drawn in a 22px box, placed at the fox's shoulder
   var PROPS = {
     tick: '<circle cx="11" cy="11" r="9.5" fill="' + LEAF + '"' + line + '/><path d="M6 11.5l3.5 3.5L16 8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
     star: '<path d="M11 1.5l2.9 6.4 7 .7-5.3 4.6 1.6 6.8L11 16.4 4.8 20l1.6-6.8L1.1 8.6l7-.7z" fill="' + GLOW + '"' + line + '/>',
@@ -70,85 +141,61 @@
     steps: '<path d="M2 20v-5h5v-5h5V5h8v15z" fill="#fff"' + line + '/>',
     flag: '<path d="M5 21V2"' + bare + '/><path d="M5 3h14l-4 5 4 5H5z" fill="' + LEAF + '"' + line + '/>',
     pencil: '<path d="M3 19l1.8-6L15.5 2.3l4.2 4.2L9 17.2z" fill="' + GLOW + '"' + line + '/><path d="M4.8 13L9 17.2"' + bare + '/>',
-    zzz: '<path d="M3 4h8l-8 8h8M13 12h6l-6 7h6" fill="none" stroke="' + INK + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-    riceball: '<path d="M11 2.5Q13.5 2.5 20 16q1.5 4-3 4H5q-4.5 0-3-4Q8.5 2.5 11 2.5z" fill="#fff"' + line + '/><rect x="7" y="13" width="8" height="7" rx="1" fill="' + INK + '"/>',
-    umbrella: '<path d="M1.5 12a9.5 9.5 0 0 1 19 0z" fill="' + SKY + '"' + line + '/><path d="M11 12v6.5q0 2.5 2.5 2.5"' + bare + '/>',
-    leaf: '<path d="M3 19C3 8 10 3 20 3c0 10-6 17-17 16z" fill="' + LEAF + '"' + line + '/><path d="M3 19L13 9" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>',
-    kite: '<path d="M12 1.5l7 8-7 9-7-9z" fill="' + GLOW + '"' + line + '/><path d="M12 18.5q-3 1 0 3"' + bare + '/>',
-    snow: '<path d="M11 2v18M3.2 6.5l15.6 9M18.8 6.5l-15.6 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>',
-    lantern: '<rect x="8" y="1.5" width="6" height="3" rx="1" fill="#fff"/><ellipse cx="11" cy="12" rx="8" ry="7.5" fill="' + FOX + '"' + line + '/><path d="M11 4.5v15M7 6q-2 6 0 12M15 6q2 6 0 12"' + bare + '/>',
-    cup: '<path d="M3 8h13v6a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6z" fill="#fff"' + line + '/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2M7 2q-1.5 2 0 4M11.5 2q-1.5 2 0 4"' + bare + '/>',
-    note: '<path d="M8 17V4l11-2v13"' + bare + '/><ellipse cx="5.5" cy="17" rx="3.5" ry="2.8" fill="' + INK + '"/><ellipse cx="16.5" cy="15" rx="3.5" ry="2.8" fill="' + INK + '"/>',
     sun: '<circle cx="11" cy="11" r="5" fill="' + GLOW + '"' + line + '/><path d="M11 1v3M11 18v3M1 11h3M18 11h3M4 4l2 2M16 16l2 2M18 4l-2 2M6 16l-2 2"' + bare + '/>',
-    crown: '<path d="M2 18L1 6l5.5 5L11 3l4.5 8L21 6l-1 12z" fill="' + GLOW + '"' + line + '/>'
+    crown: '<path d="M2 18L1 6l5.5 5L11 3l4.5 8L21 6l-1 12z" fill="' + GLOW + '"' + line + '/>',
+    flame: '<path d="M11 1.5q7 6 7 11.5a7 7 0 0 1-14 0q0-3 3-5.5 0 3 2 3.5 0-5 2-9.5z" fill="' + GLOW + '"' + line + '/>',
+    bulb: '<path d="M11 2a6.5 6.5 0 0 1 3.5 12v2.5h-7V14A6.5 6.5 0 0 1 11 2z" fill="' + GLOW + '"' + line + '/><path d="M8 19.5h6"' + bare + '/>'
   };
-
-  // id, name, how it is earned, backing colour, prop, sleepy eyes
-  var PRACTICE = [
-    ["first-set", "First set", "Finish one practice set.", "#dcefe2", "tick"],
-    ["ten-sets", "Ten sets", "Finish ten practice sets.", "#dce8f7", "star"],
-    ["whole-exercise", "Whole exercise", "Finish all five sets of one exercise.", "#ffe4c8", "medal"],
-    ["vocab", "Word collector", "Get every blank right in a vocab passage.", "#ece4f4", "book"],
-    ["five-days", "Five days", "Open CLY English on five different days.", "#fff1e3", "calendar"],
-    ["part-b-steps", "Step by step", "Read all five steps of the Part B guide.", "#e8f5ec", "steps"]
-  ];
-  var LEAGUE_FIRST = ["league-first", "First challenge", "Hand in your first weekly challenge.", "#dcefe2", "flag"];
-  var YEAR = [
-    ["New pencil", "#dce8f7", "pencil"], ["Asleep on a book", "#ece4f4", "zzz", true], ["Picnic day", "#dcefe2", "riceball"],
-    ["Rainy day", "#fff1e3", "umbrella"], ["Autumn leaf", "#ffe4c8", "leaf"], ["Kite flying", "#e8f5ec", "kite"],
-    ["First frost", "#1a64c4", "snow"], ["Lantern night", "#1d2a3a", "lantern"], ["Tea break", "#fff1e3", "cup"],
-    ["Music lesson", "#ece4f4", "note"], ["Summer sun", "#dce8f7", "sun"], ["End of the year", "#6b4596", "crown"]
-  ].map(function (y, i) {
-    return ["year-" + (i + 1), y[0], "Hand in " + (i + 1) * WEEKS_PER_STICKER + " weekly challenges that count.", y[1], y[2], y[3]];
-  });
-  var ALL = PRACTICE.concat([LEAGUE_FIRST], YEAR);
-  var BY_ID = {};
-  ALL.forEach(function (s) { BY_ID[s[0]] = s; });
-
-  function art(s, gold) {
-    var eyes = s[5]
-      ? '<path d="M21 34q3 3 6 0M37 34q3 3 6 0" fill="none" stroke="' + INK + '" stroke-width="2" stroke-linecap="round"/>'
-      : '<circle cx="24" cy="34" r="2.3" fill="' + INK + '"/><circle cx="40" cy="34" r="2.3" fill="' + INK + '"/>';
+  function standIn(b) {
     return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
-      '<circle cx="32" cy="32" r="31" fill="' + (gold ? GOLD : WHITE) + '"/>' +
-      '<circle cx="32" cy="32" r="27.5" fill="' + s[3] + '"/>' +
+      '<circle cx="32" cy="32" r="31" fill="' + WHITE + '"/><circle cx="32" cy="32" r="27.5" fill="' + b[3] + '"/>' +
       '<path d="M13 28l4-19 13 11zM51 28L47 9 34 20z" fill="' + FOX + '"/>' +
       '<path d="M16.5 22l1.5-8 6 5zM47.5 22L46 14l-6 5z" fill="' + INK + '"/>' +
       '<path d="M11 29q21-16 42 0 0 15-21 26-21-11-21-26z" fill="' + FOX + '"/>' +
       '<path d="M11 30q11 4 21 25-20-10-21-25zM53 30q-11 4-21 25 20-10 21-25z" fill="' + WHITE + '"/>' +
-      eyes + '<ellipse cx="32" cy="51.5" rx="2.8" ry="2.2" fill="' + INK + '"/>' +
-      '<g transform="translate(40 39)">' + PROPS[s[4]] + '</g></svg>';
+      '<circle cx="24" cy="34" r="2.3" fill="' + INK + '"/><circle cx="40" cy="34" r="2.3" fill="' + INK + '"/>' +
+      '<ellipse cx="32" cy="51.5" rx="2.8" ry="2.2" fill="' + INK + '"/>' +
+      '<g transform="translate(40 39)">' + PROPS[b[4]] + '</g></svg>';
+  }
+  // The picture for a badge, as markup built only from the constants above.
+  function art(b) {
+    return DRAWN.indexOf(b[0]) >= 0
+      ? '<span class="sticker-art drawn"><img src="images/stickers/' + b[0] + '.png" alt="" width="64" height="64" loading="lazy"></span>'
+      : '<span class="sticker-art">' + standIn(b) + '</span>';
   }
 
   /* ---------- What this browser remembers ---------- */
 
+  function list(v) { return Array.isArray(v) ? v : []; }
   function load() {
     var v = null;
     try { v = JSON.parse(localStorage.getItem(KEY)); } catch (e) { v = null; }
     v = v && typeof v === "object" ? v : {};
-    return { earned: v.earned || {}, days: Array.isArray(v.days) ? v.days : [], steps: Array.isArray(v.steps) ? v.steps : [], vocab: !!v.vocab };
+    var streak = v.streak && typeof v.streak.n === "number" && typeof v.streak.ends === "number" ? { n: v.streak.n, ends: v.streak.ends } : null;
+    return { earned: v.earned && typeof v.earned === "object" ? v.earned : {}, days: list(v.days), steps: list(v.steps), final: list(v.final), tips: list(v.tips), streak: streak };
   }
   function save(state) {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage blocked: stickers last for this visit only */ }
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage blocked: badges last for this visit only */ }
   }
   function setsDone() {
-    var out = {};
-    var keys = [];
+    var out = {}, keys = [];
     try { for (var i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i)); } catch (e) { /* storage blocked: no sets to count */ }
     keys.forEach(function (k) {
       if (k.indexOf("cly:sets-done:") !== 0) return;
       // one unreadable entry is skipped, and the rest still count
-      try { var list = JSON.parse(localStorage.getItem(k)); if (Array.isArray(list)) out[k] = list.length; } catch (e) { /* skipped */ }
+      try { var done = JSON.parse(localStorage.getItem(k)); if (Array.isArray(done)) out[k] = done.length; } catch (e) { /* skipped */ }
     });
     return out;
   }
 
   var state = load();
-  var today = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
-  var fresh = [];   // earned on this page, waiting to be announced
+  var today = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / DAY_MS);
+  var fresh = [];   // earned or newly held on this page, waiting to be announced
+
+  function held() { return state.streak && Date.now() < state.streak.ends ? streakId(state.streak.n) : null; }
 
   function give(ids) {
-    var added = ids.filter(function (id) { return !state.earned[id]; });
+    var added = ids.filter(function (id) { return BY_ID[id] && !isStreak(id) && !state.earned[id]; });
     if (!added.length) return;
     var earned = Object.assign({}, state.earned);
     added.forEach(function (id) { earned[id] = today; });
@@ -161,10 +208,11 @@
   function update(change) {
     state = merge(Object.assign({}, state, change), load());
     save(state);
-    give(practiceIds({ setsDone: setsDone(), days: state.days, stepsRead: state.steps, vocabDone: state.vocab }));
+    give(practiceIds({ setsDone: setsDone(), days: state.days, stepsRead: state.steps, tips: state.tips }));
+    draw();
   }
-  // The steps of a long guide are the groups in its contents; only Part B has the five to read.
   function isPage(name) { return new RegExp("(^|/)" + name + "(\\.html)?$").test(location.pathname); }
+  // The steps of a long guide are the groups in its contents; only Part B has the five to read.
   function stepOf(sectionId) {
     var link = document.querySelector(".index a[href='#" + (window.CSS && CSS.escape ? CSS.escape(sectionId) : sectionId) + "']");
     var li = link && link.closest("li");
@@ -172,7 +220,7 @@
     return li ? li.textContent.trim() : null;
   }
 
-  /* ---------- Announcing: a small sticker in the corner, never while the league clock runs ---------- */
+  /* ---------- Announcing: a small badge in the corner, never while the league clock runs ---------- */
 
   // The live region is on the page from the start, so screen readers hear what is put in it.
   var toast = document.createElement("div"), hideTimer = null;
@@ -190,16 +238,16 @@
   ["mouseleave", "focusout"].forEach(function (type) { toast.addEventListener(type, function () { if (toast.classList.contains("show")) hideSoon(); }); });
   function announce() {
     if (!fresh.length || document.body.classList.contains("playing")) return;
-    var ids = fresh, last = ids[ids.length - 1], gold = /-gold$/.test(last), s = BY_ID[last.replace(/-gold$/, "")];
+    var ids = fresh, b = BY_ID[ids[ids.length - 1]];
     fresh = [];
-    if (!s) return;
-    toast.innerHTML = '<span class="sticker-art">' + art(s, gold) + '</span><p><strong></strong><span></span></p>';
-    toast.querySelector("strong").textContent = ids.length > 1 ? ids.length + " new stickers" : "New sticker";
-    toast.querySelector("p span").textContent = s[1] + (gold ? " (gold)" : "");
+    if (!b) return;
+    toast.innerHTML = art(b) + "<p><strong></strong><span></span></p>";
+    toast.querySelector("strong").textContent = ids.length > 1 ? ids.length + " new badges" : "New badge";
+    toast.querySelector("p span").textContent = b[1];
     if (!sheet) {
       var a = document.createElement("a");
       a.href = "index.html#stickers";
-      a.textContent = "See your stickers";
+      a.textContent = "See your badges";
       toast.querySelector("p").appendChild(a);
     }
     toast.classList.remove("show");
@@ -207,7 +255,7 @@
     toast.classList.add("show");
     hideSoon();
   }
-  // a sticker earned as the clock stops is announced once the paper is out of the way
+  // a badge earned as the clock stops is announced once the paper is out of the way
   if (window.MutationObserver) new MutationObserver(announce).observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
   /* ---------- The sheet on the home page ---------- */
@@ -216,53 +264,72 @@
   function draw() {
     if (!sheet) return;
     var grid = sheet.querySelector(".sticker-grid"), caption = sheet.querySelector(".sticker-caption"), count = sheet.querySelector("[data-sticker-count]");
-    var have = 0;
+    var have = 0, holding = held();
     grid.textContent = "";
-    ALL.forEach(function (s) {
-      var gold = !!state.earned[s[0] + "-gold"], earned = gold || !!state.earned[s[0]];
+    BADGES.forEach(function (b) {
+      var streak = isStreak(b[0]), earned = streak ? holding === b[0] : !!state.earned[b[0]];
       if (earned) have += 1;
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "sticker" + (earned ? " earned" : "") + (gold ? " gold" : "");
-      b.setAttribute("aria-label", s[1] + (earned ? ", earned" : ", not earned yet"));
-      b.innerHTML = '<span class="sticker-art">' + (earned ? art(s, gold) : "") + "</span>";
-      b.addEventListener("click", function () {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "sticker" + (earned ? " earned" : "");
+      btn.setAttribute("aria-label", b[1] + (earned ? (streak ? ", held now" : ", earned") : ", not earned yet"));
+      btn.innerHTML = earned ? art(b) : '<span class="sticker-art"></span>';
+      btn.addEventListener("click", function () {
         grid.querySelectorAll("[aria-pressed]").forEach(function (x) { x.removeAttribute("aria-pressed"); });
-        b.setAttribute("aria-pressed", "true");
+        btn.setAttribute("aria-pressed", "true");
         caption.textContent = "";
         var name = document.createElement("strong");
-        name.textContent = s[1] + (gold ? " (gold)" : "") + ": ";
+        name.textContent = b[1] + ": ";
         caption.appendChild(name);
-        caption.appendChild(document.createTextNode(earned ? s[2].replace(/\.$/, "") + ". Earned!" : s[2]));
+        caption.appendChild(document.createTextNode(b[2] + (earned ? (streak ? " You hold it now: miss a week and it goes." : " Earned!") : "")));
       });
       var li = document.createElement("li");
-      li.appendChild(b);
+      li.appendChild(btn);
       grid.appendChild(li);
     });
-    count.textContent = have + " of " + ALL.length;
+    count.textContent = have + " of " + BADGES.length;
     sheet.hidden = false;
   }
 
   /* ---------- Listening to the pages ---------- */
 
   document.addEventListener("cly:set-done", function () { update({}); });
-  document.addEventListener("cly:all-right", function () {
-    if (isPage("vocab") && !state.vocab) update({ vocab: true });
+  document.addEventListener("cly:second-try", function () { give(["second-try"]); });
+  document.addEventListener("cly:top", function () { give(["to-the-top"]); });
+  document.addEventListener("cly:checklist", function (e) { if (e.detail === "week") give(["checklist-done"]); });
+  document.addEventListener("cly:tip", function (e) {
+    if (typeof e.detail === "number" && state.tips.length < TIPS_FOR_BADGE) update({ tips: addOnce(state.tips, e.detail) });
   });
   document.addEventListener("cly:read", function (e) {
-    if (!isPage("part-b") || !e.detail) return;
-    var step = stepOf(e.detail.id);
-    if (step && state.steps.indexOf(step) < 0) update({ steps: state.steps.concat([step]) });
+    if (!e.detail) return;
+    if (isPage("part-b")) {
+      var step = stepOf(e.detail.id);
+      if (step) update({ steps: addOnce(state.steps, step) });
+    } else if (isPage("final")) {
+      update({ final: addOnce(state.final, e.detail.id) });
+      var sections = document.querySelectorAll("[data-tabs] .column > section[id]");
+      var read = Array.prototype.filter.call(sections, function (s) { return state.final.indexOf(s.id) >= 0; }).length;
+      if (sections.length && read >= sections.length) give(["final-lap"]);
+    }
   });
 
   window.CLY_STICKERS = {
-    // stamps: counted weeks from the league's history (challenge.js works it out with countStamps)
-    league: function (stamps) { give(leagueIds(stamps)); },
-    countStamps: countStamps,
-    stampsToNext: stampsToNext,
-    bringsSticker: bringsSticker
+    // Called by the weekly challenge page with what the league knows: the student's past weeks, this week's id,
+    // this week's result once it counts ({ score }, or null), and how many weeks in a row they have done.
+    league: function (o) {
+      var before = held(), n = Number(o.streak) || 0;
+      update({ streak: { n: n, ends: streakEnds(o.week, !!o.done) } });
+      give(leagueIds(countedWeeks(o.history, o.week, o.done)));
+      var now = held();
+      if (now && now !== before) { fresh = fresh.concat([now]); announce(); }
+    },
+    countedWeeks: countedWeeks,
+    weeksToNextStreak: weeksToNextStreak,
+    // the streak badge held for n weeks in a row, as markup for the stamp card, or "" for none
+    streakArt: function (n) { var id = streakId(n); return id ? art(BY_ID[id]) : ""; },
+    streakName: function (n) { var id = streakId(n); return id ? BY_ID[id][1] : ""; }
   };
 
   draw();
-  update({ days: addDay(state.days, today) });
+  update({ days: addOnce(state.days, today) });
 })();

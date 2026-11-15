@@ -201,7 +201,7 @@ tr.you > td { background: var(--chest); }
 .big-score { position: relative; display: table; padding-bottom: 12px; }
 .big-score::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 7px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
 
-/* The stamp card: one square per counted week; every second square brings a fox sticker (the orange dot). */
+/* The stamp card: one square per counted week, and under it the streak badge the student holds now. */
 .stamp-card { margin: 20px 0 0; padding: 14px 16px; border: 1px solid var(--edge); border-radius: 12px; }
 .stamp-card.on { border-color: var(--leaf); background: var(--chest); }
 .stamp-card p { margin: 0; }
@@ -216,13 +216,11 @@ tr.you > td { background: var(--chest); }
   content: ""; width: 20px; height: 20px; background: var(--leaf);
   -webkit-mask: var(--i-tick) center / contain no-repeat; mask: var(--i-tick) center / contain no-repeat;
 }
-.stamps li.gift::after {
-  content: ""; position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-radius: 50%;
-  background: var(--highlight); border: 1.5px solid var(--ink);
-}
-.stamps li.gift.inked::after { background: var(--fox); }
+.stamp-streak { display: flex; align-items: center; gap: 14px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--rule-dash); }
+.stamp-badge { flex: none; width: 64px; }
+.stamp-badge .sticker-art { display: block; }
 .stamp-next { font: 500 1rem/1.4 var(--font-display); }
-.stamp-card .streak { margin: 6px 0 0; padding: 0; border: 0; background: none; font-weight: 500; }
+.stamp-card .streak { margin: 0; padding: 0; border: 0; background: none; font-weight: 500; }
 .stamp-card .streak.on strong { color: var(--leaf); }
 /* Your own row sits a little above the table, so it is the first thing you find. */
 .board-panel tr.you { position: relative; z-index: 1; filter: drop-shadow(0 3px 6px rgb(16 38 59 / 0.2)); }

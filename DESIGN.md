@@ -422,12 +422,17 @@ All of this lives in `assets/css/motion.css` and `assets/js/motion.js`, uses CSS
 - **Turning the paper over:** while the league opens the challenge, the ruled back of the paper turns away, and the paper's face arrives in 0.26s. The league's clock starts on the league's side, so the turn fills the wait that was already there.
 - **During the attempt:** held-control feedback only. Nothing else moves.
 - **Handing in:** the paper is passed away (0.5s) while the league marks it; the result arrives like returned work, and the score is underlined twice with a pen stroke. A disqualified attempt gets the plain notice.
-- **Stamp card:** replaces the streak line. One square per week that counted, eight to a row, each inked with a leaf-green tick; every second square carries an orange dot for a fox sticker. A missed week ends the streak but never removes a stamp.
+- **Stamp card:** replaces the streak line. One square per week that counted, eight to a row, each inked with a leaf-green tick; a missed week never removes a stamp. Under it, the streak badge the student holds now and how many more weeks in a row the next one needs.
 - **Boards:** rows are dealt in from the top (40ms apart), and the student's own row sits slightly raised.
 - **A closed week's answers:** ticks and crosses are written in one after another (80ms apart, about 1.5s at most); a tap shows the rest at once.
 
-### Stickers (since 2026-11-16)
-Nineteen original fox stickers drawn as SVG in `assets/js/stickers.js`: a fox head, one prop and a backing colour each, with a white die-cut rim and a 1px pencil edge so it reads on white paper. Six are earned by practice, one by the first weekly challenge, and twelve ("the fox's school year") by every second week that counts; after twelve the series repeats with a gold rim. They live on the home page under the directory. A sticker still to earn is a dashed circle. Picking one up tilts it up to 16° and shows a highlight where the pointer is. A new sticker is announced by a small note in the bottom corner, never while the league clock is running. Stickers are the one place fox orange is used as a fill.
+### Badges (since 2026-11-16; this set on the new-badges branch)
+Twenty-one round badges, listed in `assets/js/stickers.js`. CLY's own fox character, drawn by CLY, is the art: each drawing is a 512px PNG in `images/stickers/`, named for its badge, with clear space round the circle so the ears can break out of it. A badge whose drawing is not finished shows a simple code-drawn stand-in fox. They live on the home page under the directory; a badge still to earn is a dashed circle. Picking one up tilts it up to 16° and shows a highlight where the pointer is. A new badge is announced by a small note in the bottom corner, never while the league clock is running.
+- **Streak badges (4):** held, not kept. One at a time: "Flawless streak" from the first week, then 5, 10 and 15 weeks in a row. It goes when a week is missed.
+- **League badges (6):** first challenge, comeback, personal best, climber, full marks, top five. Worked out from the league's history, so they return on a new device.
+- **Practice badges (5):** first set, ten sets, whole exercise, second try, checklist done.
+- **Reading and visiting badges (6):** step by step, final lap, to the top, tip collector, five days, three in a row.
+Practice, reading and visiting badges are kept on the device only.
 
 ## Do's and Don'ts
 
@@ -447,7 +452,7 @@ Nineteen original fox stickers drawn as SVG in `assets/js/stickers.js`: a fox he
 - **Don't** put shadows on anything at rest on the paper; only the sheet, the hub and the cover stickers lift, and a control lifts only while it is held.
 - **Don't** move, tilt or lean text that is being read.
 - **Don't** add motion to a timed challenge beyond held-control feedback, or anything that delays the paper.
-- **Don't** use another artist's characters for stickers; they are original fox drawings.
+- **Don't** use another artist's characters for badges; they are CLY's own fox character.
 - **Don't** use a CREI colour for anything but its move, or without its letter.
 - **Don't** let CLY's writing look like a real candidate's script.
 - **Don't** show more than one highlighter swipe in view per section.

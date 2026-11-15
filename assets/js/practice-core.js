@@ -78,6 +78,8 @@
     this.ids.forEach(function (id) {
       if (!self.isTried(id)) { delete self.marks[id]; return; }
       var ok = self.isCorrect(id);
+      // wrong before, right now: the hint was read and the answer fixed (stickers.js gives a badge for the first one)
+      if (ok && self.tries[id] > 0 && self.marks[id] !== true) document.dispatchEvent(new CustomEvent("cly:second-try"));
       self.marks[id] = ok;
       self.tries[id] = (self.tries[id] || 0) + (ok ? 0 : 1);
     });

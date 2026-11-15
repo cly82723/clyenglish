@@ -280,23 +280,29 @@
   function stampCard(me) {
     var K = window.CLY_STICKERS, a = me.attempt, note = streakNote(me.streak, a.status === "done");
     if (!K) return note;
-    mine = { history: me.history, week: me.week.id };
-    stamps = K.countStamps(mine.history, mine.week, a.status === "done" && !a.away);
-    K.league(stamps);
+    // this week's result once it counts, and the weeks in a row the league reports (this week included once it is done)
+    var done = a.status === "done" && !a.away ? { score: a.score } : null;
+    var streak = me.streak ? me.streak.current : 0;
+    mine = { history: me.history, week: me.week.id, streak: streak, done: !!done };
+    stamps = K.countedWeeks(mine.history, mine.week, done).length;
+    K.league({ history: mine.history, week: mine.week, done: done, streak: streak });
     var seen = seenStamps(), from = stamps ? Math.floor((stamps - 1) / STAMPS_SHOWN) * STAMPS_SHOWN : 0, squares = [];
     for (var i = from + 1; i <= from + STAMPS_SHOWN; i++) {
-      var inked = i <= stamps, sticker = K.bringsSticker(i);
-      squares.push(h("li", { class: (inked ? "inked" : "") + (sticker ? " gift" : "") + (inked && i > seen ? " new" : "") },
-        inked ? h("span", { class: "visually-hidden" }, "Week " + i + ": stamped" + (sticker ? ", sticker earned" : "")) : String(i)));
+      var inked = i <= stamps;
+      squares.push(h("li", { class: (inked ? "inked" : "") + (inked && i > seen ? " new" : "") },
+        inked ? h("span", { class: "visually-hidden" }, "Week " + i + ": stamped") : String(i)));
     }
     seenStamps(stamps);
-    var toNext = K.stampsToNext(stamps);
+    // the streak badge the student holds now, and how far the next one is
+    var toNext = K.weeksToNextStreak(streak), badge = null;
+    if (streak) { badge = h("span", { class: "stamp-badge", "aria-hidden": "true" }); badge.innerHTML = K.streakArt(streak); }
+    var holding = streak ? "You hold the “" + K.streakName(streak) + "” badge. " : "";
     return h("div", { class: "stamp-card" + (stamps ? " on" : "") },
       h("p", { class: "field-label" }, "Your stamp card"),
       h("ol", { class: "stamps" }, squares),
-      h("p", { class: "stamp-next" }, h("strong", null, plural(stamps, "stamp") + "."),
-        " One for every week that counts. " + (toNext === 1 ? "One more week" : "Two more weeks") + " to your next fox sticker."),
-      note);
+      h("p", { class: "stamp-next" }, h("strong", null, plural(stamps, "stamp") + "."), " One for every week that counts."),
+      h("div", { class: "stamp-streak" }, badge, h("div", null, note,
+        h("p", { class: "stamp-next" }, holding + (toNext ? plural(toNext, "more week") + " in a row for the " + (streak + toNext) + "-week badge." : "That is the top streak badge.")))));
   }
 
   // Kept up to date while the page is open, so it never says "1 day" on Sunday night.
@@ -680,10 +686,11 @@
       el.querySelector("h2").focus();
       countUp(score, r.score);
     });
-    // this week now counts: its stamp may bring a fox sticker, announced here once the paper is out of the way
+    // this week now counts: it may bring a badge or a longer streak, announced here once the paper is out of the way
     if (window.CLY_STICKERS && mine) {
-      stamps = window.CLY_STICKERS.countStamps(mine.history, mine.week, true);
-      window.CLY_STICKERS.league(stamps);
+      var done = { score: r.score };
+      stamps = window.CLY_STICKERS.countedWeeks(mine.history, mine.week, done).length;
+      window.CLY_STICKERS.league({ history: mine.history, week: mine.week, done: done, streak: mine.streak + (mine.done ? 0 : 1) });
     }
   }
 

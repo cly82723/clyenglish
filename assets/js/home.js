@@ -126,6 +126,8 @@
       go.href = t.href;
       go.textContent = "Practise this: " + t.where;
       back.hidden = at === day;
+      // each tip shown counts once towards the tip collector badge (stickers.js)
+      document.dispatchEvent(new CustomEvent("cly:tip", { detail: at }));
     }
 
     // one control for keyboards and screen readers; the fox is the same button for fingers
@@ -202,6 +204,8 @@
       });
       next.textContent = i < levels.length - 1 ? "Next level" : "Start again";
       if (!moved) return;
+      // reaching the top level by climbing earns a badge (stickers.js)
+      if (i === levels.length - 1) document.dispatchEvent(new CustomEvent("cly:top"));
       // the highlighter draws across what changed at this level
       var marks = levels[i].querySelectorAll("mark.swipe");
       marks.forEach(function (m) { m.style.transition = "none"; m.classList.remove("on"); });

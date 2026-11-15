@@ -41,3 +41,15 @@ Branch `motion-3d-book`, started 2026-11-16. Nothing here is on the live site.
 **3. Paper interactions.** Held controls lift and tilt, cover tabs hinge, the level ladder flips, finished sets are stamped. Done when: checked on a low-end Android phone for stutter.
 
 **4. Fox stickers.** Six practice stickers, one first-challenge sticker, twelve league stickers with a gold repeat. The drawings were approved on 2026-11-16. Done when: a decision is made on moving practice stickers between devices.
+
+## Badges, second version (branch `new-badges`, not live)
+
+Started 2026-11-16. The live site still has the first set (one sticker every two weeks).
+
+- The "fox's school year" series, the two-week rule and the vocab sticker are gone. There are now 21 badges; the list and rules are in `assets/js/stickers.js`.
+- Six have CLY's drawings, cut from the badge sheet into `images/stickers/`: `streak-alive`, `streak-15`, `personal-best`, `step-by-step`, `final-lap`, `five-days`. The other fifteen show a stand-in fox until their drawings arrive; to add one, save it as `images/stickers/<badge id>.png` and add the id to `DRAWN`.
+- Dropped because the league does not store what they need: Stayed put, Both papers, Early bird, Beat the clock.
+- "Personal best" needs two earlier weeks to beat, so it is not the same moment as "Climber".
+- "Tip collector" counts tips asked for with "Another tip"; the tip already showing when the page opens is not counted.
+- Not checked in a browser: this session had no browser tools. The rules are covered by `tests/stickers.test.js` and a headless run of the script.
+- Anyone who earned a first-set sticker on the live site keeps the badges whose ids did not change (first set, ten sets, whole exercise, five days); the school-year stickers disappear.
