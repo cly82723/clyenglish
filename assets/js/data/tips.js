@@ -30,7 +30,9 @@ window.CLY_TIPS = {
     { tip: "Open a speech by speaking to the audience directly.", wrong: "Today I want to talk about recycling.", right: "How many plastic bottles did you throw away this week?", href: "part-b.html#patterns-speech", where: "Speech patterns" },
     { tip: "In a formal letter, make a request politely, not bluntly.", wrong: "Give me my money back now.", right: "I would be grateful if you could arrange a refund at your earliest convenience.", href: "part-b.html#patterns-letter", where: "Letter patterns" },
     { tip: "Back a claim with evidence, not \"people say\".", wrong: "People say that students have too much homework.", right: "A school survey found that over half of S4 students spend more than three hours on homework each night.", href: "part-b.html#crei", where: "CREI paragraphs" },
-    { tip: "In a proposal, tell the reader what they gain.", wrong: "The school should hold a book fair.", right: "A book fair would let students buy affordable novels without leaving the campus.", href: "part-b.html#patterns-proposal", where: "Proposal patterns" }
+    { tip: "In a proposal, tell the reader what they gain.", wrong: "The school should hold a book fair.", right: "A book fair would let students buy affordable novels without leaving the campus.", href: "part-b.html#patterns-proposal", where: "Proposal patterns" },
+    { tip: "Raise a problem, then offer a solution.", wrong: "Overcrowded MTR trains are a big problem.", right: "Overcrowded MTR trains are a problem; however, running extra trains at peak hours would ease it.", href: "part-b.html#patterns-article", where: "Article patterns" },
+    { tip: "End a story with a reflection, not \"It was a fun day\".", wrong: "That was a great day. The end.", right: "As the ferry pulled away, I realised that some friendships need no words.", href: "part-b.html#patterns-story", where: "Story patterns" }
   ],
   grammar: [
     { tip: "Find the time words first. They choose the tense for you.", wrong: "I have finished the paper yesterday.", right: "I finished the paper yesterday.", href: "grammar.html#tenses", where: "Tenses" },
@@ -63,7 +65,9 @@ window.CLY_TIPS = {
     { tip: "\"The number of\" takes a singular verb.", wrong: "The number of students are rising every year.", right: "The number of students is rising every year.", href: "final.html#errors", where: "Common errors" },
     { tip: "Use \"an\" before a vowel sound, not just a vowel letter.", wrong: "She is a honest student.", right: "She is an honest student.", href: "final.html#errors", where: "Common errors" },
     { tip: "\"Suggest\" is followed by V-ing, never \"to\".", wrong: "She suggested to take the MTR.", right: "She suggested taking the MTR.", href: "grammar.html#gerunds", where: "Gerunds" },
-    { tip: "\"Despite\" never takes \"of\".", wrong: "Despite of the typhoon signal, we went to school.", right: "Despite the typhoon signal, we went to school.", href: "final.html#errors", where: "Common errors" }
+    { tip: "\"Despite\" never takes \"of\".", wrong: "Despite of the typhoon signal, we went to school.", right: "Despite the typhoon signal, we went to school.", href: "final.html#errors", where: "Common errors" },
+    { tip: "\"Depend\" is followed by \"on\", never \"of\".", wrong: "It depends of the weather.", right: "It depends on the weather.", href: "final.html#errors", where: "Common errors" },
+    { tip: "Use -er or \"more\", never both.", wrong: "The MTR is more faster than the bus.", right: "The MTR is faster than the bus.", href: "final.html#errors", where: "Common errors" }
   ],
   vocab: [
     { tip: "alleviate + pressure / a burden / anxiety", wrong: "Cancelling a test would reduce stress.", right: "Cancelling one test would alleviate the pressure on S6 students.", href: "part-b.html#vocab-education", where: "Education words" },
@@ -92,6 +96,8 @@ window.CLY_TIPS = {
     { tip: "tackle + a problem / an issue / a shortage", wrong: "The government should deal with the housing problem.", right: "The government should tackle the housing shortage in Sham Shui Po.", href: "part-b.html#vocab-youth", where: "Youth & society words" },
     { tip: "implement + a policy / a plan / measures", wrong: "The school started a new rule about homework.", right: "The school implemented a new homework policy last term.", href: "part-b.html#vocab-education", where: "Education words" },
     { tip: "pose + a threat / a risk / a challenge", wrong: "Cyberbullying is dangerous to teenagers.", right: "Cyberbullying poses a serious threat to teenagers' mental health.", href: "part-b.html#vocab-technology", where: "Technology words" },
-    { tip: "strike a balance + between ... and ...", wrong: "Students need to study and rest equally.", right: "Students need to strike a balance between study and rest.", href: "part-b.html#vocab-health", where: "Health words" }
+    { tip: "strike a balance + between ... and ...", wrong: "Students need to study and rest equally.", right: "Students need to strike a balance between study and rest.", href: "part-b.html#vocab-health", where: "Health words" },
+    { tip: "bridge + a gap / the divide between ... and ...", wrong: "Mentors can help old and young people understand each other.", right: "Weekend volunteering can bridge the gap between younger and older residents.", href: "part-b.html#vocab-youth", where: "Youth & society words" },
+    { tip: "undermine + confidence / trust / efforts", wrong: "Harsh comments make students feel less sure of themselves.", right: "Harsh comments can undermine a student's confidence.", href: "part-b.html#vocab-education", where: "Education words" }
   ]
 };
