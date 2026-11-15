@@ -173,11 +173,25 @@ tr.you > td { background: var(--chest); }
 /* A control that can't be pressed yet doesn't look like a link. */
 #challenge .link-btn:disabled { color: var(--ink-soft); text-decoration: none; cursor: default; }
 /* Leaving the page: after the one allowed switch a warning, after the next a red banner, both under the clock. */
-.away-note { flex: 1 0 100%; margin: 2px 0 4px; padding: 8px 12px; border-radius: 8px; font: 700 0.95rem/1.35 var(--font-display); white-space: normal; }
+/* A note clipped under the clock, like one a teacher leaves on a desk: paper with a full pencilled edge and a ringed mark. */
+.away-note {
+  position: relative; flex: 1 0 100%; margin: 4px 0 6px; padding: 10px 14px 10px 48px; border-radius: 12px;
+  font: 700 0.95rem/1.35 var(--font-display); white-space: normal;
+}
 .away-note:empty { display: none; }
-.away-note.warned { background: var(--quote-paper); color: var(--ink); border-left: 4px solid var(--fox); }
-.away-note.out { background: var(--avoid); color: var(--paper); }
+.away-note::before {
+  content: "!"; position: absolute; left: 12px; top: 9px; display: grid; place-items: center; width: 24px; height: 24px;
+  border: 2px solid currentColor; border-radius: 50%; font: 800 0.875rem/1 var(--font-display);
+}
+/* the one allowed switch: a warning on quote paper, edged in burnt orange */
+.away-note.warned { background: var(--quote-paper); color: var(--ink); border: 1.5px solid var(--crei-evidence); }
+.away-note.warned::before { color: var(--crei-evidence); }
+/* disqualified: the same note, filled red */
+.away-note.out { background: var(--avoid); color: var(--paper); border: 1.5px solid var(--avoid); }
+.away-note.out::before { content: "\00d7"; font-size: 1.05rem; }
+/* it slides in under the clock, and its mark lands like a stamp (the same stamp as a finished set) */
 .away-note:not(:empty) { animation: note-in 0.22s var(--ease-out); }
+@media (prefers-reduced-motion: no-preference) { .away-note:not(:empty)::before { animation: stamp 0.36s var(--ease-out) 0.12s both; } }
 @media (prefers-reduced-motion: reduce) { .away-note:not(:empty) { animation: fade-in 0.15s ease-out; } }
 .not-counted { padding: 12px 16px; border-radius: 10px; background: var(--paper); border: 2px solid var(--avoid); }
 .not-counted strong { color: var(--avoid); }
