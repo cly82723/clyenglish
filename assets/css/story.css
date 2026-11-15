@@ -69,6 +69,21 @@
     linear-gradient(90deg, transparent 17%, var(--margin-rule) 17%, var(--margin-rule) calc(17% + 1px), transparent calc(17% + 1px)),
     repeating-linear-gradient(#fff 0 calc(var(--bw) * 0.075), var(--rule-strong) calc(var(--bw) * 0.075) calc(var(--bw) * 0.075 + 1px));
 }
+/* a skill written on that page: story.js fills it in when the notebook is tapped */
+.book-page { display: grid; align-content: center; gap: 5%; padding: 8% 7% 8% 23%; }
+.book-page p { margin: 0; }
+.skill-no { font: 700 calc(var(--bw) * 0.062)/1.2 var(--font-display); color: var(--sky); }
+.skill-text { font: 700 calc(var(--bw) * 0.088)/1.2 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
+.skill-more { font: 600 calc(var(--bw) * 0.05)/1.2 var(--font-display); color: var(--ink-soft); }
+/* the notebook is the one thing on the stage that can be tapped */
+.book { pointer-events: auto; cursor: pointer; }
+/* opening and shutting on a tap takes a moment; following the scroll does not */
+.book.turning, .book.turning .book-front { transition: transform 0.65s var(--ease-out); }
+/* the same skill in plain text, with its link, beside the headline */
+.skill-peek { margin: 22px 0 0; }
+.skill-said { margin: 14px 0 0; max-width: 34ch; font: 600 var(--step-0)/1.5 var(--font-display); }
+.skill-said a { white-space: nowrap; }
+
 .book-front {
   position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 0 50%;
   transform: translateZ(calc(var(--bd) / 2)) rotateY(calc(var(--open, 0) * 1deg));
@@ -163,4 +178,6 @@
   .stage { position: absolute; height: 100vh; height: 100svh; }
   .floaters { display: none; }
   .stage-tint { transition: none; }
+  /* a tapped notebook is simply shown open, facing the reader */
+  .book.open { --rx: 6; --ry: 14; --rz: 0; --open: -158; }
 }

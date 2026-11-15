@@ -51,7 +51,11 @@
     <div class="book-face book-edge book-edge-right"></div>
     <div class="book-face book-edge book-edge-top"></div>
     <div class="book-face book-edge book-edge-bottom"></div>
-    <div class="book-face book-page"></div>
+    <div class="book-face book-page">
+      <p class="skill-no"></p>
+      <p class="skill-text"></p>
+      <p class="skill-more">Tap for the next skill</p>
+    </div>
     <div class="book-front">
       <div class="book-face book-outside">
         <p class="book-label"><span>CLY English</span><small>Subject: English</small></p>
@@ -68,6 +72,9 @@
     <h1>CLY English</h1>
     <p class="scene-line">One level higher.</p>
     <p class="scene-sub">English practice from S.3 to the HKDSE</p>
+    <!-- the same thing the notebook does when it is tapped, for keyboards and screen readers: the stage is decoration -->
+    <p class="skill-peek"><button type="button" class="btn-quiet" data-skill-button>Open the notebook</button></p>
+    <p class="skill-said" aria-live="polite" data-skill-said hidden></p>
     <p class="scroll-hint" aria-hidden="true">Scroll</p>
   </section>
 

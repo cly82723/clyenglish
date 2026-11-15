@@ -5,7 +5,63 @@
   "use strict";
 
   var stage = document.querySelector(".stage");
-  if (!stage || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!stage) return;
+  var book = stage.querySelector(".book");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var TURN_MS = 700;           // how long the book takes to open or shut on a tap
+  var SHUTS_AFTER_PX = 140;    // an open book shuts once the page has scrolled this far
+  var DAY_MS = 864e5;
+
+  /* ---------- A skill inside the notebook: the six that change a Part B mark ---------- */
+
+  var SKILLS = [
+    { text: "Choose the question you can find three points for.", href: "part-b.html#choose", where: "Choosing your question" },
+    { text: "Plan for ten minutes before you write.", href: "part-b.html#plan", where: "The 10-minute plan" },
+    { text: "Use three different ideas, each with a Hong Kong example.", href: "part-b.html#method", where: "The content method" },
+    { text: "Build every body paragraph with Claim, Reason, Evidence, Impact.", href: "part-b.html#crei", where: "CREI paragraphs" },
+    { text: "Follow the format and tone of your text type.", href: "part-b.html#features", where: "Text-type features" },
+    { text: "Swap vague words for precise ones.", href: "part-b.html#vocab", where: "Topic vocabulary" }
+  ];
+  var said = document.querySelector("[data-skill-said]"), button = document.querySelector("[data-skill-button]");
+  var pageNo = book.querySelector(".skill-no"), pageText = book.querySelector(".skill-text");
+  // a different skill opens first each day; every tap after that moves on to the next
+  var at = Math.floor(Date.now() / DAY_MS) % SKILLS.length - 1;
+  var presenting = false, presentedAt = 0, turnTimer = null;
+
+  function turn() {
+    book.classList.add("turning");
+    clearTimeout(turnTimer);
+    turnTimer = setTimeout(function () { book.classList.remove("turning"); }, TURN_MS);
+  }
+  function showSkill() {
+    at = (at + 1) % SKILLS.length;
+    var skill = SKILLS[at], label = "Skill " + (at + 1) + " of " + SKILLS.length;
+    pageNo.textContent = label;
+    pageText.textContent = skill.text;
+    if (said) {
+      var name = document.createElement("strong"), link = document.createElement("a");
+      name.textContent = label + ": ";
+      link.href = skill.href;
+      link.textContent = "See how: " + skill.where;
+      said.textContent = "";
+      said.appendChild(name);
+      said.appendChild(document.createTextNode(skill.text + " "));
+      said.appendChild(link);
+      said.hidden = false;
+    }
+    if (button) button.textContent = "Next skill";
+    // with reduced motion the book is simply shown open (story.css); otherwise it turns to face the reader
+    if (reduceMotion) { book.classList.add("open"); return; }
+    presenting = true;
+    presentedAt = window.scrollY;
+    turn();
+    soon();
+  }
+  book.addEventListener("click", showSkill);
+  if (button) button.addEventListener("click", showSkill);
+
+  if (reduceMotion) return;
 
   var SCENE_STARTS_AT = 0.2;   // a scene counts as reached when its top is this far down the window
   var POINTER_TURN = 5;        // degrees the book leans towards a mouse
@@ -25,9 +81,11 @@
     { x: -14, y: -6, rx: 10, ry: 20, rz: 2, open: -150, s: 0.9 },
     { x: -20, y: -4, rx: 54, ry: -4, rz: -16, open: 0, s: 0.9 }
   ];
+  // Tapped: wherever it is, the book turns to face the reader and opens on its first page, a little larger.
+  var SHOWN_WIDE = { x: 9, y: 0, rx: 6, ry: 12, rz: 0, open: -158, s: 1.25 };   // moved right, so the open cover clears the words
+  var SHOWN_NARROW = { x: -6, y: 4, rx: 6, ry: 8, rz: 0, open: -158, s: 1.7 };
   var KEYS = ["x", "y", "rx", "ry", "rz", "open", "s"];
 
-  var book = stage.querySelector(".book");
   var scenes = Array.prototype.slice.call(document.querySelectorAll(".scene"));
   var narrow = window.matchMedia("(max-width: 760px)");
   var floaters = Array.prototype.map.call(stage.querySelectorAll(".floater"), function (el) {
@@ -52,9 +110,11 @@
     var from = starts[i], to = starts[i + 1];
     var t = to > from ? ease(Math.min(1, Math.max(0, (y - from) / (to - from)))) : 0;
     var poses = narrow.matches ? NARROW : WIDE, a = poses[i], b = poses[i + 1] || a;
+    var held = presenting ? (narrow.matches ? SHOWN_NARROW : SHOWN_WIDE) : null;
     KEYS.forEach(function (k) {
       var lean = k === "ry" ? pointer.x * POINTER_TURN : k === "rx" ? -pointer.y * POINTER_TURN : 0;
-      book.style.setProperty("--" + k, (a[k] + (b[k] - a[k]) * t + lean).toFixed(3));
+      var value = held && k in held ? held[k] : a[k] + (b[k] - a[k]) * t;
+      book.style.setProperty("--" + k, (value + lean).toFixed(3));
     });
     var scene = scenes[t > 0.5 ? i + 1 : i].getAttribute("data-scene");
     if (scene !== shown) { shown = scene; stage.setAttribute("data-scene", scene); }
@@ -72,7 +132,11 @@
   }
   function remeasure() { measure(); soon(); }
 
-  window.addEventListener("scroll", soon, { passive: true });
+  window.addEventListener("scroll", function () {
+    // an open book shuts and goes back to following the page once the reader scrolls on
+    if (presenting && Math.abs(window.scrollY - presentedAt) > SHUTS_AFTER_PX) { presenting = false; turn(); }
+    soon();
+  }, { passive: true });
   window.addEventListener("resize", remeasure);
   window.addEventListener("load", remeasure);
   // the sheets change height as their contents arrive (the stickers, the tip), so the scenes are measured again
