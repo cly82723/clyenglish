@@ -1,0 +1,71 @@
+/* CLY English — the short guide shape. Builds on site.css.
+   Every lesson is the same four parts: the rule in one line, one example at three levels, one thing to try,
+   and the reasoning folded away. A guide opens on its essentials: the whole method on one screen, which also
+   prints as one sheet of A4. A text-type page leads with what each paragraph does and ends with reminders. */
+
+/* ---------- A draft, shown to CLY before anything replaces the live guide ---------- */
+
+.draft-note { margin: 0 0 24px; padding: 12px 16px; border: 2px dashed var(--fox); border-radius: 12px; max-width: 68ch; }
+.draft-note p { margin: 0; }
+
+/* ---------- The essentials: one rule and one example for each step ---------- */
+
+.essentials { list-style: none; margin: 24px 0 20px; padding: 0; border-top: 1px solid var(--ink); max-width: 68ch; }
+.essentials > li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 2px 16px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+/* a numbered step: an ink ring, never filled, so it cannot be mistaken for a level */
+.step-no {
+  grid-row: span 3; display: grid; place-items: center; width: 36px; height: 36px; margin-top: 2px;
+  border: 1.5px solid var(--ink); border-radius: 50%;
+  font: 700 1rem/1 var(--font-display); font-variant-numeric: tabular-nums;
+}
+.essentials h3 { font: 600 1rem/1.3 var(--font-display); letter-spacing: 0; color: var(--sky); margin: 0; }
+.rule-line { margin: 2px 0 0; font: 700 var(--step-1)/1.3 var(--font-display); letter-spacing: -0.01em; }
+.pair { margin: 8px 0 0; }
+.pair s { color: var(--ink-soft); text-decoration-color: var(--avoid); text-decoration-thickness: 2px; }
+.pair b { font-weight: 700; }
+.pair .lv { font-size: 0.7rem; min-width: 2.4em; margin-right: 6px; vertical-align: 2px; }
+.essentials .more { display: inline-flex; align-items: center; min-height: 44px; font: 600 1rem/1.2 var(--font-display); }
+.essentials-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; margin: 0; }
+
+/* ---------- A lesson: the rule, then the example, then one thing to try ---------- */
+
+.lesson-rule { margin: 0 0 18px; max-width: 26ch; font: 700 var(--step-2)/1.2 var(--font-display); letter-spacing: -0.02em; }
+.lesson-part { margin: 32px 0 10px; font: 700 1rem/1.3 var(--font-display); letter-spacing: 0; color: var(--sky); }
+
+/* the reasoning: there for anyone who wants it, out of the way for anyone revising the night before */
+.why { margin: 28px 0; max-width: 68ch; border: 1px solid var(--edge); border-radius: 12px; }
+.why > summary {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px; cursor: pointer; list-style: none;
+  font: 700 1rem/1.3 var(--font-display);
+}
+.why > summary::-webkit-details-marker { display: none; }
+.why > summary::before { content: "+"; width: 1em; font-weight: 800; color: var(--sky); }
+.why[open] > summary::before { content: "\2212"; }
+.why[open] > summary { border-bottom: 1px solid var(--rule); }
+.why > div { padding: 14px 16px 4px; }
+@media (hover: hover) { .why > summary:hover { background: var(--chest); border-radius: 11px; } }
+
+/* ---------- A text type, paragraph by paragraph ---------- */
+
+.para-plan { list-style: none; margin: 16px 0 24px; padding: 0; border-top: 1px solid var(--ink); max-width: 68ch; counter-reset: para; }
+.para-plan > li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 2px 16px; padding: 14px 0; border-bottom: 1px solid var(--rule); counter-increment: para; }
+.para-plan > li::before {
+  content: counter(para); grid-row: span 3; display: grid; place-items: center; width: 36px; height: 36px; margin-top: 2px;
+  border: 1.5px solid var(--ink); border-radius: 50%; font: 700 1rem/1 var(--font-display);
+}
+.para-plan strong { font: 700 var(--step-1)/1.3 var(--font-display); }
+.para-plan .does { margin: 0; }
+/* a sentence to borrow: CLY's own wording, so it wears the rewrite paper and its dashed edge */
+.para-plan .model { margin: 8px 0 0; padding: 8px 12px; background: var(--rewrite-paper); border: 1px dashed var(--sky); border-radius: 8px; }
+
+/* ---------- Printing the essentials: one clean sheet ---------- */
+
+@media print {
+  @page { margin: 14mm; }
+  body { background: #fff; font-size: 11pt; }
+  body::before, .cover, .forms, .index, .pager, .back-cover, .draft-note, .print-btn, .sticker-toast, .essentials .more, .skip { display: none !important; }
+  .sheet { display: block; max-width: none; box-shadow: none; min-height: 0; }
+  .column { padding: 0; }
+  .essentials > li { padding: 9px 0; break-inside: avoid; }
+  .essentials, .lead, .label { max-width: none; }
+}

@@ -250,3 +250,6 @@ tr.you > td { background: var(--chest); }
   /* a closed week's answers are marked one after another */
   .review-sheet.marking .answer::after { animation: pen 0.3s var(--ease-out) var(--mark-wait, 0ms) both; }
 }
+
+/* While the clock runs, the strip of other pages steps aside with the title: the paper is all there is. */
+.playing .forms { display: none; }

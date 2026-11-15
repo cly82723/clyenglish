@@ -10,7 +10,7 @@
 /* ---------- Page turns: moving between pages turns the sheet, the cover behind it cross-fades ---------- */
 
 @view-transition { navigation: auto; }
-.sheet, .hub { view-transition-name: sheet; }
+.sheet { view-transition-name: sheet; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.28s; }
 ::view-transition-group(sheet) { animation-duration: var(--dur-turn); animation-timing-function: var(--ease-out); }
 ::view-transition-old(sheet) { animation: leaf-out 0.2s ease-in both; transform-origin: 0 30vh; }
@@ -19,9 +19,7 @@
 @keyframes leaf-in { from { opacity: 0; transform: perspective(1800px) rotateY(7deg) translateX(16px); } }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
 
-.hub { position: relative; }
 .tabs { padding-top: 4px; } /* room for a tab to swing forward; the same with reduced motion, so nothing shifts */
-.book-cover { display: none; }
 
 @media (prefers-reduced-motion: no-preference) {
 
@@ -65,49 +63,6 @@
     100% { transform: none; }
   }
 
-  /* ---------- Home: the book leans towards a mouse, and the fox floats a layer above the page ---------- */
-
-  @media (hover: hover) and (pointer: fine) and (min-width: 901px) {
-    html:not(.book-closed) .hub {
-      transform: perspective(1800px) rotateX(calc(var(--ly, 0) * -0.8deg)) rotateY(calc(var(--lx, 0) * 1.3deg));
-      transition: transform 0.6s var(--ease-out);
-    }
-    .fox img {
-      translate: calc(var(--lx, 0) * -7px) calc(var(--ly, 0) * -6px);
-      box-shadow: calc(var(--lx, 0) * 8px) calc(8px + var(--ly, 0) * 6px) 22px rgb(16 38 59 / 0.22);
-      transition: transform 0.16s var(--ease-out), translate 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
-    }
-  }
-
-  /* ---------- Home: the cover, shut for a moment on the first visit of the day, then opened ---------- */
-
-  .book-closed .hub { perspective: 2200px; perspective-origin: 50% 340px; }
-  .book-closed .book-cover {
-    display: grid; align-content: start; justify-items: center; gap: 26px;
-    position: absolute; inset: 0; z-index: 4;
-    padding: clamp(48px, 12vh, 120px) 24px 0;
-    background: var(--cover) var(--print-s, none) center top / max(100%, 900px) auto no-repeat;
-    transform-origin: 0 50%; backface-visibility: hidden;
-    box-shadow: 0 18px 40px rgb(16 38 59 / 0.18);
-    /* if motion.js never arrives, the cover still gets out of the way by itself */
-    animation: cover-gone 0.01s 2.5s forwards;
-  }
-  @keyframes cover-gone { to { visibility: hidden; } }
-  /* the spine: a soft shade down the bound edge */
-  .book-cover::after {
-    content: ""; position: absolute; inset: 0 auto 0 0; width: 16px;
-    background: linear-gradient(90deg, rgb(16 38 59 / 0.2), rgb(16 38 59 / 0));
-  }
-  .book-label {
-    background: var(--paper); border: 1px solid var(--edge); border-radius: 12px;
-    padding: 16px 30px 14px; text-align: center;
-    box-shadow: 0 6px 18px rgb(16 38 59 / 0.25);
-  }
-  .book-label span { display: block; font: 800 clamp(1.9rem, 1.4rem + 2.4vw, 3rem)/1.1 var(--font-display); letter-spacing: -0.03em; }
-  .book-label small { display: block; margin-top: 6px; font: 600 1rem/1.3 var(--font-display); color: var(--ink-soft); }
-  .book-cover img { width: 132px; height: 132px; border-radius: 50%; background: var(--paper); box-shadow: 0 8px 22px rgb(16 38 59 / 0.22); }
-  .book-opening .book-cover { animation: cover-open 0.7s cubic-bezier(0.55, 0, 0.25, 1) forwards; }
-  @keyframes cover-open { 70% { opacity: 1; } to { opacity: 0; transform: rotateY(-108deg); } }
 }
 
 /* ---------- Home: the sticker sheet ---------- */

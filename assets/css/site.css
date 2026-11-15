@@ -1035,7 +1035,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 /* a page with no contents column (vocab: its forms are the cover tabs) */
 .sheet.solo { grid-template-columns: minmax(0, 1fr); max-width: 1040px; }
 
-/* S.5 & S.6 share one cover tab; this strip splits it into the two forms and their guides */
+/* Every form has this strip: the pages of the form whose cover tab is open. S.5 & S.6 share one tab, so their strip names both. */
 .forms {
   grid-column: 1 / -1;
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px 32px;
@@ -1313,12 +1313,12 @@ body:has(.hub) .back-cover { max-width: 1040px; }
   .brand-name { font-size: 1.35rem; }
   .brand-sub { font-size: 0.875rem; margin-top: 2px; }
 
-  /* S.5 and S.6 share one row of four: the forms are already named on the cover tab */
-  .forms { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 10px var(--gutter); }
+  /* the form is already named on the cover tab, so the strip is just its pages: up to three to a row, wrapping, none hidden */
+  .forms { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px var(--gutter); }
   .forms div { display: contents; }
   .forms .form-mark { display: none; }
   .forms a {
-    justify-content: center; text-align: center; min-height: 44px; padding: 4px 6px;
+    flex: 1 1 30%; justify-content: center; text-align: center; min-height: 44px; padding: 4px 6px;
     font-size: 0.875rem; line-height: 1.15; border-radius: 12px;
   }
 
@@ -1841,3 +1841,18 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 @media (prefers-reduced-motion: reduce) {
   .practice-sheet .blank.right::after, .practice-sheet .blank.wrong::after, .practice-score.fresh, .practice-answers > ul, .see-examples[open] .cloze-examples { animation: fade-in 0.15s ease-out; }
 }
+
+/* ---------- One tab row on every page: Home, then the forms ---------- */
+
+/* the home page has no brand beside its tabs: the sheet below carries the name */
+.cover-home { max-width: 1040px; justify-content: flex-end; }
+.cover-home + .hub { margin-top: 0; }
+/* Self-study belongs to no form, so it sits under the list of forms */
+.directory-any { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.directory-any .form-mark { width: 3.6em; margin-right: 6px; }
+.directory-any a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
+  font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
+  background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 999px;
+}
+@media (hover: hover) { .directory-any a:hover { background: var(--chest); border-color: var(--ink); } }

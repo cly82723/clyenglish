@@ -416,7 +416,16 @@ All of this lives in `assets/css/motion.css` and `assets/js/motion.js`, uses CSS
 - **Cover tabs:** a tab that is not open swings 9° forward on its bottom hinge under a mouse, 14° when pressed.
 - **Level ladder:** choosing a level by click or tap flips the new line down like a card (0.38s, hinged on its top edge). Whole scripts keep their fade, and keys still change the level at once.
 - **Set marks:** a set finished for the first time is stamped: its square lands from 1.6× with a small turn (0.36s).
-- **Home book:** on a laptop the hub leans up to 1.3° towards the mouse and the fox floats a layer above it. On the first visit of each day the cover is shut for a moment, then opens on its spine (0.7s). It never plays on Back or on a link to part of the page, and a tap or key skips it.
+- **Home book:** see "Home: the scroll story" below, which replaced the lean and the once-a-day cover opening.
+
+### Navigation (since 2026-11-16)
+Every page carries the same cover tabs: Home · S.3 · S.4 · S.5 & S.6. Every form page carries the mint strip, listing that form's pages: Grammar and Weekly challenge for S.3 and S.4; Part A, Part B, Toolkit and Final reminders for S.5 & S.6. On phones the strip wraps, up to three to a row, so no link is hidden. Self-study belongs to no form and sits under the home page's list as "Any". While a weekly challenge is running, the strip steps aside with the page title.
+
+### Home: the scroll story (since 2026-11-16)
+Replaces the once-a-day cover opening and the mouse lean. The page is four scenes, one screen each: the title, Pick your form, the weekly challenge and badges, and the fox's tip with the climbing sentence. A stage is fixed behind the sheets: an exercise book built from real 3D faces (`assets/css/story.css`), posed once per scene and moved between poses by scrolling (`assets/js/story.js`), with CLY's six fox cut-outs and loose ruled sheets drifting past at three depths, the far ones blurred. The headline sits behind the book. A wash of colour over the cover picture changes with the scene, and pointing at a form shows that form's cover on the book. One version serves every device; with reduced motion nothing drifts, and the book stands once beside the headline. No 3D library is used.
+
+### The short guide shape (draft, since 2026-11-16)
+Proposed for Part B and shown in `part-b-sample.html` for CLY to judge; styles in `assets/css/guide.css`. A guide opens on its essentials: each step as one rule and one example, on one screen, printable on one sheet of A4. Every lesson has the same four parts: the rule in one line, one example at Level 3, 5 and 5**, one thing to try, and the reasoning folded behind "Why this works", with about 120 words of explanation in view at most. A text-type page leads with a paragraph-by-paragraph plan and ends with final reminders.
 
 ### The weekly challenge (since 2026-11-16)
 - **Turning the paper over:** while the league opens the challenge, the ruled back of the paper turns away, and the paper's face arrives in 0.26s. The league's clock starts on the league's side, so the turn fills the wait that was already there.
@@ -443,7 +452,8 @@ Nineteen original fox stickers drawn as SVG in `assets/js/stickers.js`: a fox he
 - **Do** keep navy-on-cover at AA on every pixel of a cover picture.
 
 ### Don't:
-- **Don't** build hero + CTA + card-grid sections; use the label panel, ruled rows and the ladder.
+- **Don't** build hero + CTA + card-grid sections; use the label panel, ruled rows and the ladder. The home page's scroll story (since 2026-11-16) is the one exception, and it still has no call-to-action strip or card grid.
+- **Don't** add a tab, a strip link or a deeper layer of navigation without CLY's say-so. Getting around is three layers at most: form, page, section.
 - **Don't** put shadows on anything at rest on the paper; only the sheet, the hub and the cover stickers lift, and a control lifts only while it is held.
 - **Don't** move, tilt or lean text that is being read.
 - **Don't** add motion to a timed challenge beyond held-control feedback, or anything that delays the paper.
