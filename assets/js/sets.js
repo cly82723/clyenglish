@@ -61,7 +61,12 @@
     }
     function stateOf(i) {
       var live = made[i] ? o.state(i) : "";
-      if (live === "done" && finished.indexOf(i) < 0) { finished.push(i); write("cly:sets-done:" + o.name, finished); }
+      if (live === "done" && finished.indexOf(i) < 0) {
+        finished.push(i);
+        write("cly:sets-done:" + o.name, finished);
+        // a set finished for the first time: its square is stamped (motion.js) and it counts towards a sticker (stickers.js)
+        document.dispatchEvent(new CustomEvent("cly:set-done", { detail: { name: o.name, set: i, bar: bar } }));
+      }
       return live === "done" || finished.indexOf(i) >= 0 ? "done" : live;
     }
     // only what changed is written, so the watcher below never hears its own writes

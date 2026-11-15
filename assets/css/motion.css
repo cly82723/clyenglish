@@ -1,0 +1,170 @@
+/* CLY English — the book as an object. Builds on site.css.
+   The paper is flat at rest: a control may lift, tilt and cast a shadow only while it is held, then lands flat.
+   Text that is being read never moves. With reduced motion, everything here falls back to site.css's fades. */
+
+:root {
+  --lift: 0 6px 14px rgb(16 38 59 / 0.2);   /* the shadow of something held above the paper */
+  --dur-turn: 0.34s;                        /* a page turning */
+}
+
+/* ---------- Page turns: moving between pages turns the sheet, the cover behind it cross-fades ---------- */
+
+@view-transition { navigation: auto; }
+.sheet, .hub { view-transition-name: sheet; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.28s; }
+::view-transition-group(sheet) { animation-duration: var(--dur-turn); animation-timing-function: var(--ease-out); }
+::view-transition-old(sheet) { animation: leaf-out 0.2s ease-in both; transform-origin: 0 30vh; }
+::view-transition-new(sheet) { animation: leaf-in var(--dur-turn) var(--ease-out) both; transform-origin: 0 30vh; }
+@keyframes leaf-out { to { opacity: 0; transform: perspective(1800px) rotateY(-9deg) translateX(-16px); } }
+@keyframes leaf-in { from { opacity: 0; transform: perspective(1800px) rotateY(7deg) translateX(16px); } }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+
+.hub { position: relative; }
+.book-cover { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ---------- Sections of one page turn the same way, hinged on the side the reader came from ---------- */
+
+  .js [data-tabs] .column > section.turn-next { animation: page-next 0.3s var(--ease-out); transform-origin: 0 240px; }
+  .js [data-tabs] .column > section.turn-prev { animation: page-prev 0.3s var(--ease-out); transform-origin: 100% 240px; }
+  @keyframes page-next { from { opacity: 0; transform: perspective(1600px) rotateY(6deg) translateX(14px); } }
+  @keyframes page-prev { from { opacity: 0; transform: perspective(1600px) rotateY(-6deg) translateX(-14px); } }
+
+  /* ---------- Cover tabs swing forward on their hinge ---------- */
+
+  .tabs { perspective: 520px; padding-top: 4px; }
+  .tabs a { transform-origin: 50% 100%; }
+  @media (hover: hover) and (pointer: fine) { .tabs a:not([aria-current="page"]):hover { transform: rotateX(-9deg); } }
+  .tabs a:not([aria-current="page"]):active { transform: rotateX(-14deg) scale(0.98); }
+
+  /* ---------- Held controls: lifted and tilted towards the finger (motion.js sets --tx and --ty, -1 to 1) ---------- */
+
+  .held.held.held.held {
+    transform: perspective(520px) translateY(-2px) rotateX(calc(var(--ty, 0) * -7deg)) rotateY(calc(var(--tx, 0) * 7deg)) scale(0.985);
+    box-shadow: var(--lift);
+  }
+  /* wide rows tilt less, or they look like they lurch */
+  :is(.choice, .pager a, .resume a).held.held.held.held {
+    transform: perspective(900px) translateY(-2px) rotateX(calc(var(--ty, 0) * -3deg)) rotateY(calc(var(--tx, 0) * 2deg)) scale(0.99);
+  }
+
+  /* ---------- Level ladder: the chosen level flips down like a card ---------- */
+
+  .js .ladder-panel.flip { animation: card-flip 0.38s var(--ease-out); transform-origin: 50% 0; }
+  @keyframes card-flip { from { opacity: 0; transform: perspective(1100px) rotateX(-72deg); } 45% { opacity: 1; } }
+
+  /* ---------- A finished set is stamped ---------- */
+
+  .set-mark.stamped, .stamps li.new { animation: stamp 0.36s var(--ease-out) both; }
+  .stamps li.new { animation-delay: 0.3s; }
+  @keyframes stamp {
+    0% { opacity: 0; transform: scale(1.6) rotate(-9deg); }
+    55% { opacity: 1; transform: scale(0.92) rotate(2deg); }
+    100% { transform: none; }
+  }
+
+  /* ---------- Home: the book leans towards a mouse, and the fox floats a layer above the page ---------- */
+
+  @media (hover: hover) and (pointer: fine) and (min-width: 901px) {
+    html:not(.book-closed) .hub {
+      transform: perspective(1800px) rotateX(calc(var(--ly, 0) * -0.8deg)) rotateY(calc(var(--lx, 0) * 1.3deg));
+      transition: transform 0.6s var(--ease-out);
+    }
+    .fox img {
+      translate: calc(var(--lx, 0) * -7px) calc(var(--ly, 0) * -6px);
+      box-shadow: calc(var(--lx, 0) * 8px) calc(8px + var(--ly, 0) * 6px) 22px rgb(16 38 59 / 0.22);
+      transition: transform 0.16s var(--ease-out), translate 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+    }
+  }
+
+  /* ---------- Home: the cover, shut for a moment on the first visit of the day, then opened ---------- */
+
+  .book-closed .hub { perspective: 2200px; perspective-origin: 50% 340px; }
+  .book-closed .book-cover {
+    display: grid; align-content: start; justify-items: center; gap: 26px;
+    position: absolute; inset: 0; z-index: 4;
+    padding: clamp(48px, 12vh, 120px) 24px 0;
+    background: var(--cover) var(--print-s, none) center top / max(100%, 900px) auto no-repeat;
+    transform-origin: 0 50%; backface-visibility: hidden;
+    box-shadow: 0 18px 40px rgb(16 38 59 / 0.18);
+  }
+  /* the spine: a soft shade down the bound edge */
+  .book-cover::after {
+    content: ""; position: absolute; inset: 0 auto 0 0; width: 16px;
+    background: linear-gradient(90deg, rgb(16 38 59 / 0.2), rgb(16 38 59 / 0));
+  }
+  .book-label {
+    background: var(--paper); border: 1px solid var(--edge); border-radius: 12px;
+    padding: 16px 30px 14px; text-align: center;
+    box-shadow: 0 6px 18px rgb(16 38 59 / 0.25);
+  }
+  .book-label span { display: block; font: 800 clamp(1.9rem, 1.4rem + 2.4vw, 3rem)/1.1 var(--font-display); letter-spacing: -0.03em; }
+  .book-label small { display: block; margin-top: 6px; font: 600 1rem/1.3 var(--font-display); color: var(--ink-soft); }
+  .book-cover img { width: 132px; height: 132px; border-radius: 50%; background: var(--paper); box-shadow: 0 8px 22px rgb(16 38 59 / 0.22); }
+  .book-opening .book-cover { animation: cover-open 0.7s cubic-bezier(0.55, 0, 0.25, 1) forwards; }
+  @keyframes cover-open { 70% { opacity: 1; } to { opacity: 0; transform: rotateY(-108deg); } }
+}
+
+/* ---------- Home: the sticker sheet ---------- */
+
+.stickers { margin: 36px 0 0; scroll-margin-top: 16px; }
+.stickers[hidden] { display: none; }
+.stickers-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding-bottom: 12px; border-bottom: 1px solid var(--ink); }
+.stickers h2 { font-size: var(--step-3); }
+.stickers-head p { margin: 0; font: 600 1rem/1.3 var(--font-display); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.sticker-grid { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 12px; }
+.sticker-grid li { display: grid; place-items: center; }
+.sticker {
+  appearance: none; border: 0; padding: 0; background: none; cursor: pointer;
+  position: relative; width: 100%; max-width: 64px; aspect-ratio: 1; border-radius: 50%;
+  transition: transform 0.2s var(--ease-out);
+}
+.sticker-art { display: block; width: 100%; aspect-ratio: 1; border-radius: 50%; }
+.sticker-art svg { display: block; width: 100%; height: 100%; }
+/* a sticker still to earn is a dashed outline; an earned one keeps a pencil edge, so its white rim shows on white paper */
+.sticker:not(.earned) .sticker-art { border: 1.5px dashed var(--ring); }
+.sticker.earned .sticker-art { box-shadow: 0 0 0 1px var(--edge); }
+.sticker.gold .sticker-art { box-shadow: 0 0 0 1px #b98a1c; }
+.sticker[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* the light it catches while it is picked up */
+.sticker.earned::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at calc(50% + var(--tx, 0) * 38%) calc(50% + var(--ty, 0) * 38%), rgb(255 255 255 / 0.7), rgb(255 255 255 / 0) 58%);
+  transition: opacity 0.2s var(--ease-colour);
+}
+.sticker-caption { margin: 14px 0 0; min-height: 1.65em; }
+.stickers .sticker-note { margin: 6px 0 0; color: var(--ink-soft); font-size: 1rem; }
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) and (pointer: fine) { .sticker.earned:hover::after { opacity: 1; } }
+  .sticker.earned.held::after { opacity: 1; }
+  .sticker.held.held.held.held {
+    transform: perspective(300px) translateY(-5px) rotateX(calc(var(--ty, 0) * -16deg)) rotateY(calc(var(--tx, 0) * 16deg)) scale(1.1);
+    box-shadow: 0 10px 18px rgb(16 38 59 / 0.26);
+  }
+}
+
+/* ---------- A new sticker, announced in the corner ---------- */
+
+.sticker-toast {
+  position: fixed; right: 16px; bottom: 16px; z-index: 20;
+  display: flex; align-items: center; gap: 12px;
+  max-width: min(340px, calc(100vw - 32px)); padding: 10px 18px 10px 10px;
+  background: var(--paper); border: 1px solid var(--ink); border-radius: 14px;
+  box-shadow: 0 8px 22px rgb(16 38 59 / 0.22);
+  font-family: var(--font-display);
+  visibility: hidden; opacity: 0; transform: translateY(12px) rotate(2deg);
+  transition: opacity 0.25s var(--ease-colour), transform 0.3s var(--ease-out), visibility 0s 0.3s;
+}
+.sticker-toast.show { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+.sticker-toast .sticker-art { flex: none; width: 52px; }
+.sticker-toast p { margin: 0; display: grid; line-height: 1.3; }
+.sticker-toast strong { font-weight: 800; }
+.sticker-toast a { font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) {
+  .sticker-toast.show .sticker-art { animation: peel-in 0.5s var(--ease-out); }
+  @keyframes peel-in { from { opacity: 0; transform: perspective(300px) rotateY(-70deg) rotate(-12deg) scale(0.7); } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sticker-toast, .sticker-toast.show { transform: none; transition: opacity 0.15s ease-out, visibility 0s; }
+}

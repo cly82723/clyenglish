@@ -26,6 +26,8 @@
     var h = section.querySelector("h2");
     var label = document.title.split(" · ")[0] + (h ? " › " + h.textContent : "");
     try { localStorage.setItem("cly:last", JSON.stringify({ href: page + "#" + section.id, label: label })); } catch (e) { /* storage blocked: home simply shows no "Continue" */ }
+    // stickers.js counts the steps of Part B a student has opened
+    document.dispatchEvent(new CustomEvent("cly:read", { detail: { page: page, id: section.id } }));
   }
 
   /* ---------- Subtabs: one section of the page at a time ---------- */
@@ -169,6 +171,7 @@
     axis.setAttribute("role", "tablist");
     axis.setAttribute("aria-label", "Choose a level");
     var start = ladder.getAttribute("data-start") || panels[0].getAttribute("data-level");
+    var built = false;   // true once the ladder has drawn its opening level
 
     var buttons = panels.map(function (p, i) {
       // a panel keeps its own id when it has one (part-b.html#sample-story-5 links straight to a script)
@@ -232,7 +235,10 @@
       }
       // the highlighter is wiped at once and drawn again, quicker than its first draw: this is a repeat
       marks.forEach(function (m) { m.style.transition = "none"; m.classList.remove("on"); });
+      // a line flips down like a card (motion.css); whole scripts keep their fade, and the first draw has no flip
+      panels.forEach(function (p) { p.classList.remove("flip"); });
       void panels[i].offsetWidth;
+      if (built && !ladder.classList.contains("script-ladder")) panels[i].classList.add("flip");
       marks.forEach(function (m) { m.style.transition = ""; m.style.transitionDuration = "0.4s"; });
       requestAnimationFrame(function () { swipe(panels[i]); });
     }
@@ -268,6 +274,7 @@
     var linked = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
     var linkedIndex = linked ? panels.findIndex(function (q) { return q === linked || q.contains(linked); }) : -1;
     select(linkedIndex >= 0 ? linkedIndex : startIndex, false, linkedIndex >= 0);
+    built = true;
   }
 
   /* ---------- Checklist: remembered in this browser only ---------- */
