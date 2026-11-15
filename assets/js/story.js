@@ -1,126 +1,208 @@
-/* CLY English — the home page scroll story (index.html). The exercise book on the stage is posed once for each
-   scene; scrolling moves it from one pose to the next, and the fox stickers drift past at their own speeds.
-   Nothing here is needed to use the page: with reduced motion this file does nothing and story.css takes over. */
+/* CLY English — the home page scroll story (index.html).
+   The notebook's journey: it starts shut, facing the reader; it opens as the page scrolls, on the word of the day;
+   then it shuts and is packed into the bag, out of the way of everything below. Scrolling back up takes it out
+   again. Tapping the notebook, or the bag once it is packed, shows the next word.
+   Designed for a phone first: there the whole journey happens in the first screen and a half, behind the sheets.
+   With reduced motion nothing follows the scroll: the notebook stands still, and a tap simply shows it open. */
 (function () {
   "use strict";
 
   var stage = document.querySelector(".stage");
   if (!stage) return;
   var book = stage.querySelector(".book");
+  var bag = document.querySelector("[data-bag]");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var narrow = window.matchMedia("(max-width: 760px)");
 
-  var TURN_MS = 700;           // how long the book takes to open or shut on a tap
-  var SHUTS_AFTER_PX = 140;    // an open book shuts once the page has scrolled this far
-  var DAY_MS = 864e5;
+  var POINTER_TURN = 5;        // degrees the notebook leans towards a mouse
+  var POINTER_DRIFT = 26;      // pixels the nearest sticker shifts away from a mouse
+  var SPIN_PER_PX = 0.03;      // degrees a sticker turns for each pixel it travels
+  var TURN_MS = 700;           // how long the notebook takes to open or shut on a tap
+  var SHUTS_AFTER_PX = 140;    // a notebook opened by a tap goes back to its journey once the page has scrolled this far
+  var SCENE_STARTS_AT = 0.2;   // a scene counts as reached when its top is this far down the window
+  var STAYS_OPEN = 0.4;        // the share of the last stretch the notebook stays open before it is packed
+  var SHUT_BY = 0.45;          // ...then it shuts over this share of the packing,
+  var MOVES_FROM = 0.3;        // starts towards the bag at this point,
+  var FADES_FROM = 0.82;       // and is out of sight inside it from here
+  var BAG_CENTRE_PX = 44;      // the bag sits this far in from the bottom-left corner
 
-  /* ---------- A skill inside the notebook: the six that change a Part B mark ---------- */
+  /* ---------- The word of the day ---------- */
 
-  var SKILLS = [
-    { text: "Choose the question you can find three points for.", href: "part-b.html#choose", where: "Choosing your question" },
-    { text: "Plan for ten minutes before you write.", href: "part-b.html#plan", where: "The 10-minute plan" },
-    { text: "Use three different ideas, each with a Hong Kong example.", href: "part-b.html#method", where: "The content method" },
-    { text: "Build every body paragraph with Claim, Reason, Evidence, Impact.", href: "part-b.html#crei", where: "CREI paragraphs" },
-    { text: "Follow the format and tone of your text type.", href: "part-b.html#features", where: "Text-type features" },
-    { text: "Swap vague words for precise ones.", href: "part-b.html#vocab", where: "Topic vocabulary" }
-  ];
+  // One list for each month; a month without one uses the latest earlier list, so there is always a word.
+  function wordsFor(date) {
+    var all = window.CLY_WORDS || {}, key = date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2);
+    var keys = Object.keys(all).filter(function (k) { return k <= key && all[k].length; }).sort();
+    return keys.length ? all[keys[keys.length - 1]] : [];
+  }
+  var now = new Date(), words = wordsFor(now), stepped = 0;
   var said = document.querySelector("[data-skill-said]"), button = document.querySelector("[data-skill-button]");
-  var pageNo = book.querySelector(".skill-no"), pageText = book.querySelector(".skill-text");
-  // a different skill opens first each day; every tap after that moves on to the next
-  var at = Math.floor(Date.now() / DAY_MS) % SKILLS.length - 1;
-  var presenting = false, presentedAt = 0, turnTimer = null;
+  var page = { word: book.querySelector(".word-word"), eg: book.querySelector(".word-eg"), topic: book.querySelector(".word-topic"), label: book.querySelector(".word-label") };
+
+  function line(label, text) {
+    var p = document.createElement("span"), b = document.createElement("strong");
+    b.textContent = label;
+    p.appendChild(b);
+    p.appendChild(document.createTextNode(text));
+    return p;
+  }
+  // today's word is on the page from the start; each tap moves on to the next in the month's list
+  function writeWord(spoken) {
+    if (!words.length) return;
+    var w = words[(now.getDate() - 1 + stepped) % words.length];
+    page.label.textContent = stepped ? "Another word" : "Word of the day";
+    page.word.textContent = w.word;
+    page.eg.textContent = w.strong;
+    page.topic.textContent = w.topic;
+    if (!said || !spoken) return;
+    var link = document.createElement("a");
+    link.href = w.href;
+    link.textContent = "More " + w.topic + " words";
+    said.textContent = "";
+    said.appendChild(line((stepped ? "Another word: " : "Word of the day: "), w.word));
+    said.appendChild(line("Without it: ", w.weak));
+    said.appendChild(line("With it: ", w.strong));
+    said.appendChild(link);
+    said.hidden = false;
+  }
+  writeWord(false);
+
+  var shown = false;         // opened by a tap, where it stands
+  var fromBag = false;       // ...or taken out of the bag, to the middle of the screen
+  var shownAt = 0, turnTimer = null, tapped = false;
 
   function turn() {
     book.classList.add("turning");
     clearTimeout(turnTimer);
     turnTimer = setTimeout(function () { book.classList.remove("turning"); }, TURN_MS);
   }
-  function showSkill() {
-    at = (at + 1) % SKILLS.length;
-    var skill = SKILLS[at], label = "Skill " + (at + 1) + " of " + SKILLS.length;
-    pageNo.textContent = label;
-    pageText.textContent = skill.text;
-    if (said) {
-      var name = document.createElement("strong"), link = document.createElement("a");
-      name.textContent = label + ": ";
-      link.href = skill.href;
-      link.textContent = "See how: " + skill.where;
-      said.textContent = "";
-      said.appendChild(name);
-      said.appendChild(document.createTextNode(skill.text + " "));
-      said.appendChild(link);
-      said.hidden = false;
-    }
-    if (button) button.textContent = "Next skill";
-    // with reduced motion the book is simply shown open (story.css); otherwise it turns to face the reader
-    if (reduceMotion) { book.classList.add("open"); return; }
-    presenting = true;
-    presentedAt = window.scrollY;
+  function nextWord() {
+    if (tapped) stepped += 1;
+    tapped = true;
+    writeWord(true);
+    if (button) button.textContent = "Next word";
+  }
+  function putBack() {
+    if (!shown) return;
+    shown = false;
+    fromBag = false;
+    stage.classList.remove("front");
     turn();
     soon();
   }
-  book.addEventListener("click", showSkill);
-  if (button) button.addEventListener("click", showSkill);
+  function show(outOfBag) {
+    nextWord();
+    if (reduceMotion) { book.classList.add("open"); return; }
+    shown = true;
+    fromBag = outOfBag;
+    shownAt = window.scrollY;
+    stage.classList.toggle("front", outOfBag);
+    turn();
+    soon();
+  }
+  book.addEventListener("click", function (e) { e.stopPropagation(); show(fromBag); });
+  if (button) button.addEventListener("click", function () { show(packed); });
+  if (bag) bag.addEventListener("click", function () { show(true); });
+  // out of the bag, a tap anywhere else puts it back
+  stage.addEventListener("click", putBack);
 
+  var packed = false;
   if (reduceMotion) return;
 
-  var SCENE_STARTS_AT = 0.2;   // a scene counts as reached when its top is this far down the window
-  var POINTER_TURN = 5;        // degrees the book leans towards a mouse
-  var POINTER_DRIFT = 26;      // pixels the nearest sticker shifts away from a mouse
-  var SPIN_PER_PX = 0.03;      // degrees a sticker turns for each pixel it travels
+  /* ---------- The journey: four poses, and the scroll positions they are reached at ---------- */
 
-  // The book: one pose for each scene, in order. x in vw, y in vh, turns in degrees, open is the cover on its hinge.
+  // x in vw, y in vh, turns in degrees, open is the cover on its hinge, s is size, o is how visible it is.
   var WIDE = [
-    { x: 0, y: 2, rx: 10, ry: -34, rz: -5, open: 0, s: 1.08 },      // title: closed, three-quarter view
-    { x: 2, y: 0, rx: 4, ry: -14, rz: 0, open: -34, s: 1 },         // forms: facing you, cover ajar
-    { x: 9, y: 0, rx: 12, ry: 14, rz: 3, open: -152, s: 0.92 },     // league: wide open on its first page
-    { x: 1, y: 4, rx: 56, ry: -4, rz: -18, open: 0, s: 0.9 }        // learn: shut, lying on the desk
+    { x: 0, y: 2, rx: 6, ry: 0, rz: 0, open: 0, s: 1.1, o: 1 },         // shut, facing the reader
+    { x: 2, y: 0, rx: 6, ry: 10, rz: 0, open: -84, s: 1, o: 1 },        // opening
+    { x: 9, y: 0, rx: 10, ry: 14, rz: 2, open: -156, s: 0.95, o: 1 }    // wide open
   ];
   var NARROW = [
-    { x: 0, y: 0, rx: 8, ry: -30, rz: -4, open: 0, s: 1.1 },
-    { x: -18, y: -6, rx: 4, ry: -12, rz: 0, open: -30, s: 1 },
-    { x: -14, y: -6, rx: 10, ry: 20, rz: 2, open: -150, s: 0.9 },
-    { x: -20, y: -4, rx: 54, ry: -4, rz: -16, open: 0, s: 0.9 }
+    { x: 0, y: 0, rx: 6, ry: 0, rz: 0, open: 0, s: 1, o: 1 },
+    { x: 0, y: 0, rx: 6, ry: 8, rz: 0, open: -84, s: 1, o: 1 },
+    { x: 0, y: 0, rx: 6, ry: 8, rz: 0, open: -156, s: 1, o: 1 }
   ];
-  // Tapped: wherever it is, the book turns to face the reader and opens on its first page, a little larger.
-  var SHOWN_WIDE = { x: 9, y: 0, rx: 6, ry: 12, rz: 0, open: -158, s: 1.25 };   // moved right, so the open cover clears the words
-  var SHOWN_NARROW = { x: -6, y: 4, rx: 6, ry: 8, rz: 0, open: -158, s: 1.7 };
-  var KEYS = ["x", "y", "rx", "ry", "rz", "open", "s"];
+  // On a phone the journey is measured in screens scrolled, so it is over before the sheets take the screen.
+  var NARROW_MARKS = [0, 0.28, 0.56, 1.2];
+  // Tapped where it stands: it turns to face the reader and opens. A phone has no room for it to grow.
+  var TAPPED_WIDE = { x: 9, y: 0, rx: 6, ry: 12, rz: 0, open: -158, s: 1.25, o: 1 };
+  var TAPPED_NARROW = { rx: 6, ry: 8, rz: 0, open: -158, o: 1 };
+  var KEYS = ["x", "y", "rx", "ry", "rz", "open", "s", "o"];
 
   var scenes = Array.prototype.slice.call(document.querySelectorAll(".scene"));
-  var narrow = window.matchMedia("(max-width: 760px)");
   var floaters = Array.prototype.map.call(stage.querySelectorAll(".floater"), function (el) {
-    var d = el.dataset, size = Number(d.size);
-    el.style.left = d.x + "%";
-    el.style.width = "max(" + size + "vw, " + size * 6 + "px)";
-    return { el: el, y: Number(d.y), speed: Number(d.speed), spin: Number(d.spin) };
+    var d = el.dataset;
+    return { el: el, x: Number(d.x), y: Number(d.y), px: Number(d.px || d.x), py: Number(d.py || d.y), size: Number(d.size), speed: Number(d.speed), spin: Number(d.spin) };
   });
 
-  var starts = [], windowHeight = 0, pointer = { x: 0, y: 0 }, queued = false, shown = "";
+  var sceneStarts = [], marks = [], away = null, outOfBag = null;
+  var width = 0, height = 0, pointer = { x: 0, y: 0 }, queued = false, tint = "";
+
+  function clamp(t) { return Math.min(1, Math.max(0, t)); }
+  function ease(t) { return t * t * (3 - 2 * t); }
 
   function measure() {
-    windowHeight = window.innerHeight;
-    starts = scenes.map(function (s, i) { return i === 0 ? 0 : s.offsetTop - windowHeight * SCENE_STARTS_AT; });
+    width = window.innerWidth;
+    height = window.innerHeight;
+    sceneStarts = scenes.map(function (s, i) { return i === 0 ? 0 : s.offsetTop - height * SCENE_STARTS_AT; });
+    marks = narrow.matches ? NARROW_MARKS.map(function (m) { return m * height; }) : sceneStarts.slice(0, 4);
+    // where the notebook's own centre sits (story.css), and so how far it travels to reach the bag or the middle
+    var box = book.offsetParent ? { left: book.offsetLeft + book.offsetWidth / 2, top: book.offsetTop + book.offsetHeight / 2, w: book.offsetWidth } : { left: width * 0.7, top: height * 0.5, w: 200 };
+    away = { x: (BAG_CENTRE_PX - box.left) / width * 100, y: (height - BAG_CENTRE_PX - box.top) / height * 100, rx: 0, ry: 0, rz: -14, open: 0, s: 0.16, o: 0 };
+    // out of the bag: open in the middle, sized so that cover and page together stay inside the screen
+    var size = Math.min(1.3, (width - 32) / (box.w * 2.05));
+    // the open cover lies to the left of the spine, so the notebook itself sits right of centre by about half its width
+    outOfBag = { x: (width / 2 + box.w * size * 0.48 - box.left) / width * 100, y: (height * 0.48 - box.top) / height * 100, rx: 6, ry: 0, rz: 0, open: -160, s: size, o: 1 };
+    floaters.forEach(function (f) {
+      f.el.style.left = (narrow.matches ? f.px : f.x) + "%";
+      f.el.style.width = "max(" + f.size + "vw, " + f.size * 6 + "px)";
+    });
   }
-  function ease(t) { return t * t * (3 - 2 * t); }
+
+  function pose(y) {
+    var poses = narrow.matches ? NARROW : WIDE, i = 0, out = {};
+    while (i < marks.length - 2 && y >= marks[i + 1]) i++;
+    var t = marks[i + 1] > marks[i] ? clamp((y - marks[i]) / (marks[i + 1] - marks[i])) : 0;
+    if (i < poses.length - 1) {
+      KEYS.forEach(function (k) { out[k] = poses[i][k] + (poses[i + 1][k] - poses[i][k]) * ease(t); });
+      out.packing = 0;
+      return out;
+    }
+    // the last stretch: it stays open a while, then shuts, travels to the bag and is gone
+    var open = poses[poses.length - 1], p = clamp((t - STAYS_OPEN) / (1 - STAYS_OPEN));
+    var shut = ease(clamp(p / SHUT_BY)), move = ease(clamp((p - MOVES_FROM) / (1 - MOVES_FROM))), fade = clamp((p - FADES_FROM) / (1 - FADES_FROM));
+    ["rx", "ry", "rz", "open"].forEach(function (k) { out[k] = open[k] + (away[k] - open[k]) * shut; });
+    ["x", "y", "s"].forEach(function (k) { out[k] = open[k] + (away[k] - open[k]) * move; });
+    out.o = 1 - fade;
+    out.packing = p;
+    return out;
+  }
 
   function draw() {
     queued = false;
-    var y = window.scrollY, i = 0;
-    while (i < starts.length - 2 && y >= starts[i + 1]) i++;
-    var from = starts[i], to = starts[i + 1];
-    var t = to > from ? ease(Math.min(1, Math.max(0, (y - from) / (to - from)))) : 0;
-    var poses = narrow.matches ? NARROW : WIDE, a = poses[i], b = poses[i + 1] || a;
-    var held = presenting ? (narrow.matches ? SHOWN_NARROW : SHOWN_WIDE) : null;
+    var y = window.scrollY, at = pose(y), held = null;
+    if (shown) held = fromBag ? outOfBag : (narrow.matches ? TAPPED_NARROW : TAPPED_WIDE);
     KEYS.forEach(function (k) {
-      var lean = k === "ry" ? pointer.x * POINTER_TURN : k === "rx" ? -pointer.y * POINTER_TURN : 0;
-      var value = held && k in held ? held[k] : a[k] + (b[k] - a[k]) * t;
+      var lean = held && fromBag ? 0 : k === "ry" ? pointer.x * POINTER_TURN : k === "rx" ? -pointer.y * POINTER_TURN : 0;
+      var value = held && k in held ? held[k] : at[k];
       book.style.setProperty("--" + k, (value + lean).toFixed(3));
     });
-    var scene = scenes[t > 0.5 ? i + 1 : i].getAttribute("data-scene");
-    if (scene !== shown) { shown = scene; stage.setAttribute("data-scene", scene); }
+    // the bag: there once packing begins, large while the notebook goes in, a small button afterwards
+    packed = at.packing >= 1;
+    if (bag) {
+      bag.hidden = at.packing <= 0;
+      bag.classList.toggle("packing", at.packing > 0 && at.packing < 1);
+      bag.classList.toggle("lid-up", at.packing > 0 && at.packing < FADES_FROM);
+    }
+    book.classList.toggle("away", packed && !shown);
+
+    var i = 0;
+    while (i < sceneStarts.length - 1 && y >= sceneStarts[i + 1] - height * 0.3) i++;
+    var name = scenes[i].getAttribute("data-scene");
+    if (name !== tint) { tint = name; stage.setAttribute("data-scene", name); }
+
     floaters.forEach(function (f) {
-      var travelled = y * f.speed;
-      f.el.style.setProperty("--fy", (f.y / 100 * windowHeight - travelled).toFixed(1));
+      var travelled = y * f.speed, top = (narrow.matches ? f.py : f.y) / 100 * height;
+      f.el.style.setProperty("--fy", (top - travelled).toFixed(1));
       f.el.style.setProperty("--fr", (f.spin + travelled * SPIN_PER_PX * (f.spin < 0 ? -1 : 1)).toFixed(2));
       f.el.style.setProperty("--px", (-pointer.x * f.speed * POINTER_DRIFT).toFixed(1));
     });
@@ -133,30 +215,30 @@
   function remeasure() { measure(); soon(); }
 
   window.addEventListener("scroll", function () {
-    // an open book shuts and goes back to following the page once the reader scrolls on
-    if (presenting && Math.abs(window.scrollY - presentedAt) > SHUTS_AFTER_PX) { presenting = false; turn(); }
+    if (shown && Math.abs(window.scrollY - shownAt) > SHUTS_AFTER_PX) putBack();
     soon();
   }, { passive: true });
   window.addEventListener("resize", remeasure);
   window.addEventListener("load", remeasure);
   // the sheets change height as their contents arrive (the stickers, the tip), so the scenes are measured again
   if ("ResizeObserver" in window) new ResizeObserver(remeasure).observe(document.querySelector(".story"));
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") putBack(); });
 
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
     window.addEventListener("pointermove", function (e) {
-      pointer = { x: e.clientX / window.innerWidth * 2 - 1, y: e.clientY / window.innerHeight * 2 - 1 };
+      pointer = { x: e.clientX / width * 2 - 1, y: e.clientY / height * 2 - 1 };
       soon();
     }, { passive: true });
-    // pointing at a form shows its cover on the book, as if picking that book up
+    // pointing at a form shows its cover colour on the notebook, as if picking that book up
     Array.prototype.forEach.call(document.querySelectorAll(".directory li"), function (row) {
       // the form is read from the row's own mark: "S.3" is the s3 book
       var form = row.querySelector(".form-mark").textContent.replace(".", "").toLowerCase();
-      function show() { stage.setAttribute("data-form", form); }
-      function hide() { stage.removeAttribute("data-form"); }
-      row.addEventListener("pointerenter", show);
-      row.addEventListener("pointerleave", hide);
-      row.addEventListener("focusin", show);
-      row.addEventListener("focusout", hide);
+      function on() { stage.setAttribute("data-form", form); }
+      function off() { stage.removeAttribute("data-form"); }
+      row.addEventListener("pointerenter", on);
+      row.addEventListener("pointerleave", off);
+      row.addEventListener("focusin", on);
+      row.addEventListener("focusout", off);
     });
   }
 

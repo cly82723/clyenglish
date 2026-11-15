@@ -35,11 +35,11 @@
 <!-- The stage: the exercise book and the fox stickers, fixed behind the page and moved by scrolling (story.js). Decoration only. -->
 <div class="stage" aria-hidden="true">
   <div class="floaters">
-    <img class="floater far" src="images/fox/sleep.png" alt="" width="410" height="420" data-x="88" data-y="14" data-speed="0.18" data-spin="-10" data-size="13">
+    <img class="floater far phone" src="images/fox/sleep.png" alt="" width="410" height="420" data-x="88" data-y="14" data-speed="0.18" data-spin="-10" data-size="13" data-px="50" data-py="46">
     <img class="floater far" src="images/fox/read.png" alt="" width="280" height="420" data-x="88" data-y="118" data-speed="0.22" data-spin="12" data-size="10">
     <span class="floater sheet-paper far" data-x="30" data-y="16" data-speed="0.15" data-spin="-24" data-size="9"></span>
-    <img class="floater mid" src="images/fox/wave.png" alt="" width="235" height="420" data-x="14" data-y="150" data-speed="0.5" data-spin="8" data-size="11">
-    <img class="floater mid" src="images/fox/star.png" alt="" width="316" height="420" data-x="90" data-y="226" data-speed="0.55" data-spin="-14" data-size="15">
+    <img class="floater mid phone" src="images/fox/wave.png" alt="" width="235" height="420" data-x="14" data-y="150" data-speed="0.5" data-spin="8" data-size="11" data-px="34" data-py="150">
+    <img class="floater mid phone" src="images/fox/star.png" alt="" width="316" height="420" data-x="90" data-y="226" data-speed="0.55" data-spin="-14" data-size="15" data-px="64" data-py="250">
     <span class="floater sheet-paper mid" data-x="78" data-y="84" data-speed="0.45" data-spin="30" data-size="12"></span>
     <img class="floater near" src="images/fox/cheer.png" alt="" width="310" height="420" data-x="6" data-y="312" data-speed="0.95" data-spin="-8" data-size="17">
     <img class="floater near" src="images/fox/thumbs-up.png" alt="" width="276" height="420" data-x="93" data-y="420" data-speed="1.05" data-spin="10" data-size="16">
@@ -52,9 +52,10 @@
     <div class="book-face book-edge book-edge-top"></div>
     <div class="book-face book-edge book-edge-bottom"></div>
     <div class="book-face book-page">
-      <p class="skill-no"></p>
-      <p class="skill-text"></p>
-      <p class="skill-more">Tap for the next skill</p>
+      <p class="word-label">Word of the day</p>
+      <p class="word-word"></p>
+      <p class="word-eg"></p>
+      <p class="word-topic"></p>
     </div>
     <div class="book-front">
       <div class="book-face book-outside">
@@ -66,6 +67,16 @@
   </div>
 </div>
 <div class="stage-tint" aria-hidden="true"></div>
+<!-- where the notebook is packed away; once it is inside, tapping the bag takes it out again -->
+<button type="button" class="bag" data-bag hidden aria-label="Take the notebook out: word of the day">
+  <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <path d="M24 14v-3a8 8 0 0 1 16 0v3" fill="none" stroke="#1d2a3a" stroke-width="3" stroke-linecap="round"/>
+    <rect x="10" y="14" width="44" height="44" rx="12" fill="#1f7a45" stroke="#1d2a3a" stroke-width="2.5"/>
+    <path class="bag-flap" d="M10 30V26a12 12 0 0 1 12-12h20a12 12 0 0 1 12 12v4q-22 8-44 0z" fill="#17603a" stroke="#1d2a3a" stroke-width="2.5" stroke-linejoin="round"/>
+    <rect x="20" y="38" width="24" height="14" rx="4" fill="#e8f5ec" stroke="#1d2a3a" stroke-width="2.5"/>
+    <circle cx="32" cy="31" r="3.5" fill="#f2711c" stroke="#1d2a3a" stroke-width="2"/>
+  </svg>
+</button>
 
 <main class="story" id="main">
   <section class="scene scene-title" data-scene="title">
@@ -73,7 +84,7 @@
     <p class="scene-line">One level higher.</p>
     <p class="scene-sub">English practice from S.3 to the HKDSE</p>
     <!-- the same thing the notebook does when it is tapped, for keyboards and screen readers: the stage is decoration -->
-    <p class="skill-peek"><button type="button" class="btn-quiet" data-skill-button>Open the notebook</button></p>
+    <p class="skill-peek"><button type="button" class="btn-quiet" data-skill-button>Word of the day</button></p>
     <p class="skill-said" aria-live="polite" data-skill-said hidden></p>
     <p class="scroll-hint" aria-hidden="true">Scroll</p>
   </section>
@@ -185,6 +196,7 @@
   <p>CLY English · Original guides for HKDSE English. Not affiliated with the HKEAA.</p>
 </footer>
 <script src="assets/js/data/tips.js"></script>
+<script src="assets/js/data/words.js"></script>
 <script src="assets/js/home.js"></script>
 <script src="assets/js/stickers.js"></script>
 <script src="assets/js/motion.js"></script>

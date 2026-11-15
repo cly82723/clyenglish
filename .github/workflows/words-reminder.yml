@@ -1,0 +1,44 @@
+# Reminds CLY to write next month's "word of the day" list (assets/js/data/words.js).
+# On the 22nd it always opens a reminder; on the 28th only if next month's list is still missing.
+# GitHub emails the repository owner when the issue is opened and assigned.
+name: Word of the day reminder
+
+on:
+  schedule:
+    - cron: "0 1 22,28 * *"   # 09:00 Hong Kong time on the 22nd and 28th
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open a reminder if next month's words are due
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          next=$(date -u -d "$(date -u +%Y-%m-01) +1 month" +%Y-%m)
+          name=$(date -u -d "$(date -u +%Y-%m-01) +1 month" +"%B %Y")
+          day=$(date -u +%d)
+          if grep -q "\"$next\"" assets/js/data/words.js; then
+            echo "The list for $next is already there."
+            exit 0
+          fi
+          title="Words of the day for $name are due"
+          if [ "$day" != "22" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            title="Still missing: words of the day for $name"
+          fi
+          if gh issue list --state open --search "in:title \"words of the day for $name\"" --json number --jq 'length' | grep -qv '^0$'; then
+            gh issue comment "$(gh issue list --state open --search "in:title \"words of the day for $name\"" --json number --jq '.[0].number')" --body "Reminder: the list for $name is still missing. Until it is added, the site keeps showing this month's words."
+            exit 0
+          fi
+          gh issue create --title "$title" --assignee "$OWNER" --body "The notebook on the home page needs its list of words for **$name**.
+
+          Add a block keyed \`\"$next\"\` to \`assets/js/data/words.js\`, with up to 31 entries (word, weak, strong, topic, href), or ask Claude to draft them for you to check.
+
+          Until it is added, the site keeps showing this month's words, so nothing breaks."

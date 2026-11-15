@@ -308,6 +308,74 @@
     count();
   }
 
+  /* ---------- Rows: a guide is one list, and each row opens in place ---------- */
+  // One row is open at a time. A link to a row, or to anything inside one, opens it. The page remembers the row
+  // a student had open; a first visit shows every row closed, so the whole list fits on one screen.
+  function initRows(main) {
+    var rows = Array.prototype.slice.call(main.querySelectorAll("details.row"));
+    var page = location.pathname.split("/").pop() || "index.html";
+    var key = "cly:row:" + main.getAttribute("data-rows");
+    var moved = window.CLY_MOVED || {};   // on Part B: where each thing that used to be on this page lives now
+    var restoring = false;
+
+    function saved(value) {
+      try {
+        if (value === undefined) return localStorage.getItem(key);
+        if (value) localStorage.setItem(key, value); else localStorage.removeItem(key);
+      } catch (e) { /* storage blocked: the list simply opens closed next time */ }
+      return null;
+    }
+    function titleOf(row) { var t = row.querySelector(".row-title"); return t ? t.textContent : row.id; }
+
+    // opens the row that is, or holds, the thing with this id; false if there is no such thing here
+    function openFor(id, scroll) {
+      var el = id && document.getElementById(id);
+      var row = el && el.closest("details.row");
+      if (!row) return false;
+      restoring = !scroll;
+      row.open = true;
+      // ladders and pickers inside the row open the panel that holds the target
+      document.dispatchEvent(new CustomEvent("cly:show", { detail: id }));
+      if (scroll) requestAnimationFrame(function () { (el === row ? row : el).scrollIntoView({ block: "start" }); });
+      return true;
+    }
+    // a link into Part B for something that has moved goes on to its new page
+    function goToMoved() {
+      var id = location.hash.slice(1);
+      if (!id || document.getElementById(id) || !moved[id]) return false;
+      location.replace(moved[id]);
+      return true;
+    }
+
+    rows.forEach(function (row) {
+      row.addEventListener("toggle", function () {
+        if (!row.open) { if (saved() === row.id) saved(""); return; }
+        // browsers without named details: shut the others here
+        rows.forEach(function (other) { if (other !== row) other.open = false; });
+        saved(row.id);
+        try { localStorage.setItem("cly:last", JSON.stringify({ href: page + "#" + row.id, label: document.title.split(" · ")[0] + " › " + titleOf(row) })); } catch (e) { /* home simply shows no "Continue" */ }
+        document.dispatchEvent(new CustomEvent("cly:read", { detail: { page: page, id: row.id } }));
+        swipe(row);
+        if (restoring) { restoring = false; return; }
+        history.replaceState(null, "", "#" + row.id);
+        // the rows above may just have closed, so the opened row is brought back to the top of the screen
+        requestAnimationFrame(function () {
+          if (row.getBoundingClientRect().top < 0) row.scrollIntoView({ block: "start" });
+        });
+      });
+    });
+
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest("a[href*='#']");
+      if (!a || a.pathname !== location.pathname || a.hash.length < 2) return;
+      if (openFor(a.hash.slice(1), true)) { e.preventDefault(); history.pushState(null, "", a.hash); }
+    });
+    window.addEventListener("hashchange", function () { if (!goToMoved()) openFor(location.hash.slice(1), true); });
+    if (goToMoved()) return;
+    if (!openFor(location.hash.slice(1), true)) openFor(saved(), false);
+  }
+
+  document.querySelectorAll("[data-rows]").forEach(initRows);
   document.querySelectorAll("[data-tabs]").forEach(initTabs);
   document.querySelectorAll(".ladder").forEach(initLadder);
   document.querySelectorAll(".checklist[data-store]").forEach(initChecklist);

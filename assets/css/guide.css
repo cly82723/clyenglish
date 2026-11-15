@@ -69,3 +69,86 @@
   .essentials > li { padding: 9px 0; break-inside: avoid; }
   .essentials, .lead, .label { max-width: none; }
 }
+
+/* ---------- A guide as one list: every row opens in place, one at a time, with no side list ---------- */
+
+/* Designed for a phone first: one column, the row heading a full-width tap target, nothing wider than the screen. */
+.rows { max-width: 760px; margin: 0 auto; padding-bottom: 56px; }
+.rows > .label, .rows > .lead, .rows > p { max-width: 68ch; }
+.rows > .title { margin-bottom: 12px; }
+.rows-group { margin: 44px 0 6px; font-size: var(--step-2); scroll-margin-top: 12px; }
+.rows-group + p { margin: 0 0 10px; color: var(--ink-soft); }
+.rows-foot { margin: 20px 0 0; }
+
+.row { border-top: 1px solid var(--rule-strong); scroll-margin-top: 8px; }
+.row:first-of-type, .rows-group + .row, .rows-group + p + .row { border-top-color: var(--ink); }
+.row:last-of-type { border-bottom: 1px solid var(--rule-strong); }
+.row > summary {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) 24px; gap: 0 12px; align-items: start;
+  padding: 14px 0; cursor: pointer; list-style: none; -webkit-tap-highlight-color: transparent;
+}
+.row > summary::-webkit-details-marker { display: none; }
+/* the mark: a ringed number for a step or an item, a boxed label for an exam question */
+.row-mark {
+  display: grid; place-items: center; width: 36px; height: 36px; margin-top: 1px;
+  border: 1.5px solid var(--ink); border-radius: 50%;
+  font: 700 1rem/1 var(--font-display); font-variant-numeric: tabular-nums;
+}
+.row-mark.wide { border-radius: 8px; font-size: 0.875rem; }
+.row-head { display: grid; gap: 2px; min-width: 0; }
+.row-kicker { font: 600 0.875rem/1.3 var(--font-display); color: var(--sky); }
+.row-title { font: 700 var(--step-1)/1.3 var(--font-display); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.row-eg { margin-top: 6px; font: 400 1rem/1.55 var(--font-body); overflow-wrap: anywhere; }
+.row-eg s { color: var(--ink-soft); text-decoration-color: var(--avoid); text-decoration-thickness: 2px; }
+.row-eg b { display: block; font-weight: 700; }
+/* the turn mark at the end of the heading: a plus that becomes a minus */
+.row > summary::after {
+  content: "+"; grid-column: 3; grid-row: 1; justify-self: end; margin-top: 4px;
+  font: 800 1.4rem/1 var(--font-display); color: var(--sky);
+}
+.row[open] > summary::after { content: "\2212"; }
+.row[open] > summary .row-title { color: var(--ink); }
+@media (hover: hover) { .row > summary:hover .row-title { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; } }
+.row > summary:focus-visible { outline-offset: 2px; }
+
+/* an open row: its body sits under the heading, full width on a phone, in line with the title on wider screens */
+.row-body { padding: 4px 0 28px; min-width: 0; }
+.row-body > :first-child { margin-top: 0; }
+.row-body .ladder, .row-body .task, .row-body table { max-width: 100%; }
+.row-body img, .row-body table { max-width: 100%; }
+.row-body .table-wrap { overflow-x: auto; }
+.lesson-part span {
+  display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; margin-right: 6px;
+  border-radius: 6px; background: var(--sky); color: var(--paper); font-size: 0.875rem;
+}
+.row-links { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.row-links a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
+  font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
+  background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 999px;
+}
+@media (hover: hover) { .row-links a:hover { background: var(--chest); border-color: var(--ink); } }
+@media (min-width: 761px) { .row-body { padding-left: 52px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .row[open] > .row-body { animation: note-in 0.24s var(--ease-out); }
+}
+@media print {
+  .rows-foot { display: none !important; }
+  .row > summary::after { display: none; }
+  .row > summary { padding: 9px 0; }
+}
+
+/* On a phone a closed row is its rule alone, so the whole list fits on one screen; the example shows once it is open. */
+@media (max-width: 760px) {
+  .row:not([open]) .row-eg { display: none; }
+  .row > summary { padding: 12px 0; }
+  .rows > .title { font-size: 1.9rem; }
+  .rows-group { margin-top: 36px; }
+}
+
+/* Tables inside a row never run past a phone's edge: fixed columns, tighter cells, and long words may break. */
+@media (max-width: 760px) {
+  .row-body table { table-layout: fixed; font-size: 0.9375rem; }
+  .row-body th, .row-body td { padding: 10px 6px; overflow-wrap: anywhere; hyphens: auto; }
+  .row-body th:first-child, .row-body td:first-child { padding-left: 0; }
+}
