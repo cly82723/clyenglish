@@ -116,7 +116,8 @@
         step("Do this week's challenge", "A cloze one week, proofreading the next. Each week runs Monday to Sunday."),
         step("Beat the clock", "You have 20 minutes. The clock keeps going if you leave, and your answers hand in by themselves."),
         step("Climb the league", "The top five each week get 5, 4, 3, 2 and 1 points. Same score? The faster time wins."),
-        step("Keep your streak", "Do the challenge every week to build a streak. Miss a whole week and it starts again.")),
+        step("Keep your streak", "Do the challenge every week to build a streak. Miss a whole week and it starts again."),
+        step("Earn fox badges", "Your first challenge earns a badge. Keep your streak to hold a streak badge, with new ones at 5, 10 and 15 weeks in a row. You don't need a high score: turning up every week is enough.")),
       h("p", { class: "meta" }, "Play fair: your teacher can see if you leave the page for more than 3 seconds. Answers come out every Monday."));
   }
 

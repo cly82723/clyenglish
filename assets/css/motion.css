@@ -141,6 +141,7 @@
   background: radial-gradient(circle at calc(50% + var(--tx, 0) * 38%) calc(50% + var(--ty, 0) * 38%), rgb(255 255 255 / 0.7), rgb(255 255 255 / 0) 58%);
   transition: opacity 0.2s var(--ease-colour);
 }
+.sticker-intro { margin: 14px 0 0; max-width: 60ch; }
 .sticker-caption { margin: 14px 0 0; min-height: 1.65em; }
 .stickers .sticker-note { margin: 6px 0 0; color: var(--ink-soft); font-size: 1rem; }
 @media (prefers-reduced-motion: no-preference) {
