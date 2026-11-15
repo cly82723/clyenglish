@@ -5,11 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CLY English · HKDSE English, one level higher</title>
 <meta name="description" content="English practice for Hong Kong secondary students: grammar for S.3 and S.4, and HKDSE Paper 2 writing guides for S.5 and S.6.">
-<script>document.documentElement.className = "js preload";</script>
+<script>
+document.documentElement.className = "js preload";
+// The book's cover is shut for a moment on the first visit of the day: never on Back, a link to a part of the page, or with reduced motion.
+(function () {
+  try {
+    var day = new Date().toDateString(), nav = performance.getEntriesByType("navigation")[0];
+    if (localStorage.getItem("cly:opened") === day || (nav && nav.type === "back_forward") || location.hash || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    localStorage.setItem("cly:opened", day);
+    document.documentElement.className += " book-closed";
+  } catch (e) { /* storage blocked: the book is simply open */ }
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/motion.css">
 <link rel="icon" href="images/brand/cly-icon-32.png" sizes="32x32">
 <link rel="icon" href="images/brand/cly-icon-16.png" sizes="16x16">
 <meta name="theme-color" content="#1f7a45">
@@ -18,6 +30,10 @@
 <a class="skip" href="#directory">Skip to the directory</a>
 
 <main class="hub" id="main">
+  <div class="book-cover" aria-hidden="true">
+    <p class="book-label"><span>CLY English</span><small>English practice from S.3 to the HKDSE</small></p>
+    <img src="images/brand/cly-mark-320.png" alt="" width="132" height="132">
+  </div>
   <section class="hello">
     <div class="hello-title"><h1>CLY English</h1><p>English practice from S.3 to the HKDSE</p></div>
     <button class="fox" type="button" tabindex="-1" aria-hidden="true">
@@ -36,6 +52,16 @@
   </nav>
 
   <p class="resume" hidden><a href="index.html"><small>Continue where you left off</small><span></span></a></p>
+
+  <section class="stickers" id="stickers" aria-labelledby="stickers-title" data-stickers hidden>
+    <div class="stickers-head">
+      <h2 id="stickers-title">Your stickers</h2>
+      <p><span data-sticker-count></span> collected</p>
+    </div>
+    <ul class="sticker-grid"></ul>
+    <p class="sticker-caption" aria-live="polite">Tap a sticker to see how to earn it.</p>
+    <p class="sticker-note">Stickers are kept on this device only. League stickers come back when you sign in to the weekly challenge.</p>
+  </section>
 
   <section class="tip-day" aria-label="CLY's tip of the day">
     <div class="bubble">
@@ -97,6 +123,8 @@
 </footer>
 <script src="assets/js/data/tips.js"></script>
 <script src="assets/js/home.js"></script>
+<script src="assets/js/stickers.js"></script>
+<script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>
 </body>
 </html>

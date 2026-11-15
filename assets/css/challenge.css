@@ -185,3 +185,68 @@ tr.you > td { background: var(--chest); }
 .pledge { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0 0; cursor: pointer; }
 .pledge input { flex: none; width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--leaf); }
 .confirm .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- The paper as an object: turned over to start, passed away to hand in, returned with its score ---------- */
+
+/* The back of the question paper, shown while the league answers. */
+.paper-back { position: relative; display: grid; place-items: center; max-width: 68ch; height: min(46vh, 380px); margin: 8px 0 24px; }
+.paper-back::before {
+  content: ""; position: absolute; inset: 0;
+  border: 1px solid var(--edge); border-radius: 12px;
+  background: repeating-linear-gradient(var(--paper) 0 31px, var(--rule) 31px 32px);
+}
+/* the words stay put for the whole wait, however slow the connection: only the sheet behind them moves */
+.paper-back p { position: relative; margin: 0; padding: 6px 14px; background: var(--paper); font: 700 var(--step-1)/1.3 var(--font-display); }
+/* The score is underlined twice, as a teacher underlines a total. */
+.big-score { position: relative; display: table; padding-bottom: 12px; }
+.big-score::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 7px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+
+/* The stamp card: one square per counted week; every second square brings a fox sticker (the orange dot). */
+.stamp-card { margin: 20px 0 0; padding: 14px 16px; border: 1px solid var(--edge); border-radius: 12px; }
+.stamp-card.on { border-color: var(--leaf); background: var(--chest); }
+.stamp-card p { margin: 0; }
+.stamps { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; padding: 0; }
+.stamps li {
+  position: relative; display: grid; place-items: center; width: 34px; height: 34px;
+  border: 1.5px dashed var(--ring); border-radius: 8px; background: var(--paper);
+  font: 700 0.875rem/1 var(--font-display); color: var(--ink-soft); font-variant-numeric: tabular-nums;
+}
+.stamps li.inked { border: 2px solid var(--leaf); }
+.stamps li.inked::before {
+  content: ""; width: 20px; height: 20px; background: var(--leaf);
+  -webkit-mask: var(--i-tick) center / contain no-repeat; mask: var(--i-tick) center / contain no-repeat;
+}
+.stamps li.gift::after {
+  content: ""; position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--highlight); border: 1.5px solid var(--ink);
+}
+.stamps li.gift.inked::after { background: var(--fox); }
+.stamp-next { font: 500 1rem/1.4 var(--font-display); }
+.stamp-card .streak { margin: 6px 0 0; padding: 0; border: 0; background: none; font-weight: 500; }
+.stamp-card .streak.on strong { color: var(--leaf); }
+/* Your own row sits a little above the table, so it is the first thing you find. */
+.board-panel tr.you { position: relative; z-index: 1; filter: drop-shadow(0 3px 6px rgb(16 38 59 / 0.2)); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .paper-back.turning::before { animation: paper-away 0.26s ease-in 0.12s forwards; }
+  @keyframes paper-away { to { transform: perspective(1400px) rotateY(88deg); } }
+  /* the face arrives in a quarter of a second: the league's clock is already running, so the turn stays short */
+  .paper.turned-in { animation: paper-face 0.26s var(--ease-out); }
+  @keyframes paper-face { from { transform: perspective(1400px) rotateY(-80deg); } }
+  .paper-back.handing::before { animation: paper-hand 0.5s ease-in forwards; }
+  @keyframes paper-hand { to { opacity: 0; transform: perspective(1400px) rotateX(64deg) translateY(-70px) scale(0.9); } }
+  .handed-in.returned { animation: paper-return 0.5s var(--ease-out); }
+  @keyframes paper-return { from { opacity: 0; transform: translateY(-26px) rotate(-1.5deg); } }
+  .returned .big-score::after { animation: pen 0.35s var(--ease-out) 0.8s both; }
+  /* the boards are dealt in from the top, a row at a time */
+  .board-panel tbody tr { animation: deal-in 0.3s var(--ease-out) both; }
+  .board-panel tbody tr:nth-child(2) { animation-delay: 40ms; }
+  .board-panel tbody tr:nth-child(3) { animation-delay: 80ms; }
+  .board-panel tbody tr:nth-child(4) { animation-delay: 120ms; }
+  .board-panel tbody tr:nth-child(5) { animation-delay: 160ms; }
+  .board-panel tbody tr:nth-child(6) { animation-delay: 200ms; }
+  .board-panel tbody tr:nth-child(n+7) { animation-delay: 240ms; }
+  @keyframes deal-in { from { opacity: 0; transform: translateY(-8px); } }
+  /* a closed week's answers are marked one after another */
+  .review-sheet.marking .answer::after { animation: pen 0.3s var(--ease-out) var(--mark-wait, 0ms) both; }
+}

@@ -348,7 +348,9 @@ Mostly flat paper. Depth exists only where the book is physically layered: the s
 Each page's cover carries a picture like an illustrated exercise-book cover (steps, meadow, great tree, hillside, garden). It keeps its colours under a soft white veil, and any part darker than a relative luminance of 0.42 is lifted, so navy cover text keeps AA after compression. The picture is fixed to the window, so the sheet slides over it like a page over a desk. Prints live in `assets/img/cover/` at 2400px and 1200px.
 
 ### Named Rules
-**The Flat Paper Rule.** Nothing on the paper casts a shadow. Separate things with a 1px pencil-edge outline, a 1px ink or grey rule, a tint or mint. Lines stay hairline: 2px is kept for focus rings and the picked answer only.
+**The Flat Paper Rule (flat at rest).** Nothing on the paper casts a shadow while it is at rest. Separate things with a 1px pencil-edge outline, a 1px ink or grey rule, a tint or mint. Lines stay hairline: 2px is kept for focus rings and the picked answer only. Since 2026-11-16 a control may lift, tilt and cast the **Held** shadow (`0 6px 14px rgb(16 38 59 / 0.2)`) only while a finger or mouse is holding it, and it lands flat again. Two things stay raised by agreement: the student's own row in a league table, and the new-sticker note in the corner.
+
+**The Still Text Rule.** Text that is being read never moves, tilts or leans. Motion belongs to controls, the cover, the home book, page turns and marks.
 
 **The Print Stays on the Cover Rule.** Pictures belong to the cover. The paper, where students read, is always plain white.
 
@@ -407,6 +409,26 @@ The main action is an ink pill; the rest are 1px outlined ink pills that fill mi
 ### Focus
 A 3px ink outline with 3px offset and 4px corners; navy on the cover too.
 
+### The book as an object (since 2026-11-16)
+All of this lives in `assets/css/motion.css` and `assets/js/motion.js`, uses CSS 3D only (no library), and is switched off by the device's reduced-motion setting, which leaves the fades above.
+- **Page turns:** moving between pages turns the sheet on its left edge (0.34s) while the cover cross-fades, using the browser's cross-page view transitions. Browsers without them load the page at once. Sections of one page turn the same way (0.3s, 6°).
+- **Held controls:** a pressed choice, chip, button, cell or directory link lifts 2px and tilts up to 7° towards the finger, with the Held shadow, then lands flat. Wide rows tilt 3°.
+- **Cover tabs:** a tab that is not open swings 9° forward on its bottom hinge under a mouse, 14° when pressed.
+- **Level ladder:** choosing a level by click or tap flips the new line down like a card (0.38s, hinged on its top edge). Whole scripts keep their fade, and keys still change the level at once.
+- **Set marks:** a set finished for the first time is stamped: its square lands from 1.6× with a small turn (0.36s).
+- **Home book:** on a laptop the hub leans up to 1.3° towards the mouse and the fox floats a layer above it. On the first visit of each day the cover is shut for a moment, then opens on its spine (0.7s). It never plays on Back or on a link to part of the page, and a tap or key skips it.
+
+### The weekly challenge (since 2026-11-16)
+- **Turning the paper over:** while the league opens the challenge, the ruled back of the paper turns away, and the paper's face arrives in 0.26s. The league's clock starts on the league's side, so the turn fills the wait that was already there.
+- **During the attempt:** held-control feedback only. Nothing else moves.
+- **Handing in:** the paper is passed away (0.5s) while the league marks it; the result arrives like returned work, and the score is underlined twice with a pen stroke. A disqualified attempt gets the plain notice.
+- **Stamp card:** replaces the streak line. One square per week that counted, eight to a row, each inked with a leaf-green tick; every second square carries an orange dot for a fox sticker. A missed week ends the streak but never removes a stamp.
+- **Boards:** rows are dealt in from the top (40ms apart), and the student's own row sits slightly raised.
+- **A closed week's answers:** ticks and crosses are written in one after another (80ms apart, about 1.5s at most); a tap shows the rest at once.
+
+### Stickers (since 2026-11-16)
+Nineteen original fox stickers drawn as SVG in `assets/js/stickers.js`: a fox head, one prop and a backing colour each, with a white die-cut rim and a 1px pencil edge so it reads on white paper. Six are earned by practice, one by the first weekly challenge, and twelve ("the fox's school year") by every second week that counts; after twelve the series repeats with a gold rim. They live on the home page under the directory. A sticker still to earn is a dashed circle. Picking one up tilts it up to 16° and shows a highlight where the pointer is. A new sticker is announced by a small note in the bottom corner, never while the league clock is running. Stickers are the one place fox orange is used as a fill.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -422,7 +444,10 @@ A 3px ink outline with 3px offset and 4px corners; navy on the cover too.
 
 ### Don't:
 - **Don't** build hero + CTA + card-grid sections; use the label panel, ruled rows and the ladder.
-- **Don't** put shadows on anything on the paper; only the sheet, the hub and the cover stickers lift.
+- **Don't** put shadows on anything at rest on the paper; only the sheet, the hub and the cover stickers lift, and a control lifts only while it is held.
+- **Don't** move, tilt or lean text that is being read.
+- **Don't** add motion to a timed challenge beyond held-control feedback, or anything that delays the paper.
+- **Don't** use another artist's characters for stickers; they are original fox drawings.
 - **Don't** use a CREI colour for anything but its move, or without its letter.
 - **Don't** let CLY's writing look like a real candidate's script.
 - **Don't** show more than one highlighter swipe in view per section.

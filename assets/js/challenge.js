@@ -14,12 +14,17 @@
   var COUNT_UP_MS = 700;       // the score counting up after handing in
   var RESEND_WAIT_S = 60;
   var WARN_AT_MS = [5 * 60 * 1000, 60 * 1000];
+  var STAMPS_SHOWN = 8;        // squares on the stamp card: one row on a phone
+  var MARK_EVERY_MS = 80;      // answers are marked one after another when a closed week is opened
+  var MARK_LAST = 18;          // ...and the last mark never waits more than about a second and a half
   var FORMAT = { cloze: "Cloze", proofreading: "Proofreading" };
 
   var league = null;
   var paperFormat = "";        // the paper being done, so the result screen's next step matches it
   var playing = false;
-  var saveNow = null;          // while playing: saves the answers at once (the test bar uses it before reloading)
+  var stamps = 0;              // weeks that have counted so far, from the league's history (see stampCard)
+  var mine = null;             // that history and this week's id, kept so a handed-in paper is counted the same way
+  var saveNow = null;         // while playing: saves the answers at once (the test bar uses it before reloading)
   // Timers and listeners belong to one view and stop when the next view is drawn.
   var cleanups = [];
   function every(ms, fn) { var t = setInterval(fn, ms); cleanups.push(function () { clearInterval(t); }); }
@@ -36,6 +41,11 @@
     build(root);
   }
   function loading(text) { view(function (el) { el.appendChild(h("p", { class: "meta loading" }, text || "Loading…")); }); }
+  // The back of the question paper, shown while the league answers: it turns over as the challenge opens ("turning")
+  // and is passed away as it is handed in ("handing"). The wait is the same as before; only what fills it changed.
+  function paperBack(text, how) {
+    view(function (el) { el.appendChild(h("div", { class: "paper-back " + how }, h("p", { class: "meta", role: "status" }, text))); });
+  }
 
   function problem(err, retry) {
     if (err && err.signIn) return signIn(err.message);
@@ -238,7 +248,7 @@
     } else {
       box.appendChild(ready(me));
     }
-    var keepGoing = s.active ? streakNote(me.streak, a.status === "done") : null;
+    var keepGoing = s.active ? stampCard(me) : null;
     if (keepGoing) box.appendChild(keepGoing);
     var covers = coverage(w.id);
     if (covers) box.appendChild(covers);
@@ -255,6 +265,38 @@
     else next = "Do the challenge every week to build one.";
     return h("p", { class: "streak" + (n > 0 ? " on" : "") },
       h("strong", null, n > 0 ? "Streak: " + plural(n, "week") + " in a row." : "Streak: none yet."), " ", h("span", null, next));
+  }
+
+  // The stamp card: one stamp for every week that counted, in a row or not, and a fox sticker for every second one.
+  // A missed week ends the streak but never takes a stamp away. Only the student sees it.
+  function seenStamps(n) {
+    var key = "cly:stamps:" + S.form;
+    try {
+      if (n === undefined) return Number(localStorage.getItem(key)) || 0;
+      localStorage.setItem(key, String(n));
+    } catch (e) { /* storage blocked: the newest stamp simply presses in again next time */ }
+    return 0;
+  }
+  function stampCard(me) {
+    var K = window.CLY_STICKERS, a = me.attempt, note = streakNote(me.streak, a.status === "done");
+    if (!K) return note;
+    mine = { history: me.history, week: me.week.id };
+    stamps = K.countStamps(mine.history, mine.week, a.status === "done" && !a.away);
+    K.league(stamps);
+    var seen = seenStamps(), from = stamps ? Math.floor((stamps - 1) / STAMPS_SHOWN) * STAMPS_SHOWN : 0, squares = [];
+    for (var i = from + 1; i <= from + STAMPS_SHOWN; i++) {
+      var inked = i <= stamps, sticker = K.bringsSticker(i);
+      squares.push(h("li", { class: (inked ? "inked" : "") + (sticker ? " gift" : "") + (inked && i > seen ? " new" : "") },
+        inked ? h("span", { class: "visually-hidden" }, "Week " + i + ": stamped" + (sticker ? ", sticker earned" : "")) : String(i)));
+    }
+    seenStamps(stamps);
+    var toNext = K.stampsToNext(stamps);
+    return h("div", { class: "stamp-card" + (stamps ? " on" : "") },
+      h("p", { class: "field-label" }, "Your stamp card"),
+      h("ol", { class: "stamps" }, squares),
+      h("p", { class: "stamp-next" }, h("strong", null, plural(stamps, "stamp") + "."),
+        " One for every week that counts. " + (toNext === 1 ? "One more week" : "Two more weeks") + " to your next fox sticker."),
+      note);
   }
 
   // Kept up to date while the page is open, so it never says "1 day" on Sunday night.
@@ -401,7 +443,7 @@
 
   // pledged: the student ticked the promise (a first start); carrying on an attempt needs no tick.
   function start(pledged) {
-    loading("Opening the challenge…");
+    paperBack("Opening the challenge…", "turning");
     league.call("start", pledged === true ? { pledged: true } : {}).then(play, function (err) { problem(err, function () { home(); }); });
   }
 
@@ -502,7 +544,7 @@
         // Still in another window when time ran out: that time away is reported before the answers go in.
         var stillAway = leftAt != null ? Date.now() - leftAt : 0;
         leftAt = null;
-        view(function (v) { v.appendChild(h("p", { class: "meta loading" }, timeUp ? "Time's up! Handing in your answers…" : "Handing in…")); });
+        paperBack(timeUp ? "Time's up! Handing in your answers…" : "Handing in…", "handing");
         (stillAway ? league.call("away", { ms: stillAway }).catch(function () { return null; }) : Promise.resolve())
           .then(function () { return league.call("submit", { answers: answers }); })
           .then(function (r) { result(r, timeUp); }, function (err) {
@@ -566,7 +608,7 @@
 
       el.appendChild(bar);
       drawAway();
-      el.appendChild(h("section", { class: "paper", "aria-labelledby": "paper-title" },
+      el.appendChild(h("section", { class: "paper turned-in", "aria-labelledby": "paper-title" },
         h("h2", { id: "paper-title" }, ch.title),
         ch.textType ? h("p", { class: "tagline" }, ch.textType) : null,
         h("p", null, ch.format === "cloze"
@@ -624,7 +666,7 @@
     if (r.disqualified) return notCounted(r, timeUp);
     view(function (el) {
       var score = h("strong", null, "0");
-      el.appendChild(h("section", { class: "handed-in" },
+      el.appendChild(h("section", { class: "handed-in returned" },
         h("h2", null, "Handed in"),
         timeUp ? h("p", { class: "time-up" }, "Time ran out, so your answers were handed in for you.") : null,
         h("p", { class: "big-score", "aria-label": r.score + " out of " + r.outOf }, score, h("span", { "aria-hidden": "true" }, " / " + r.outOf)),
@@ -638,6 +680,11 @@
       el.querySelector("h2").focus();
       countUp(score, r.score);
     });
+    // this week now counts: its stamp may bring a fox sticker, announced here once the paper is out of the way
+    if (window.CLY_STICKERS && mine) {
+      stamps = window.CLY_STICKERS.countStamps(mine.history, mine.week, true);
+      window.CLY_STICKERS.league(stamps);
+    }
   }
 
   // Handed in after being disqualified: how long they were away, and no score until the answers come out.
@@ -681,6 +728,11 @@
           P.review(d.challenge, d.answers, right),
           nextStep(reviewAdvice(P.missedTopics(d.challenge, right), score === total, d.challenge.format), d.challenge.format)));
         window.scrollTo(0, 0);
+        // the marks are written in one after another, like a paper being marked; a tap shows the rest at once
+        var marked = el.querySelector(".review-sheet");
+        marked.querySelectorAll(".answer").forEach(function (m, i) { m.style.setProperty("--mark-wait", Math.min(i, MARK_LAST) * MARK_EVERY_MS + "ms"); });
+        marked.classList.add("marking");
+        listen(marked, "pointerdown", function () { marked.classList.remove("marking"); });
       });
     }, function (err) { problem(err, function () { home("mine"); }); });
   }
