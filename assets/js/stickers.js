@@ -11,6 +11,7 @@
   var SETS_PER_EXERCISE = 5;
   var PART_B_STEPS = 5;
   var TOAST_MS = 5000;
+  var TOAST_FADE_MS = 400;
   var KEY = "cly:stickers";
 
   /* ---------- What earns what: plain functions, tested in tests/stickers.test.js ---------- */
@@ -28,7 +29,15 @@
     for (var k = 1; k <= series; k++) ids.push("year-" + ((k - 1) % SERIES_LENGTH + 1) + (k > SERIES_LENGTH ? "-gold" : ""));
     return ids;
   }
-  function stampsToNext(stamps) { return WEEKS_PER_STICKER - (stamps % WEEKS_PER_STICKER); }
+  // Weeks until the next sticker: the very first counted week brings the first-challenge sticker.
+  function stampsToNext(stamps) { return stamps < 1 ? 1 : WEEKS_PER_STICKER - (stamps % WEEKS_PER_STICKER); }
+  // Does the nth stamp bring a sticker? The first one does, then every second one.
+  function bringsSticker(n) { return n === 1 || (n > 0 && n % WEEKS_PER_STICKER === 0); }
+  function union(a, b) { return a.concat(b.filter(function (x) { return a.indexOf(x) < 0; })); }
+  // Two tabs open at once: what the other tab saved is kept, never written over.
+  function merge(mine, saved) {
+    return { earned: Object.assign({}, saved.earned, mine.earned), days: union(mine.days, saved.days), steps: union(mine.steps, saved.steps), vocab: mine.vocab || saved.vocab };
+  }
   // Practice stickers from what the pages already keep: finished sets per exercise, days visited, steps read.
   function practiceIds(facts) {
     var ids = [], sets = facts.setsDone || {}, total = 0, whole = false;
@@ -43,7 +52,7 @@
   }
   function addDay(days, day) { return days.indexOf(day) < 0 ? days.concat([day]) : days; }
 
-  var pure = { countStamps: countStamps, leagueIds: leagueIds, stampsToNext: stampsToNext, practiceIds: practiceIds, addDay: addDay, SERIES_LENGTH: SERIES_LENGTH };
+  var pure = { countStamps: countStamps, leagueIds: leagueIds, stampsToNext: stampsToNext, bringsSticker: bringsSticker, merge: merge, practiceIds: practiceIds, addDay: addDay, SERIES_LENGTH: SERIES_LENGTH };
   if (typeof module !== "undefined" && module.exports) { module.exports = pure; return; }
 
   /* ---------- The sticker sheet: one fox, a prop and a colour each ---------- */
@@ -124,14 +133,13 @@
   }
   function setsDone() {
     var out = {};
-    try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        if (k.indexOf("cly:sets-done:") !== 0) continue;
-        var list = JSON.parse(localStorage.getItem(k));
-        if (Array.isArray(list)) out[k] = list.length;
-      }
-    } catch (e) { /* storage blocked: no sets to count */ }
+    var keys = [];
+    try { for (var i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i)); } catch (e) { /* storage blocked: no sets to count */ }
+    keys.forEach(function (k) {
+      if (k.indexOf("cly:sets-done:") !== 0) return;
+      // one unreadable entry is skipped, and the rest still count
+      try { var list = JSON.parse(localStorage.getItem(k)); if (Array.isArray(list)) out[k] = list.length; } catch (e) { /* skipped */ }
+    });
     return out;
   }
 
@@ -144,21 +152,21 @@
     if (!added.length) return;
     var earned = Object.assign({}, state.earned);
     added.forEach(function (id) { earned[id] = today; });
-    state = Object.assign({}, state, { earned: earned });
+    state = merge(Object.assign({}, state, { earned: earned }), load());
     fresh = fresh.concat(added);
     save(state);
     announce();
     draw();
   }
   function update(change) {
-    state = Object.assign({}, state, change);
+    state = merge(Object.assign({}, state, change), load());
     save(state);
     give(practiceIds({ setsDone: setsDone(), days: state.days, stepsRead: state.steps, vocabDone: state.vocab }));
   }
   // The steps of a long guide are the groups in its contents; only Part B has the five to read.
-  function isPage(name) { return new RegExp("(^|/)" + name + "\\.html$").test(location.pathname); }
+  function isPage(name) { return new RegExp("(^|/)" + name + "(\\.html)?$").test(location.pathname); }
   function stepOf(sectionId) {
-    var link = document.querySelector(".index a[href='#" + sectionId + "']");
+    var link = document.querySelector(".index a[href='#" + (window.CSS && CSS.escape ? CSS.escape(sectionId) : sectionId) + "']");
     var li = link && link.closest("li");
     while (li && !li.classList.contains("index-group")) li = li.previousElementSibling;
     return li ? li.textContent.trim() : null;
@@ -166,18 +174,25 @@
 
   /* ---------- Announcing: a small sticker in the corner, never while the league clock runs ---------- */
 
-  var toast = null, hideTimer = null;
+  // The live region is on the page from the start, so screen readers hear what is put in it.
+  var toast = document.createElement("div"), hideTimer = null;
+  toast.className = "sticker-toast";
+  toast.setAttribute("role", "status");
+  document.body.appendChild(toast);
+  function hideToast() {
+    toast.classList.remove("show");
+    // emptied once it has faded, so its link can't be reached while it is out of sight
+    hideTimer = setTimeout(function () { toast.textContent = ""; }, TOAST_FADE_MS);
+  }
+  function hideSoon() { clearTimeout(hideTimer); hideTimer = setTimeout(hideToast, TOAST_MS); }
+  // it stays for as long as a mouse or the keyboard is on it
+  ["mouseenter", "focusin"].forEach(function (type) { toast.addEventListener(type, function () { clearTimeout(hideTimer); }); });
+  ["mouseleave", "focusout"].forEach(function (type) { toast.addEventListener(type, function () { if (toast.classList.contains("show")) hideSoon(); }); });
   function announce() {
     if (!fresh.length || document.body.classList.contains("playing")) return;
     var ids = fresh, last = ids[ids.length - 1], gold = /-gold$/.test(last), s = BY_ID[last.replace(/-gold$/, "")];
     fresh = [];
     if (!s) return;
-    if (!toast) {
-      toast = document.createElement("div");
-      toast.className = "sticker-toast";
-      toast.setAttribute("role", "status");
-      document.body.appendChild(toast);
-    }
     toast.innerHTML = '<span class="sticker-art">' + art(s, gold) + '</span><p><strong></strong><span></span></p>';
     toast.querySelector("strong").textContent = ids.length > 1 ? ids.length + " new stickers" : "New sticker";
     toast.querySelector("p span").textContent = s[1] + (gold ? " (gold)" : "");
@@ -190,8 +205,7 @@
     toast.classList.remove("show");
     void toast.offsetWidth;
     toast.classList.add("show");
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(function () { toast.classList.remove("show"); }, TOAST_MS);
+    hideSoon();
   }
   // a sticker earned as the clock stops is announced once the paper is out of the way
   if (window.MutationObserver) new MutationObserver(announce).observe(document.body, { attributes: true, attributeFilter: ["class"] });
@@ -245,7 +259,8 @@
     // stamps: counted weeks from the league's history (challenge.js works it out with countStamps)
     league: function (stamps) { give(leagueIds(stamps)); },
     countStamps: countStamps,
-    stampsToNext: stampsToNext
+    stampsToNext: stampsToNext,
+    bringsSticker: bringsSticker
   };
 
   draw();

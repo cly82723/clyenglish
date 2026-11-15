@@ -40,4 +40,4 @@ Branch `motion-3d-book`, started 2026-11-16. Nothing here is on the live site.
 
 **3. Paper interactions.** Held controls lift and tilt, cover tabs hinge, the level ladder flips, finished sets are stamped. Done when: checked on a low-end Android phone for stutter.
 
-**4. Fox stickers.** Six practice stickers, one first-challenge sticker, twelve league stickers with a gold repeat. Done when: CLY has approved the drawings, and a decision is made on moving practice stickers between devices.
+**4. Fox stickers.** Six practice stickers, one first-challenge sticker, twelve league stickers with a gold repeat. The drawings were approved on 2026-11-16. Done when: a decision is made on moving practice stickers between devices.

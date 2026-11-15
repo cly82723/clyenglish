@@ -38,7 +38,7 @@ test("after twelve stickers the series starts again in gold", () => {
 });
 
 test("a missed week does not take away progress to the next sticker", () => {
-  assert.strictEqual(S.stampsToNext(0), 2);
+  assert.strictEqual(S.stampsToNext(0), 1);
   assert.strictEqual(S.stampsToNext(1), 1);
   assert.strictEqual(S.stampsToNext(2), 2);
   assert.strictEqual(S.stampsToNext(7), 1);
@@ -54,6 +54,24 @@ test("practice stickers come from finished sets, days visited, steps read and vo
   assert.deepStrictEqual(S.practiceIds({ days: [1, 2, 3, 4, 9] }), ["five-days"]);
   assert.deepStrictEqual(S.practiceIds({ stepsRead: ["0", "1", "2", "3"] }), []);
   assert.deepStrictEqual(S.practiceIds({ stepsRead: ["0", "1", "2", "3", "4"] }), ["part-b-steps"]);
+});
+
+test("the first stamp brings a sticker, then every second one", () => {
+  assert.deepStrictEqual([1, 2, 3, 4, 5, 6].map(S.bringsSticker), [true, true, false, true, false, true]);
+  assert.strictEqual(S.bringsSticker(0), false);
+});
+
+test("what another tab saved is kept when this tab saves", () => {
+  // Arrange
+  const mine = { earned: { "first-set": 10 }, days: [10], steps: ["Step 0"], vocab: false };
+  const saved = { earned: { vocab: 11 }, days: [10, 11], steps: ["Step 1"], vocab: true };
+
+  // Act
+  const both = S.merge(mine, saved);
+
+  // Assert
+  assert.deepStrictEqual(both, { earned: { vocab: 11, "first-set": 10 }, days: [10, 11], steps: ["Step 0", "Step 1"], vocab: true });
+  assert.deepStrictEqual(mine.days, [10]);
 });
 
 test("a day is counted once, and the list it was given is left alone", () => {

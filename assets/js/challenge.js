@@ -23,6 +23,7 @@
   var paperFormat = "";        // the paper being done, so the result screen's next step matches it
   var playing = false;
   var stamps = 0;              // weeks that have counted so far, from the league's history (see stampCard)
+  var mine = null;             // that history and this week's id, kept so a handed-in paper is counted the same way
   var saveNow = null;         // while playing: saves the answers at once (the test bar uses it before reloading)
   // Timers and listeners belong to one view and stop when the next view is drawn.
   var cleanups = [];
@@ -279,11 +280,12 @@
   function stampCard(me) {
     var K = window.CLY_STICKERS, a = me.attempt, note = streakNote(me.streak, a.status === "done");
     if (!K) return note;
-    stamps = K.countStamps(me.history, me.week.id, a.status === "done" && !a.away);
+    mine = { history: me.history, week: me.week.id };
+    stamps = K.countStamps(mine.history, mine.week, a.status === "done" && !a.away);
     K.league(stamps);
     var seen = seenStamps(), from = stamps ? Math.floor((stamps - 1) / STAMPS_SHOWN) * STAMPS_SHOWN : 0, squares = [];
     for (var i = from + 1; i <= from + STAMPS_SHOWN; i++) {
-      var inked = i <= stamps, sticker = K.stampsToNext(i) === 2;
+      var inked = i <= stamps, sticker = K.bringsSticker(i);
       squares.push(h("li", { class: (inked ? "inked" : "") + (sticker ? " gift" : "") + (inked && i > seen ? " new" : "") },
         inked ? h("span", { class: "visually-hidden" }, "Week " + i + ": stamped" + (sticker ? ", sticker earned" : "")) : String(i)));
     }
@@ -679,8 +681,10 @@
       countUp(score, r.score);
     });
     // this week now counts: its stamp may bring a fox sticker, announced here once the paper is out of the way
-    stamps += 1;
-    if (window.CLY_STICKERS) window.CLY_STICKERS.league(stamps);
+    if (window.CLY_STICKERS && mine) {
+      stamps = window.CLY_STICKERS.countStamps(mine.history, mine.week, true);
+      window.CLY_STICKERS.league(stamps);
+    }
   }
 
   // Handed in after being disqualified: how long they were away, and no score until the answers come out.
