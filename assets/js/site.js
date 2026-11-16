@@ -317,6 +317,7 @@
     var key = "cly:row:" + main.getAttribute("data-rows");
     var moved = window.CLY_MOVED || {};   // on Part B: where each thing that used to be on this page lives now
     var restoring = false;
+    var aimed = null;
 
     function saved(value) {
       try {
@@ -333,7 +334,14 @@
       var row = el && el.closest("details.row");
       if (!row) return false;
       restoring = !scroll;
+      // a link to something inside a closed row: once the row has opened, the screen goes to that thing, not the row's top
+      aimed = scroll && !row.open && el !== row ? el : null;
       row.open = true;
+      // a fold inside the row (a question's sample answers) opens too when the link points into it
+      for (var fold = el.closest("details"); fold && fold !== row; fold = fold.parentElement.closest("details")) fold.open = true;
+      // a link to a past question that has a sample opens the sample with it
+      var sample = el.classList.contains("q") && el.querySelector(".q-sample");
+      if (sample) sample.open = true;
       // ladders and pickers inside the row open the panel that holds the target
       document.dispatchEvent(new CustomEvent("cly:show", { detail: id }));
       if (scroll) requestAnimationFrame(function () { (el === row ? row : el).scrollIntoView({ block: "start" }); });
@@ -357,6 +365,12 @@
         document.dispatchEvent(new CustomEvent("cly:read", { detail: { page: page, id: row.id } }));
         swipe(row);
         if (restoring) { restoring = false; return; }
+        if (aimed) {
+          var target = aimed;
+          aimed = null;
+          requestAnimationFrame(function () { target.scrollIntoView({ block: "start" }); });
+          return;
+        }
         history.replaceState(null, "", "#" + row.id);
         // the rows above may just have closed, so the opened row is brought back to the top of the screen
         requestAnimationFrame(function () {
