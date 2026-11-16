@@ -7,13 +7,13 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const idsIn = (html) => new Set((html.match(/ id="([^"]+)"/g) || []).map((s) => s.slice(5, -1)));
-const GUIDES = ["part-a.html", "part-b.html", "text-types.html", "samples.html", "toolkit.html", "final.html"];
+const GUIDES = ["part-a.html", "part-b.html", "text-types.html", "samples.html", "toolkit.html", "final.html", "cutoffs.html"];
 const pages = Object.fromEntries(GUIDES.map((f) => [f, read(f)]));
 const moved = JSON.parse(pages["part-b.html"].match(/window\.CLY_MOVED = (\{.*?\});/)[1]);
 
 test("every S.5 and S.6 guide is one list of rows, with no side contents list", () => {
   for (const file of GUIDES) {
-    assert.ok(/<details class="row"/.test(pages[file]), file + " has no rows");
+    assert.ok(/<details class="row[ "]/.test(pages[file]), file + " has no rows");
     assert.ok(!/<nav class="index"/.test(pages[file]), file + " still has a side list");
   }
 });
@@ -23,11 +23,29 @@ test("Part B is five steps, in order", () => {
   assert.deepStrictEqual(rows, ["choose", "method", "crei", "language", "check"]);
 });
 
-test("the strip is the same six links on every S.5 and S.6 guide", () => {
+test("the strip is the same seven links on every S.5 and S.6 guide", () => {
   const strip = (html) => [...html.match(/<nav class="forms"[\s\S]*?<\/nav>/)[0].matchAll(/<a href="([^"]+)"/g)].map((m) => m[1]);
   for (const file of GUIDES) {
-    assert.deepStrictEqual(strip(pages[file]), ["part-a.html", "part-b.html", "text-types.html", "samples.html", "toolkit.html", "final.html"], file);
+    assert.deepStrictEqual(strip(pages[file]), ["part-a.html", "part-b.html", "text-types.html", "samples.html", "toolkit.html", "final.html", "cutoffs.html"], file);
   }
+});
+
+test("cut-offs run from 2026 back to 2013, six levels a year, each level no higher than the one above", () => {
+  const rows = [...pages["cutoffs.html"].matchAll(/<details class="row cut-row" id="y(\d{4})"[\s\S]*?<\/summary>/g)];
+  const years = rows.map((m) => Number(m[1]));
+  assert.deepStrictEqual(years, Array.from({ length: 14 }, (_, i) => 2026 - i));
+  for (const m of rows) {
+    const levels = [...m[0].matchAll(/class="cut-lv">([^<]+)<\/span><b>(\d+)%/g)];
+    assert.deepStrictEqual(levels.map((l) => l[1]), ["5**", "5*", "5", "4", "3", "2"], m[1]);
+    const shares = levels.map((l) => Number(l[2]));
+    assert.deepStrictEqual(shares, shares.slice().sort((a, b) => b - a), m[1] + " is out of order");
+  }
+});
+
+test("the cut-offs page says its figures are estimates and names where they come from", () => {
+  const html = pages["cutoffs.html"];
+  assert.ok(/Estimates, not official/.test(html));
+  ["afterschool.com.hk", "notesity.hk", "dsetreasure.com"].forEach((site) => assert.ok(html.includes(site), site + " is not credited"));
 });
 
 test("past paper samples are nine questions, newest year first, each with its text type", () => {
