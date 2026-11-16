@@ -174,9 +174,31 @@
 .bag[hidden] { display: none; }
 .bag svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .bag-flap { transform-origin: 32px 14px; transition: transform 0.3s var(--ease-out); }
-/* while the notebook is going in, the bag is larger and its flap is up */
-.bag.packing { transform: scale(1.45); }
-.bag.lid-up .bag-flap { transform: rotate(-58deg) translate(-4px, -2px); }
+/* while the notebook is going in, the bag is larger and its flap is thrown right back */
+.bag.packing { transform: scale(1.6); }
+.bag.lid-up .bag-flap { transform: rotate(-104deg) translate(-5px, -3px); }
+@media (prefers-reduced-motion: no-preference) {
+  /* it arrives with a hop as the notebook starts to shut, and takes the notebook's weight when it lands */
+  .bag:not([hidden]) { animation: bag-in 0.4s var(--ease-out); }
+  @keyframes bag-in { from { opacity: 0; transform: translateY(40px) scale(0.6); } }
+  .bag.gulp svg { animation: bag-gulp 0.55s var(--ease-out); transform-origin: 50% 100%; }
+  @keyframes bag-gulp {
+    0% { transform: none; }
+    28% { transform: scale(1.14, 0.8); }
+    58% { transform: scale(0.94, 1.1); }
+    80% { transform: scale(1.03, 0.97); }
+    100% { transform: none; }
+  }
+}
+
+/* Being packed: the notebook crosses in front of the page on its way to the bag. It is see-through for the trip
+   (story.js) and taps go straight through it, so it never hides a word for long or blocks a link. */
+.stage.packing { z-index: 7; }
+.bag.swallows { z-index: 8; }
+.stage.packing .book { pointer-events: none; }
+.floaters { transition: opacity 0.25s var(--ease-colour); }
+.stage.quiet .floaters { opacity: 0; }
+.stage.packing .floaters { visibility: hidden; }
 
 /* Taken out of the bag: the stage comes in front of everything, over a dimmed page; a tap anywhere puts it back. */
 .stage.front { z-index: 8; pointer-events: auto; background: rgb(29 42 58 / 0.5); }
@@ -190,6 +212,7 @@
   .stage { z-index: 0; }
   .stage-tint { z-index: -1; }
   .stage.front { z-index: 8; }
+  .stage.packing { z-index: 7; }
   /* the notebook: above the headline, sized so that it and its opened cover both stay inside the screen */
   .book { --bw: clamp(112px, 34vw, 150px); left: 64%; top: 26%; }
   /* the first screen ends early enough for "Pick your form" to show at its foot */

@@ -17,7 +17,7 @@
 
   /* ---------- Pressed controls lift and tilt towards the finger, then land flat ---------- */
 
-  var TILTS = ".choice, .chip, .btn, .btn-quiet, .cell, .letter, .set-mark, .sticker, .directory a, .resume a, .forms a, .pager a, .word-cell, .levelup-steps button";
+  var TILTS = ".choice, .chip, .btn, .btn-quiet, .cell, .letter, .set-mark, .sticker, .directory a, .resume a, .forms a, .pager a, .word-cell, .levelup-steps button, .stamp-card, tr.step";
   var held = null;
   function release() {
     if (!held) return;
@@ -38,6 +38,43 @@
   }, { passive: true });
   ["pointerup", "pointercancel", "dragstart", "blur"].forEach(function (type) { window.addEventListener(type, release, { passive: true }); });
   document.addEventListener("scroll", release, { passive: true });
+
+  /* ---------- The league: its rules, stamp card and tables arrive as they are scrolled to, once ---------- */
+
+  // challenge.js redraws #challenge for each screen, so new arrivals are picked up as they are added. An element
+  // waits (challenge.css: .waits) only once it is being watched, so without this code nothing is ever hidden.
+  var league = document.getElementById("challenge");
+  if (league && "IntersectionObserver" in window && "MutationObserver" in window) {
+    var ARRIVES = ".how .skeleton > li, .stamp-card, .board-panel table";
+    var DEAL_GAP_MS = 110;   // between two things that come into view together, so they land one after another
+    var seen = new IntersectionObserver(function (entries) {
+      var landed = 0;
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        seen.unobserve(entry.target);
+        entry.target.style.setProperty("--wait", landed++ * DEAL_GAP_MS + "ms");
+        entry.target.classList.remove("waits");
+        entry.target.classList.add("arrives");
+      });
+    });
+    // challenge.js changes text often (clocks, the mark counting up), so one look per frame is enough
+    var looking = false;
+    var watch = function () {
+      if (looking) return;
+      looking = true;
+      requestAnimationFrame(look);
+    };
+    var look = function () {
+      looking = false;
+      Array.prototype.forEach.call(league.querySelectorAll(ARRIVES), function (el) {
+        if (el.classList.contains("waits") || el.classList.contains("arrives")) return;
+        el.classList.add("waits");
+        seen.observe(el);
+      });
+    };
+    new MutationObserver(watch).observe(league, { childList: true, subtree: true });
+    look();
+  }
 
   /* ---------- A sticker catches the light where the pointer is ---------- */
 

@@ -12,6 +12,7 @@
   var SAVE_AFTER_MS = 2500;    // answers are saved this long after the last change
   var LIMIT_MS = 20 * 60 * 1000;
   var COUNT_UP_MS = 700;       // the score counting up after handing in
+  var FLIP_MS = 520;           // ...once the result sheet has turned over (challenge.css: paper-flip)
   var RESEND_WAIT_S = 60;
   var WARN_AT_MS = [5 * 60 * 1000, 60 * 1000];
   var STAMPS_SHOWN = 8;        // squares on the stamp card: one row on a phone
@@ -300,11 +301,28 @@
   }
 
   // Kept up to date while the page is open, so it never says "1 day" on Sunday night.
+  // Shown as a small flip clock (days, hours, minutes); a screen reader hears the plain words instead.
   function countdown(closesAt) {
-    var span = h("span", { class: "countdown" });
-    var draw = function () { span.textContent = " · closes in " + closesIn(closesAt - Date.now()); };
+    var said = h("span", { class: "visually-hidden" });
+    var tiles = ["d", "h", "m"].map(function (unit) { return { digits: h("b"), unit: unit }; });
+    var span = h("span", { class: "countdown" }, " · closes in ", said,
+      h("span", { class: "flip-clock", "aria-hidden": "true" }, tiles.map(function (t) { return [t.digits, h("i", null, t.unit)]; })));
+    var draw = function () {
+      var ms = Math.max(0, closesAt - Date.now()), mins = Math.ceil(ms / 60000);
+      var words = closesIn(ms);
+      if (said.textContent !== words) said.textContent = words;
+      [Math.floor(mins / 1440), Math.floor(mins % 1440 / 60), mins % 60].forEach(function (n, i) {
+        var text = ("0" + n).slice(-2), el = tiles[i].digits;
+        if (el.textContent === text) return;
+        el.textContent = text;
+        // a tile whose number changed turns over (challenge.css)
+        el.classList.remove("tick");
+        void el.offsetWidth;
+        el.classList.add("tick");
+      });
+    };
     draw();
-    every(30000, draw);
+    every(10000, draw);
     return span;
   }
 
@@ -391,12 +409,16 @@
       h("tbody", null, rows)));
   }
   var you = function (r, label) { return r.you ? [h("strong", null, label), " ", h("span", { class: "you-tag" }, "you")] : label; };
+  // The top three places are the podium: their rows rise as steps when the table is scrolled to (motion.js).
+  var PODIUM = 3;
+  var rowClass = function (r) { return ((r.place <= PODIUM ? "step step-" + r.place : "") + (r.you ? " you" : "")).trim() || null; };
+  var placeCell = function (r) { return h("td", null, r.place <= PODIUM ? h("span", { class: "podium" }, ordinal(r.place)) : ordinal(r.place)); };
 
   function weekBoards(d) {
     var board = function (rows, caption) {
       return table(caption, ["Place", "Student", "Score", "Time", "Points"], rows.map(function (r) {
-        return h("tr", { class: r.you ? "you" : null },
-          h("td", null, ordinal(r.place)), h("td", null, you(r, r.label)), h("td", null, r.score + " / 15"),
+        return h("tr", { class: rowClass(r) },
+          placeCell(r), h("td", null, you(r, r.label)), h("td", null, r.score + " / 15"),
           h("td", null, duration(r.timeSec)), h("td", null, String(r.points || 0)));
       }));
     };
@@ -413,8 +435,8 @@
     return h("div", { class: "season-table" },
       table("Season league table", ["Place", "Student", "Points", "1st", "2nd", "3rd", "4th", "5th", "Weeks"], d.rows.map(function (r) {
         var finishes = [r.firsts, r.seconds, r.thirds, r.fourths, r.fifths].map(function (n) { return h("td", null, String(n || 0)); });
-        return h("tr", { class: r.you ? "you" : null },
-          h("td", null, ordinal(r.place)), h("td", null, you(r, r.label)), h("td", null, h("strong", null, String(r.points))),
+        return h("tr", { class: rowClass(r) },
+          placeCell(r), h("td", null, you(r, r.label)), h("td", null, h("strong", null, String(r.points))),
           finishes, h("td", null, String(r.played)));
       })),
       h("p", { class: "meta" }, "After " + d.weeks + (d.weeks === 1 ? " week" : " weeks") + ". Students with the same points share a place, so there can be joint winners. You see everyone with points, and your own row."));
@@ -678,7 +700,8 @@
           h("button", { type: "button", class: "btn", onclick: function () { home("board", true); } }, "See the weekly board"))));
       el.querySelector("h2").setAttribute("tabindex", "-1");
       el.querySelector("h2").focus();
-      countUp(score, r.score);
+      // the sheet turns over first; the mark counts up once it is face up
+      after(CLY.reduceMotion ? 0 : FLIP_MS, function () { countUp(score, r.score); });
     });
     // this week now counts: its stamp may bring a fox sticker, announced here once the paper is out of the way
     if (window.CLY_STICKERS && mine) {

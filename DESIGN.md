@@ -438,7 +438,18 @@ Every S.5 and S.6 guide is a single column of rows that open in place (`details.
 - **During the attempt:** held-control feedback only. Nothing else moves.
 - **Handing in:** the paper is passed away (0.5s) while the league marks it; the result arrives like returned work, and the score is underlined twice with a pen stroke. A disqualified attempt gets the plain notice.
 - **Stamp card:** replaces the streak line. One square per week that counted, eight to a row, each inked with a leaf-green tick; every second square carries an orange dot for a fox sticker. A missed week ends the streak but never removes a stamp.
-- **Boards:** rows are dealt in from the top (40ms apart), and the student's own row sits slightly raised.
+- **Boards:** the top three places are a podium: each wears a gold, silver or bronze pill, and their rows rise as steps (third, second, first) when the table is scrolled to. The student's own row lifts into place and is marked in fox orange wherever it stands. Every other row is still text.
+
+### The league pages as they are scrolled (since 2026-11-16)
+Light and quick, never a pinned journey: students come here every week to do one thing, and "Start the challenge" stays on the first phone screen. Each of these plays once, when it is scrolled to (`assets/js/motion.js` adds `.waits`, then `.arrives`); with reduced motion, or without the observers, everything is simply in place.
+- **The rules** (welcome screen only): five numbered cards, dealt onto the page one after another. The wording is unchanged.
+- **The stamp card** is the league's one 3D object: it lies tilted back like a card on a desk, lifts to face the reader, and its stamps press in in turn. Pressed, it tilts a little; so does a podium step. No motion-sensor tilt.
+- **The countdown to closing** is a small flip clock (days, hours, minutes); a tile turns over when its number changes. A screen reader hears the plain words.
+- **The result:** the marked sheet is turned face up (0.52s), then the mark counts up.
+- **Still:** the timed paper, sign-in and a closed week's review.
+
+### Packing the notebook (home page, since 2026-11-16)
+The notebook shuts where it stands, then crosses in front of the page to the bag: about 55% see-through for the trip, with taps passing straight through it, solid again at the bag's mouth, then it drops in. The bag hops in as the notebook starts to shut, throws its flap right back, and squashes once under the notebook's weight. The packing takes about half a phone screen of scrolling, so a flick cannot skip it.
 - **A closed week's answers:** ticks and crosses are written in one after another (80ms apart, about 1.5s at most); a tap shows the rest at once.
 
 ### Stickers (since 2026-11-16)

@@ -20,11 +20,18 @@
   var TURN_MS = 700;           // how long the notebook takes to open or shut on a tap
   var SHUTS_AFTER_PX = 140;    // a notebook opened by a tap goes back to its journey once the page has scrolled this far
   var SCENE_STARTS_AT = 0.2;   // a scene counts as reached when its top is this far down the window
-  var STAYS_OPEN = 0.4;        // the share of the last stretch the notebook stays open before it is packed
-  var SHUT_BY = 0.45;          // ...then it shuts over this share of the packing,
-  var MOVES_FROM = 0.3;        // starts towards the bag at this point,
-  var FADES_FROM = 0.82;       // and is out of sight inside it from here
+  var STAYS_OPEN = 0.32;       // the share of the last stretch the notebook stays open before it is packed
+  var SHUT_BY = 0.26;          // ...then it shuts over this share of the packing,
+  var MOVES_FROM = 0.26;       // starts towards the bag at this point, in front of the page and see-through,
+  var SOLID_FROM = 0.7;        // turns solid again as it nears the bag,
+  var LANDS_AT = 0.86;         // reaches the bag's mouth here,
+  var FADES_FROM = 0.93;       // and is out of sight inside it from here
+  var GHOST = 0.55;            // how visible it is while it crosses the words
+  var GHOST_OVER = 0.1;        // the share of the packing it takes to turn see-through
   var BAG_CENTRE_PX = 44;      // the bag sits this far in from the bottom-left corner
+  var BAG_MOUTH_PX = 92;       // ...and, grown for the packing, its mouth is this far above the bottom edge
+  var AT_MOUTH = 0.24;         // the notebook's size as it reaches the mouth
+  var INSIDE = 0.1;            // ...and once it has dropped in
 
   /* ---------- The word of the day ---------- */
 
@@ -122,7 +129,8 @@
     { x: 0, y: 0, rx: 6, ry: 8, rz: 0, open: -156, s: 1, o: 1 }
   ];
   // On a phone the journey is measured in screens scrolled, so it is over before the sheets take the screen.
-  var NARROW_MARKS = [0, 0.28, 0.56, 1.2];
+  // The last stretch is long enough for the packing to take half a screen of scrolling, so a flick cannot skip it.
+  var NARROW_MARKS = [0, 0.28, 0.56, 1.3];
   // Tapped where it stands: it turns to face the reader and opens. A phone has no room for it to grow.
   var TAPPED_WIDE = { x: 9, y: 0, rx: 6, ry: 12, rz: 0, open: -158, s: 1.25, o: 1 };
   var TAPPED_NARROW = { rx: 6, ry: 8, rz: 0, open: -158, o: 1 };
@@ -147,7 +155,9 @@
     marks = narrow.matches ? NARROW_MARKS.map(function (m) { return m * height; }) : sceneStarts.slice(0, 4);
     // where the notebook's own centre sits (story.css), and so how far it travels to reach the bag or the middle
     var box = book.offsetParent ? { left: book.offsetLeft + book.offsetWidth / 2, top: book.offsetTop + book.offsetHeight / 2, w: book.offsetWidth } : { left: width * 0.7, top: height * 0.5, w: 200 };
-    away = { x: (BAG_CENTRE_PX - box.left) / width * 100, y: (height - BAG_CENTRE_PX - box.top) / height * 100, rx: 0, ry: 0, rz: -14, open: 0, s: 0.16, o: 0 };
+    // "away" is the bag's mouth; from there it drops by "sinks" (in vh) to the bag's middle
+    away = { x: (BAG_CENTRE_PX - box.left) / width * 100, y: (height - BAG_MOUTH_PX - box.top) / height * 100, rx: 0, ry: 0, rz: -14, open: 0, s: AT_MOUTH,
+      sinks: (BAG_MOUTH_PX - BAG_CENTRE_PX) / height * 100 };
     // out of the bag: open in the middle, sized so that cover and page together stay inside the screen
     var size = Math.min(1.3, (width - 32) / (box.w * 2.05));
     // the open cover lies to the left of the spine, so the notebook itself sits right of centre by about half its width
@@ -169,11 +179,20 @@
     }
     // the last stretch: it stays open a while, then shuts, travels to the bag and is gone
     var open = poses[poses.length - 1], p = clamp((t - STAYS_OPEN) / (1 - STAYS_OPEN));
-    var shut = ease(clamp(p / SHUT_BY)), move = ease(clamp((p - MOVES_FROM) / (1 - MOVES_FROM))), fade = clamp((p - FADES_FROM) / (1 - FADES_FROM));
+    var shut = ease(clamp(p / SHUT_BY)), move = ease(clamp((p - MOVES_FROM) / (LANDS_AT - MOVES_FROM)));
+    var drop = ease(clamp((p - LANDS_AT) / (1 - LANDS_AT))), fade = clamp((p - FADES_FROM) / (1 - FADES_FROM));
+    // It shuts where it stands, then comes in front of the page see-through, and is solid again by the time it lands.
+    // On a phone it shut behind a sheet, so it comes through the paper from nothing; on a wide screen it only thins.
+    var from = narrow.matches ? 0 : 1, thin = from + (GHOST - from) * clamp((p - MOVES_FROM) / GHOST_OVER);
+    var seen = p < MOVES_FROM ? 1 : thin + (1 - thin) * clamp((p - SOLID_FROM) / (LANDS_AT - SOLID_FROM));
     ["rx", "ry", "rz", "open"].forEach(function (k) { out[k] = open[k] + (away[k] - open[k]) * shut; });
     ["x", "y", "s"].forEach(function (k) { out[k] = open[k] + (away[k] - open[k]) * move; });
-    out.o = 1 - fade;
+    out.y += away.sinks * drop;
+    out.s += (INSIDE - AT_MOUTH) * drop;
+    out.o = seen * (1 - fade);
     out.packing = p;
+    out.inFront = p >= MOVES_FROM && p < 1;
+    out.leaving = t;
     return out;
   }
 
@@ -188,11 +207,20 @@
     });
     // the bag: there once packing begins, large while the notebook goes in, a small button afterwards
     packed = at.packing >= 1;
+    var travelling = !!at.inFront && !shown;
     if (bag) {
       bag.hidden = at.packing <= 0;
-      bag.classList.toggle("packing", at.packing > 0 && at.packing < 1);
+      bag.classList.toggle("packing", at.packing > 0 && !packed);
       bag.classList.toggle("lid-up", at.packing > 0 && at.packing < FADES_FROM);
+      // the notebook lands: the bag takes its weight, once each time it goes in
+      bag.classList.toggle("gulp", at.packing >= FADES_FROM);
+      // from the moment it reaches the mouth the bag is in front of it, so it sinks behind the bag's front
+      bag.classList.toggle("swallows", at.packing >= LANDS_AT && !packed);
     }
+    // While it travels the notebook is in front of the page, and taps pass through it. The stickers drifting on
+    // the same stage would come forward with it, so they fade out just before it sets off and return afterwards.
+    stage.classList.toggle("packing", travelling);
+    stage.classList.toggle("quiet", (at.leaving || 0) > STAYS_OPEN / 2 && !packed);
     book.classList.toggle("away", packed && !shown);
 
     var i = 0;
