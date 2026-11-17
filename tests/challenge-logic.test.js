@@ -87,6 +87,33 @@ test("weekly ranking: score, then time; the top five get 5 to 1 points; exact ti
     [["4A-2", 1, 5], ["4A-3", 2, 4], ["4A-4", 2, 4], ["4A-1", 4, 2], ["4A-6", 5, 1], ["4A-7", 6, 0], ["4A-5", 7, 0]]);
 });
 
+test("the gap to the place above: marks behind, or seconds behind on the same score; none in first place", () => {
+  const ranked = L.rankWeek([
+    { key: "A", score: 14, timeMs: 400000 }, { key: "B", score: 12, timeMs: 500000 },
+    { key: "C", score: 12, timeMs: 512400 }, { key: "D", score: 12, timeMs: 512400 }, { key: "E", score: 9, timeMs: 100000 }
+  ]);
+  assert.strictEqual(L.gapAbove(ranked, "A"), null);
+  assert.deepStrictEqual(L.gapAbove(ranked, "B"), { place: 1, marks: 2, seconds: 0 });
+  assert.deepStrictEqual(L.gapAbove(ranked, "C"), { place: 2, marks: 0, seconds: 12 });
+  // level with C, so the place above is still 2nd, not C
+  assert.deepStrictEqual(L.gapAbove(ranked, "D"), { place: 2, marks: 0, seconds: 12 });
+  assert.deepStrictEqual(L.gapAbove(ranked, "E"), { place: 3, marks: 3, seconds: 0 });
+  assert.strictEqual(L.gapAbove(ranked, "nobody"), null);
+});
+
+test("the class table: every student counts, those who haven't taken part as 0; level averages share a place", () => {
+  const students = [
+    { key: "a1", cls: "4A" }, { key: "a2", cls: "4A" }, { key: "a3", cls: "4A" }, { key: "a4", cls: "4A" },
+    { key: "b1", cls: "4B" }, { key: "b2", cls: "4B" },
+    { key: "c1", cls: "4C" }, { key: "c2", cls: "4C" }
+  ];
+  const ranked = [{ key: "a1", score: 15 }, { key: "a2", score: 13 }, { key: "b1", score: 8 }, { key: "b2", score: 6 }, { key: "c1", score: 14 }];
+  assert.deepStrictEqual(L.classTable(students, ranked).map(c => [c.cls, c.took, c.size, c.average, c.place]),
+    [["4A", 2, 4, 7, 1], ["4B", 2, 2, 7, 1], ["4C", 1, 2, 7, 1]]);
+  const more = ranked.concat([{ key: "c2", score: 10 }]);
+  assert.deepStrictEqual(L.classTable(students, more).map(c => [c.cls, c.average, c.place]), [["4C", 12, 1], ["4A", 7, 2], ["4B", 7, 2]]);
+});
+
 test("league: points add up and level points are joint", () => {
   const table = L.leagueTable({
     w1: [{ key: "A", place: 1, points: 5 }, { key: "B", place: 2, points: 4 }, { key: "C", place: 3, points: 3 }],

@@ -431,10 +431,35 @@
     };
     var tookPart = function (n) { return h("p", { class: "took-part" }, n === 1 ? "1 student has taken part." : n + " students have taken part."); };
     var out = [h("h3", null, "This week · " + weekName(d.thisWeek.id))];
-    out.push(d.thisWeek.rows.length ? [board(d.thisWeek.rows, "This week's board"), tookPart(d.thisWeek.entrants)] : h("p", null, "Nobody has finished this week's challenge yet. Be the first!"));
-    if (d.lastWeek.rows.length) out.push(h("h3", null, "Final board · " + weekName(d.lastWeek.id)), board(d.lastWeek.rows, "Final board for " + weekName(d.lastWeek.id)), tookPart(d.lastWeek.entrants));
+    out.push(d.thisWeek.rows.length ? [board(d.thisWeek.rows, "This week's board"), gapNote(d.thisWeek.gap), tookPart(d.thisWeek.entrants)] : h("p", null, "Nobody has finished this week's challenge yet. Be the first!"));
+    if (d.lastWeek.rows.length) out.push(h("h3", null, "Final board · " + weekName(d.lastWeek.id)), board(d.lastWeek.rows, "Final board for " + weekName(d.lastWeek.id)), gapNote(d.lastWeek.gap), tookPart(d.lastWeek.entrants));
     out.push(h("p", { class: "meta" }, "Best score first. Same score? The faster time wins. Points: 5 for 1st, 4 for 2nd, 3 for 3rd, 2 for 4th, 1 for 5th. You see the top five and your own score; nobody else sees yours."));
+    // the classes this week while it runs, or last week's final order before anyone has finished this week
+    var week = d.thisWeek.classes && d.thisWeek.classes.length ? d.thisWeek : d.lastWeek;
+    if (week.classes && week.classes.length) out.push(classTable(week, d.yourClass));
     return h("div", null, out);
+  }
+
+  // How far the student is behind the place above: a target for next week, never who is there.
+  function gapNote(gap) {
+    if (!gap) return null;
+    var text = gap.marks
+      ? plural(gap.marks, "mark") + " behind " + ordinal(gap.place) + " place."
+      : "Same score as " + ordinal(gap.place) + " place, but " + plural(gap.seconds, "second") + " slower.";
+    return h("p", { class: "gap-note" }, h("strong", null, text), " That's your target.");
+  }
+
+  // Classes by their average score, where everyone in the class counts: a class rises by turning up.
+  function classTable(week, mine) {
+    return h("div", { class: "class-table" },
+      h("h3", null, "Classes · " + weekName(week.id)),
+      table("Classes by average score", ["Place", "Class", "Took part", "Average"], week.classes.map(function (c) {
+        var r = { you: c.cls === mine };
+        return h("tr", { class: r.you ? "you" : null },
+          h("td", null, ordinal(c.place)), h("td", null, you(r, c.cls)),
+          h("td", null, c.took + " of " + c.size), h("td", null, h("strong", null, c.average + " / 15")));
+      })),
+      h("p", { class: "meta" }, "Everyone in the class counts: anyone who hasn't taken part counts as 0, so the best way up is for the whole class to do the challenge."));
   }
 
   function leagueTable(d) {
