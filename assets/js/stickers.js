@@ -38,7 +38,8 @@
       ids["first-challenge"] = true;
       if (prev && dayOf(w.week) - dayOf(prev.week) > 7) ids.comeback = true;          // a week was missed in between
       if (prev && w.score > prev.score) ids.climber = true;                           // higher than the week before
-      if (i > 1 && w.score > best) ids["personal-best"] = true;                       // higher than every earlier week
+      // higher than every earlier week, or full marks again, since 15 out of 15 can't be beaten
+      if (i > 1 && (w.score > best || w.score === FULL_MARKS)) ids["personal-best"] = true;
       if (w.score === FULL_MARKS) ids["full-marks"] = true;
       if (w.points > 0) ids["top-five"] = true;
       best = Math.max(best, w.score);
@@ -107,7 +108,7 @@
     ["streak-15", "15 weeks in a row", "Do the weekly challenge 15 weeks in a row.", "#6b4596", "crown"],
     ["first-challenge", "First challenge", "Hand in your first weekly challenge.", "#dcefe2", "flag"],
     ["comeback", "Comeback", "Miss a week, then come back and do the next challenge.", "#dce8f7", "sun"],
-    ["personal-best", "Personal best", "Beat your own best score in the weekly challenge.", "#6b4596", "star"],
+    ["personal-best", "Personal best", "Beat your own best score in the weekly challenge, or get 15 out of 15 again. Counts from your third week.", "#6b4596", "star"],
     ["climber", "Climber", "Score higher than you did the week before.", "#dce8f7", "steps"],
     ["full-marks", "Full marks", "Score 15 out of 15 in a weekly challenge.", "#ffe4c8", "tick"],
     ["top-five", "Top five", "Finish a week in the top five. It shows after the week closes.", "#1a64c4", "medal"],

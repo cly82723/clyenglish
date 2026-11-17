@@ -45,6 +45,13 @@ test("climber is a higher score than the week before; personal best needs two ea
   assert.ok(!notBest.includes("personal-best"));
 });
 
+test("full marks again counts as a personal best, since 15 out of 15 can't be beaten", () => {
+  const again = S.leagueIds([week("2026-11-02", 15), week("2026-11-09", 12), week("2026-11-16", 15)]);
+  assert.ok(again.includes("personal-best"));
+  // but not before the third week, as for any personal best
+  assert.ok(!S.leagueIds([week("2026-11-02", 15), week("2026-11-09", 15)]).includes("personal-best"));
+});
+
 test("full marks and a top-five finish are read from the score and the points", () => {
   assert.ok(S.leagueIds([week("2026-11-02", 15)]).includes("full-marks"));
   assert.ok(!S.leagueIds([week("2026-11-02", 14)]).includes("full-marks"));
