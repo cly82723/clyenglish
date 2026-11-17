@@ -41,12 +41,13 @@
 
   function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); return el; }
 
-  // Opens another section of the page through its index link, so the URL, focus and pager stay in step.
-  // A part inside a topic (the Tense Matrix inside Tenses) has no index link of its own, so a stand-in link opens it.
+  // Opens another part of the page with a stand-in link, so the URL stays in step. On a page of rows (site.js,
+  // initRows) the link opens the row that holds the part, such as the Tense Matrix inside Tenses, and scrolls to it;
+  // on a page of tabbed sections it goes through the side list, as before.
   function go(id) {
     var link = document.querySelector(".index a[href='#" + id + "']");
     if (link) { link.click(); return; }
-    var sheet = document.querySelector("[data-tabs]");
+    var sheet = document.querySelector("[data-tabs]") || document.querySelector("[data-rows]");
     if (!sheet) return;
     var a = h("a", { href: "#" + id, hidden: true });
     sheet.appendChild(a); a.click(); sheet.removeChild(a);

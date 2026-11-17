@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="stylesheet" href="assets/css/motion.css">
+<link rel="stylesheet" href="assets/css/guide.css">
 <link rel="icon" href="images/brand/cly-icon-32.png" sizes="32x32">
 <link rel="icon" href="images/brand/cly-icon-16.png" sizes="16x16">
 <meta name="theme-color" content="#1f7a45">
@@ -31,100 +32,115 @@
   </nav>
 </header>
 
-<div class="sheet" data-tabs>
+<div class="sheet solo">
   <nav class="forms" aria-label="S.4 pages">
     <div><span class="form-mark">S.4</span><a href="grammar.html" aria-current="page">Grammar</a><a href="challenge.html">Weekly challenge</a></div>
   </nav>
-  <nav class="index" aria-label="Grammar topics" data-collapse>
-    <p class="index-title">S.4 Grammar</p>
-    <ol>
-      <li><a href="#tenses">Tenses</a></li>
-      <li><a href="#passive">Passive voice</a></li>
-      <li><a href="#gerunds-infinitives">Gerunds &amp; infinitives</a></li>
-      <li><a href="#conditionals">Conditionals</a></li>
-      <li><a href="#practice">Practice</a></li>
-    </ol>
-  </nav>
 
-  <main class="column" id="main">
+  <main class="column rows" id="main" data-rows="grammar">
     <h1 class="title">S.4 Grammar</h1>
     <noscript><p class="tip">These exercises need JavaScript. Turn it on in your browser to practise.</p></noscript>
 
-    <section id="tenses">
-      <h2>Tenses</h2>
-      <div class="part" id="matrix">
-        <h3>The Tense Matrix</h3>
-        <p>Every tense is a <strong>time</strong> plus an <strong>aspect</strong>. <mark class="swipe">Choose a tense to see its formula and examples.</mark></p>
-        <p class="terms">In the formulas, <strong>S</strong> is the subject, <strong>V1</strong> the base verb (<em>go</em>), <strong>V3</strong> the past participle (<em>gone</em>) and <strong>V-ing</strong> the -ing form (<em>going</em>).</p>
-        <div data-grammar="matrix"></div>
+    <details class="row" id="tenses" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">1</span>
+        <span class="row-head"><span class="row-title">Tenses</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="matrix">
+          <h3>The Tense Matrix</h3>
+          <p>Every tense is a <strong>time</strong> plus an <strong>aspect</strong>. <mark class="swipe">Choose a tense to see its formula and examples.</mark></p>
+          <p class="terms">In the formulas, <strong>S</strong> is the subject, <strong>V1</strong> the base verb (<em>go</em>), <strong>V3</strong> the past participle (<em>gone</em>) and <strong>V-ing</strong> the -ing form (<em>going</em>).</p>
+          <div data-grammar="matrix"></div>
+        </div>
+        <div class="part" id="tensequiz">
+          <h3>Quick quiz</h3>
+          <p>Read the whole sentence before you choose: some time words point the wrong way. Wrong answers get a hint and another try. There are five sets.</p>
+          <div data-grammar="tensequiz"></div>
+        </div>
+        <div class="part" id="tensecloze">
+          <h3>Tense cloze</h3>
+          <p>Pick a verb from the bank and type it in the right tense. Each verb is used once at most, and the tenses come in any order.</p>
+          <div data-grammar="tensecloze"></div>
+        </div>
       </div>
-      <div class="part" id="tensequiz">
-        <h3>Quick quiz</h3>
-        <p>Read the whole sentence before you choose: some time words point the wrong way. Wrong answers get a hint and another try. There are five sets.</p>
-        <div data-grammar="tensequiz"></div>
-      </div>
-      <div class="part" id="tensecloze">
-        <h3>Tense cloze</h3>
-        <p>Pick a verb from the bank and type it in the right tense. Each verb is used once at most, and the tenses come in any order.</p>
-        <div data-grammar="tensecloze"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="passive">
-      <h2>The passive voice</h2>
-      <div data-grammar="passive"></div>
-    </section>
+    <details class="row" id="passive" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">2</span>
+        <span class="row-head"><span class="row-title">The passive voice</span></span>
+      </summary>
+      <div class="row-body">
+        <div data-grammar="passive"></div>
+      </div>
+    </details>
 
-    <section id="gerunds-infinitives">
-      <h2>Gerunds &amp; infinitives</h2>
-      <div class="part" id="gerunds">
-        <h3>Gerunds (V-ing as a noun)</h3>
-        <div data-grammar="gerunds"></div>
+    <details class="row" id="gerunds-infinitives" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">3</span>
+        <span class="row-head"><span class="row-title">Gerunds &amp; infinitives</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="gerunds">
+          <h3>Gerunds (V-ing as a noun)</h3>
+          <div data-grammar="gerunds"></div>
+        </div>
+        <div class="part" id="infinitives">
+          <h3>To-infinitives (to + V1)</h3>
+          <div data-grammar="infinitives"></div>
+        </div>
       </div>
-      <div class="part" id="infinitives">
-        <h3>To-infinitives (to + V1)</h3>
-        <div data-grammar="infinitives"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="conditionals">
-      <h2>Conditionals</h2>
-      <div class="part" id="condmatrix">
-        <h3>The Conditionals Matrix</h3>
-        <p>Every conditional is <strong>how real</strong> plus <strong>when</strong>. <mark class="swipe">Choose one to see its formula and a picture of it.</mark></p>
-        <div data-grammar="condmatrix"></div>
+    <details class="row" id="conditionals" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">4</span>
+        <span class="row-head"><span class="row-title">Conditionals</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="condmatrix">
+          <h3>The Conditionals Matrix</h3>
+          <p>Every conditional is <strong>how real</strong> plus <strong>when</strong>. <mark class="swipe">Choose one to see its formula and a picture of it.</mark></p>
+          <div data-grammar="condmatrix"></div>
+        </div>
+        <div class="part" id="condquiz">
+          <h3>Quick quiz</h3>
+          <p>Ask: is it real or imaginary, and when does it happen?</p>
+          <div data-grammar="condquiz"></div>
+        </div>
+        <div class="part" id="condmatch">
+          <h3>Match &amp; change</h3>
+          <p><strong>Part A:</strong> match each sentence to its meaning. <strong>Part B:</strong> type the verbs in the right form.</p>
+          <div data-grammar="condmatch"></div>
+        </div>
       </div>
-      <div class="part" id="condquiz">
-        <h3>Quick quiz</h3>
-        <p>Ask: is it real or imaginary, and when does it happen?</p>
-        <div data-grammar="condquiz"></div>
-      </div>
-      <div class="part" id="condmatch">
-        <h3>Match &amp; change</h3>
-        <p><strong>Part A:</strong> match each sentence to its meaning. <strong>Part B:</strong> type the verbs in the right form.</p>
-        <div data-grammar="condmatch"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="practice">
-      <h2>Practice</h2>
-      <p>Mixed practice for everything above, and more. Each set lists what to look out for.</p>
-      <div class="part" id="verbcloze">
-        <h3>Cloze</h3>
-        <p>Put the verb in brackets into the right form. You may need any tense, the passive, a gerund or an infinitive, and sometimes “not”.</p>
-        <div data-grammar="verbcloze"></div>
+    <details class="row" id="practice" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">5</span>
+        <span class="row-head"><span class="row-title">Practice</span></span>
+      </summary>
+      <div class="row-body">
+        <p>Mixed practice for everything above, and more. Each set lists what to look out for.</p>
+        <div class="part" id="verbcloze">
+          <h3>Cloze</h3>
+          <p>Put the verb in brackets into the right form. You may need any tense, the passive, a gerund or an infinitive, and sometimes “not”.</p>
+          <div data-grammar="verbcloze"></div>
+        </div>
+        <div class="part" id="proofreading">
+          <h3>Proofreading</h3>
+          <p>Grammar, phrasal verbs, collocations, prepositions and word form. Most lines have one mistake; a few are correct, so tap “No mistake” for those.</p>
+          <div data-grammar="proofreading"></div>
+        </div>
+        <div class="part" id="weekly">
+          <h3>Weekly challenge</h3>
+          <p>Ready to test yourself? Every week there is one 20-minute challenge for S.4, a cloze one week and proofreading the next, with a weekly board and a season league table.</p>
+          <p><a href="challenge.html">Go to the weekly challenge</a></p>
+        </div>
       </div>
-      <div class="part" id="proofreading">
-        <h3>Proofreading</h3>
-        <p>Grammar, phrasal verbs, collocations, prepositions and word form. Most lines have one mistake; a few are correct, so tap “No mistake” for those.</p>
-        <div data-grammar="proofreading"></div>
-      </div>
-      <div class="part" id="weekly">
-        <h3>Weekly challenge</h3>
-        <p>Ready to test yourself? Every week there is one 20-minute challenge for S.4, a cloze one week and proofreading the next, with a weekly board and a season league table.</p>
-        <p><a href="challenge.html">Go to the weekly challenge</a></p>
-      </div>
-    </section>
+    </details>
   </main>
 </div>
 

@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="stylesheet" href="assets/css/motion.css">
+<link rel="stylesheet" href="assets/css/guide.css">
 <link rel="icon" href="images/brand/cly-icon-32.png" sizes="32x32">
 <link rel="icon" href="images/brand/cly-icon-16.png" sizes="16x16">
 <meta name="theme-color" content="#1f7a45">
@@ -31,254 +32,313 @@
   </nav>
 </header>
 
-<div class="sheet" data-tabs>
+<div class="sheet solo">
   <nav class="forms" aria-label="S.3 pages">
     <div><span class="form-mark">S.3</span><a href="s3-grammar.html" aria-current="page">Grammar</a><a href="s3-challenge.html">Weekly challenge</a></div>
   </nav>
-  <nav class="index" aria-label="Grammar topics" data-collapse>
-    <p class="index-title">S.3 Grammar · Units 1–4</p>
-    <ol>
-      <li class="index-group">Unit 1</li>
-      <li><a href="#indefinite-pronouns">Indefinite pronouns</a></li>
-      <li><a href="#noun-phrases">Noun phrases</a></li>
-      <li><a href="#bare-infinitives">Bare infinitives</a></li>
-      <li class="index-group">Unit 2</li>
-      <li><a href="#so-so-that">So, so that, so as to</a></li>
-      <li><a href="#must-have-to">Must, have to, need to</a></li>
-      <li class="index-group">Units 1 &amp; 2</li>
-      <li><a href="#units-consolidation">Consolidation</a></li>
-      <li class="index-group">Unit 3</li>
-      <li><a href="#past-perfect">Past perfect</a></li>
-      <li><a href="#present-participle">Present participle</a></li>
-      <li><a href="#past-participle">Past participle</a></li>
-      <li><a href="#participle-consolidation">Participle practice</a></li>
-      <li class="index-group">Unit 4</li>
-      <li><a href="#reported-statements">Reported statements</a></li>
-      <li><a href="#reported-questions">Reported questions</a></li>
-      <li><a href="#reported-consolidation">Reported speech practice</a></li>
-      <li><a href="#linking-words">Linking words</a></li>
-      <li class="index-group">All units</li>
-      <li><a href="#tenses">Tenses</a></li>
-      <li><a href="#practice-cloze">Practice cloze</a></li>
-    </ol>
-  </nav>
 
-  <main class="column" id="main">
+  <main class="column rows" id="main" data-rows="s3-grammar">
     <h1 class="title">S.3 Grammar · Units 1–4</h1>
     <noscript><p class="tip">These exercises need JavaScript. Turn it on in your browser to practise.</p></noscript>
 
-    <section id="indefinite-pronouns">
-      <h2>Indefinite pronouns</h2>
-      <p>Twelve topics, each with the rules in plain words, a diagram and a quiz. <mark class="swipe">The quizzes test what sounds natural, not just what fits a formula,</mark> so read every option to the end. Consolidation exercises ask you to rewrite sentences yourself.</p>
-      <div class="part" id="indefinite-rules">
-        <div data-grammar="s3lesson" data-set="indefinite"></div>
+    <h2 class="rows-group">Unit 1</h2>
+    <details class="row" id="indefinite-pronouns" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">1</span>
+        <span class="row-head"><span class="row-title">Indefinite pronouns</span></span>
+      </summary>
+      <div class="row-body">
+        <p>Twelve topics, each with the rules in plain words, a diagram and a quiz. <mark class="swipe">The quizzes test what sounds natural, not just what fits a formula,</mark> so read every option to the end. Consolidation exercises ask you to rewrite sentences yourself.</p>
+        <div class="part" id="indefinite-rules">
+          <div data-grammar="s3lesson" data-set="indefinite"></div>
+        </div>
+        <div class="part" id="indefinite-quiz">
+          <h3>Quiz</h3>
+          <p>Check how many the word means, then count the negatives. Wrong answers get a hint and another try.</p>
+          <div data-grammar="s3quiz" data-set="indefinite"></div>
+        </div>
       </div>
-      <div class="part" id="indefinite-quiz">
-        <h3>Quiz</h3>
-        <p>Check how many the word means, then count the negatives. Wrong answers get a hint and another try.</p>
-        <div data-grammar="s3quiz" data-set="indefinite"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="noun-phrases">
-      <h2>Defining and non-defining noun phrases</h2>
-      <div class="part" id="noun-rules">
-        <div data-grammar="s3lesson" data-set="noun"></div>
+    <details class="row" id="noun-phrases" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">2</span>
+        <span class="row-head"><span class="row-title">Defining and non-defining noun phrases</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="noun-rules">
+          <div data-grammar="s3lesson" data-set="noun"></div>
+        </div>
+        <div class="part" id="noun-quiz">
+          <h3>Quiz</h3>
+          <p>Cover the phrase with your finger each time: do you still know who or what is meant?</p>
+          <div data-grammar="s3quiz" data-set="noun"></div>
+        </div>
       </div>
-      <div class="part" id="noun-quiz">
-        <h3>Quiz</h3>
-        <p>Cover the phrase with your finger each time: do you still know who or what is meant?</p>
-        <div data-grammar="s3quiz" data-set="noun"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="bare-infinitives">
-      <h2>Bare infinitives</h2>
-      <div class="part" id="bare-rules">
-        <div data-grammar="s3lesson" data-set="bare"></div>
+    <details class="row" id="bare-infinitives" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">3</span>
+        <span class="row-head"><span class="row-title">Bare infinitives</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="bare-rules">
+          <div data-grammar="s3lesson" data-set="bare"></div>
+        </div>
+        <div class="part" id="bare-quiz">
+          <h3>Quiz</h3>
+          <p>Find the word that switches off "to". The tense of the sentence doesn't change the verb after it.</p>
+          <div data-grammar="s3quiz" data-set="bare"></div>
+        </div>
       </div>
-      <div class="part" id="bare-quiz">
-        <h3>Quiz</h3>
-        <p>Find the word that switches off "to". The tense of the sentence doesn't change the verb after it.</p>
-        <div data-grammar="s3quiz" data-set="bare"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="so-so-that">
-      <h2>So, so that and so as to</h2>
-      <div class="part" id="so-rules">
-        <div data-grammar="s3lesson" data-set="so"></div>
+    <h2 class="rows-group">Unit 2</h2>
+    <details class="row" id="so-so-that" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">4</span>
+        <span class="row-head"><span class="row-title">So, so that and so as to</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="so-rules">
+          <div data-grammar="s3lesson" data-set="so"></div>
+        </div>
+        <div class="part" id="so-quiz">
+          <h3>Quiz</h3>
+          <p>Ask whether it really happened or was only the aim, then look at what follows the blank.</p>
+          <div data-grammar="s3quiz" data-set="so"></div>
+        </div>
       </div>
-      <div class="part" id="so-quiz">
-        <h3>Quiz</h3>
-        <p>Ask whether it really happened or was only the aim, then look at what follows the blank.</p>
-        <div data-grammar="s3quiz" data-set="so"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="must-have-to">
-      <h2>Must, have to and need to</h2>
-      <div class="part" id="must-rules">
-        <div data-grammar="s3lesson" data-set="must"></div>
+    <details class="row" id="must-have-to" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">5</span>
+        <span class="row-head"><span class="row-title">Must, have to and need to</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="must-rules">
+          <div data-grammar="s3lesson" data-set="must"></div>
+        </div>
+        <div class="part" id="must-quiz">
+          <h3>Quiz</h3>
+          <p>In negative sentences, ask: is it forbidden, or is it a free choice?</p>
+          <div data-grammar="s3quiz" data-set="must"></div>
+        </div>
       </div>
-      <div class="part" id="must-quiz">
-        <h3>Quiz</h3>
-        <p>In negative sentences, ask: is it forbidden, or is it a free choice?</p>
-        <div data-grammar="s3quiz" data-set="must"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="units-consolidation">
-      <h2>Consolidation: Units 1 and 2</h2>
-      <p>Rewrite real sentences yourself. Part A is Unit 1, Part B is Unit 2, and Part C mixes the two, so you have to choose the right grammar first.</p>
-      <div class="part" id="units-a">
-        <h3>Part A · Unit 1</h3>
-        <div data-grammar="s3rewrite" data-set="unit1A"></div>
+    <h2 class="rows-group">Units 1 &amp; 2</h2>
+    <details class="row" id="units-consolidation" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">6</span>
+        <span class="row-head"><span class="row-title">Consolidation: Units 1 and 2</span></span>
+      </summary>
+      <div class="row-body">
+        <p>Rewrite real sentences yourself. Part A is Unit 1, Part B is Unit 2, and Part C mixes the two, so you have to choose the right grammar first.</p>
+        <div class="part" id="units-a">
+          <h3>Part A · Unit 1</h3>
+          <div data-grammar="s3rewrite" data-set="unit1A"></div>
+        </div>
+        <div class="part" id="units-b">
+          <h3>Part B · Unit 2</h3>
+          <div data-grammar="s3rewrite" data-set="unit2B"></div>
+        </div>
+        <div class="part" id="units-c">
+          <h3>Part C · Both units, mixed</h3>
+          <div data-grammar="s3rewrite" data-set="unitsMixedC"></div>
+        </div>
       </div>
-      <div class="part" id="units-b">
-        <h3>Part B · Unit 2</h3>
-        <div data-grammar="s3rewrite" data-set="unit2B"></div>
-      </div>
-      <div class="part" id="units-c">
-        <h3>Part C · Both units, mixed</h3>
-        <div data-grammar="s3rewrite" data-set="unitsMixedC"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="past-perfect">
-      <h2>Past perfect</h2>
-      <div class="part" id="pastperfect-rules">
-        <div data-grammar="s3lesson" data-set="pastPerfect"></div>
+    <h2 class="rows-group">Unit 3</h2>
+    <details class="row" id="past-perfect" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">7</span>
+        <span class="row-head"><span class="row-title">Past perfect</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="pastperfect-rules">
+          <div data-grammar="s3lesson" data-set="pastPerfect"></div>
+        </div>
+        <div class="part" id="pastperfect-quiz">
+          <h3>Quiz</h3>
+          <p>Some options are grammatical but change the meaning. Wrong answers get a hint and another try.</p>
+          <div data-grammar="s3quiz" data-set="pastPerfect"></div>
+        </div>
       </div>
-      <div class="part" id="pastperfect-quiz">
-        <h3>Quiz</h3>
-        <p>Some options are grammatical but change the meaning. Wrong answers get a hint and another try.</p>
-        <div data-grammar="s3quiz" data-set="pastPerfect"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="present-participle">
-      <h2>Present participle phrases</h2>
-      <div class="part" id="present-rules">
-        <div data-grammar="s3lesson" data-set="present"></div>
+    <details class="row" id="present-participle" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">8</span>
+        <span class="row-head"><span class="row-title">Present participle phrases</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="present-rules">
+          <div data-grammar="s3lesson" data-set="present"></div>
+        </div>
+        <div class="part" id="present-quiz">
+          <h3>Quiz</h3>
+          <p>Watch for sentences where the wrong person (or thing) is doing the action.</p>
+          <div data-grammar="s3quiz" data-set="present"></div>
+        </div>
+        <div class="part" id="present-rewrite">
+          <h3>Rewrite practice</h3>
+          <div data-grammar="s3rewrite" data-set="presentA"></div>
+        </div>
       </div>
-      <div class="part" id="present-quiz">
-        <h3>Quiz</h3>
-        <p>Watch for sentences where the wrong person (or thing) is doing the action.</p>
-        <div data-grammar="s3quiz" data-set="present"></div>
-      </div>
-      <div class="part" id="present-rewrite">
-        <h3>Rewrite practice</h3>
-        <div data-grammar="s3rewrite" data-set="presentA"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="past-participle">
-      <h2>Past participle phrases</h2>
-      <div class="part" id="past-rules">
-        <div data-grammar="s3lesson" data-set="past"></div>
+    <details class="row" id="past-participle" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">9</span>
+        <span class="row-head"><span class="row-title">Past participle phrases</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="past-rules">
+          <div data-grammar="s3lesson" data-set="past"></div>
+        </div>
+        <div class="part" id="past-quiz">
+          <h3>Quiz</h3>
+          <p>Ask each time: is the subject doing the action, or is it done to the subject?</p>
+          <div data-grammar="s3quiz" data-set="past"></div>
+        </div>
+        <div class="part" id="past-rewrite">
+          <h3>Rewrite practice</h3>
+          <div data-grammar="s3rewrite" data-set="pastB"></div>
+        </div>
       </div>
-      <div class="part" id="past-quiz">
-        <h3>Quiz</h3>
-        <p>Ask each time: is the subject doing the action, or is it done to the subject?</p>
-        <div data-grammar="s3quiz" data-set="past"></div>
-      </div>
-      <div class="part" id="past-rewrite">
-        <h3>Rewrite practice</h3>
-        <div data-grammar="s3rewrite" data-set="pastB"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="participle-consolidation">
-      <h2>Consolidation: participle phrases</h2>
-      <p>Both kinds side by side, then rewrite real sentences that mix them, so you have to choose the right one first. There are five texts to work through.</p>
-      <div data-grammar="s3visual" data-set="participle-compare"></div>
-      <div class="part" id="participle-mixed">
-        <h3>Present or past?</h3>
-        <div data-grammar="s3rewrite" data-set="participles"></div>
+    <details class="row" id="participle-consolidation" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">10</span>
+        <span class="row-head"><span class="row-title">Consolidation: participle phrases</span></span>
+      </summary>
+      <div class="row-body">
+        <p>Both kinds side by side, then rewrite real sentences that mix them, so you have to choose the right one first. There are five texts to work through.</p>
+        <div data-grammar="s3visual" data-set="participle-compare"></div>
+        <div class="part" id="participle-mixed">
+          <h3>Present or past?</h3>
+          <div data-grammar="s3rewrite" data-set="participles"></div>
+        </div>
       </div>
-    </section>
+    </details>
 
-    <section id="reported-statements">
-      <h2>Reported statements</h2>
-      <div class="part" id="statements-rules">
-        <div data-grammar="s3lesson" data-set="statements"></div>
+    <h2 class="rows-group">Unit 4</h2>
+    <details class="row" id="reported-statements" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">11</span>
+        <span class="row-head"><span class="row-title">Reported statements</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="statements-rules">
+          <div data-grammar="s3lesson" data-set="statements"></div>
+        </div>
+        <div class="part" id="statements-quiz">
+          <h3>Quiz</h3>
+          <p>Read the situation first: when was it said, and is it still true? That decides what changes.</p>
+          <div data-grammar="s3quiz" data-set="statements"></div>
+        </div>
       </div>
-      <div class="part" id="statements-quiz">
-        <h3>Quiz</h3>
-        <p>Read the situation first: when was it said, and is it still true? That decides what changes.</p>
-        <div data-grammar="s3quiz" data-set="statements"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="reported-questions">
-      <h2>Reported questions</h2>
-      <div class="part" id="questions-rules">
-        <div data-grammar="s3lesson" data-set="questions"></div>
+    <details class="row" id="reported-questions" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">12</span>
+        <span class="row-head"><span class="row-title">Reported questions</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="questions-rules">
+          <div data-grammar="s3lesson" data-set="questions"></div>
+        </div>
+        <div class="part" id="questions-quiz">
+          <h3>Quiz</h3>
+          <p>Check the word order and the full stop or question mark at the end. Both can be the trap.</p>
+          <div data-grammar="s3quiz" data-set="questions"></div>
+        </div>
       </div>
-      <div class="part" id="questions-quiz">
-        <h3>Quiz</h3>
-        <p>Check the word order and the full stop or question mark at the end. Both can be the trap.</p>
-        <div data-grammar="s3quiz" data-set="questions"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="reported-consolidation">
-      <h2>Consolidation: reported speech</h2>
-      <p>Report what people really said. Read the situation first: when was it said, and is it still true?</p>
-      <div class="part" id="reported-a">
-        <h3>Part A · Reported statements</h3>
-        <div data-grammar="s3rewrite" data-set="statementsA"></div>
+    <details class="row" id="reported-consolidation" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">13</span>
+        <span class="row-head"><span class="row-title">Consolidation: reported speech</span></span>
+      </summary>
+      <div class="row-body">
+        <p>Report what people really said. Read the situation first: when was it said, and is it still true?</p>
+        <div class="part" id="reported-a">
+          <h3>Part A · Reported statements</h3>
+          <div data-grammar="s3rewrite" data-set="statementsA"></div>
+        </div>
+        <div class="part" id="reported-b">
+          <h3>Part B · Reported questions</h3>
+          <div data-grammar="s3rewrite" data-set="questionsB"></div>
+        </div>
       </div>
-      <div class="part" id="reported-b">
-        <h3>Part B · Reported questions</h3>
-        <div data-grammar="s3rewrite" data-set="questionsB"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="linking-words">
-      <h2>Linking words</h2>
-      <div class="part" id="linking-rules">
-        <div data-grammar="s3lesson" data-set="linking"></div>
+    <details class="row" id="linking-words" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">14</span>
+        <span class="row-head"><span class="row-title">Linking words</span></span>
+      </summary>
+      <div class="row-body">
+        <div class="part" id="linking-rules">
+          <div data-grammar="s3lesson" data-set="linking"></div>
+        </div>
+        <div class="part" id="linking-quiz">
+          <h3>Quiz</h3>
+          <p>Choose the job first, then check what follows the blank: a noun, a verb, or a whole clause.</p>
+          <div data-grammar="s3quiz" data-set="linking"></div>
+        </div>
       </div>
-      <div class="part" id="linking-quiz">
-        <h3>Quiz</h3>
-        <p>Choose the job first, then check what follows the blank: a noun, a verb, or a whole clause.</p>
-        <div data-grammar="s3quiz" data-set="linking"></div>
-      </div>
-    </section>
+    </details>
 
-    <section id="tenses">
-      <h2>Tenses</h2>
-      <p>The weekly challenge can use any of these. Look for the clue words next to the blank, then choose the form. For a negative, add not or n't.</p>
-      <div class="table-wrap">
-        <table class="tenses-table">
-          <caption class="visually-hidden">The tenses, their forms and clue words</caption>
-          <thead><tr><th scope="col">Tense</th><th scope="col">Form</th><th scope="col">Clue words</th><th scope="col">Example</th></tr></thead>
-          <tbody>
-            <tr><th scope="row">Present simple</th><td data-label="Form">V1, or V1 + s</td><td data-label="Clue words">every day, usually, often</td><td data-label="Example">She <strong>walks</strong> to school every day.</td></tr>
-            <tr><th scope="row">Present continuous</th><td data-label="Form">am / is / are + V-ing</td><td data-label="Clue words">now, right now, at the moment</td><td data-label="Example">We <strong>are having</strong> lunch now.</td></tr>
-            <tr><th scope="row">Past simple</th><td data-label="Form">V2 (the past form)</td><td data-label="Clue words">yesterday, last week, ago, in 2020</td><td data-label="Example">The bus <strong>left</strong> ten minutes ago.</td></tr>
-            <tr><th scope="row">Past continuous</th><td data-label="Form">was / were + V-ing</td><td data-label="Clue words">while, when, at eight last night</td><td data-label="Example">I <strong>was reading</strong> when she called.</td></tr>
-            <tr><th scope="row">Present perfect</th><td data-label="Form">have / has + V3</td><td data-label="Clue words">since, for, already, yet</td><td data-label="Example">He <strong>has lived</strong> here since 2010.</td></tr>
-            <tr><th scope="row">Past perfect</th><td data-label="Form">had + V3</td><td data-label="Clue words">by the time, before, after</td><td data-label="Example">By the time we arrived, the film <strong>had started</strong>.</td></tr>
-            <tr><th scope="row">Future</th><td data-label="Form">will + V1, or am / is / are going to + V1</td><td data-label="Clue words">tomorrow, next week, soon</td><td data-label="Example">We <strong>will visit</strong> Grandma next week.</td></tr>
-          </tbody>
-        </table>
+    <h2 class="rows-group">All units</h2>
+    <details class="row" id="tenses" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">15</span>
+        <span class="row-head"><span class="row-title">Tenses</span></span>
+      </summary>
+      <div class="row-body">
+        <p>The weekly challenge can use any of these. Look for the clue words next to the blank, then choose the form. For a negative, add not or n't.</p>
+        <div class="table-wrap">
+          <table class="tenses-table">
+            <caption class="visually-hidden">The tenses, their forms and clue words</caption>
+            <thead><tr><th scope="col">Tense</th><th scope="col">Form</th><th scope="col">Clue words</th><th scope="col">Example</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Present simple</th><td data-label="Form">V1, or V1 + s</td><td data-label="Clue words">every day, usually, often</td><td data-label="Example">She <strong>walks</strong> to school every day.</td></tr>
+              <tr><th scope="row">Present continuous</th><td data-label="Form">am / is / are + V-ing</td><td data-label="Clue words">now, right now, at the moment</td><td data-label="Example">We <strong>are having</strong> lunch now.</td></tr>
+              <tr><th scope="row">Past simple</th><td data-label="Form">V2 (the past form)</td><td data-label="Clue words">yesterday, last week, ago, in 2020</td><td data-label="Example">The bus <strong>left</strong> ten minutes ago.</td></tr>
+              <tr><th scope="row">Past continuous</th><td data-label="Form">was / were + V-ing</td><td data-label="Clue words">while, when, at eight last night</td><td data-label="Example">I <strong>was reading</strong> when she called.</td></tr>
+              <tr><th scope="row">Present perfect</th><td data-label="Form">have / has + V3</td><td data-label="Clue words">since, for, already, yet</td><td data-label="Example">He <strong>has lived</strong> here since 2010.</td></tr>
+              <tr><th scope="row">Past perfect</th><td data-label="Form">had + V3</td><td data-label="Clue words">by the time, before, after</td><td data-label="Example">By the time we arrived, the film <strong>had started</strong>.</td></tr>
+              <tr><th scope="row">Future</th><td data-label="Form">will + V1, or am / is / are going to + V1</td><td data-label="Clue words">tomorrow, next week, soon</td><td data-label="Example">We <strong>will visit</strong> Grandma next week.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>More on the past perfect: <a href="#past-perfect">Past perfect</a>. Test yourself: <a href="#practice-cloze">Practice cloze</a>.</p>
       </div>
-      <p>More on the past perfect: <a href="#past-perfect">Past perfect</a>. Test yourself: <a href="#practice-cloze">Practice cloze</a>.</p>
-    </section>
+    </details>
 
-    <section id="practice-cloze">
-      <h2>Practice cloze</h2>
-      <p>This is the same kind of paper as the weekly challenge, with no clock and no score on the league. Check your answers whenever you like, as many times as you like.</p>
-      <div data-grammar="s3practice"></div>
-      <div class="part" id="weekly">
-        <h3>Weekly challenge</h3>
-        <p>Ready to test yourself? Every week there is one 20-minute challenge for S.3, a cloze one week and proofreading the next, with a weekly board and a season league table.</p>
-        <p><a href="s3-challenge.html">Go to the weekly challenge</a></p>
+    <details class="row" id="practice-cloze" name="rows">
+      <summary>
+        <span class="row-mark" aria-hidden="true">16</span>
+        <span class="row-head"><span class="row-title">Practice cloze</span></span>
+      </summary>
+      <div class="row-body">
+        <p>This is the same kind of paper as the weekly challenge, with no clock and no score on the league. Check your answers whenever you like, as many times as you like.</p>
+        <div data-grammar="s3practice"></div>
+        <div class="part" id="weekly">
+          <h3>Weekly challenge</h3>
+          <p>Ready to test yourself? Every week there is one 20-minute challenge for S.3, a cloze one week and proofreading the next, with a weekly board and a season league table.</p>
+          <p><a href="s3-challenge.html">Go to the weekly challenge</a></p>
+        </div>
       </div>
-    </section>
+    </details>
   </main>
 </div>
 
