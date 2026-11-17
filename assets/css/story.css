@@ -84,6 +84,8 @@
 .book.turning, .book.turning .book-front { transition: transform 0.65s var(--ease-out), opacity 0.3s var(--ease-colour); }
 /* the same skill in plain text, with its link, beside the headline */
 .skill-peek { margin: 22px 0 0; }
+.badges-new { margin: 14px 0 0; font: 600 1rem/1.4 var(--font-display); }
+.badges-new a { display: inline-flex; align-items: center; min-height: 44px; color: var(--leaf-deep); text-underline-offset: 0.2em; }
 .skill-said { margin: 14px 0 0; max-width: 34ch; font: 600 var(--step-0)/1.5 var(--font-display); }
 .skill-said a { white-space: nowrap; }
 
