@@ -127,7 +127,7 @@
     ["five-days", "Five days", "Open CLY English on five different days.", "#fff1e3", "calendar"],
     ["three-in-a-row", "Three in a row", "Open CLY English three days running.", "#dce8f7", "sun"]
   ];
-  var DRAWN = ["streak-alive", "streak-5", "streak-15", "first-challenge", "comeback", "personal-best", "climber", "full-marks", "first-set", "ten-sets", "whole-exercise", "second-try",
+  var DRAWN = ["streak-alive", "streak-5", "streak-15", "first-challenge", "comeback", "personal-best", "climber", "full-marks", "top-five", "first-set", "ten-sets", "whole-exercise", "second-try", "checklist-done",
     "step-by-step", "final-lap", "to-the-top", "tip-collector", "five-days", "three-in-a-row"];
   var BY_ID = {};
   BADGES.forEach(function (b) { BY_ID[b[0]] = b; });
