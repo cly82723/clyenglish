@@ -185,7 +185,7 @@
 .q-task > :last-child { margin-bottom: 0; }
 .q-list { margin: 0 0 8px; padding-left: 1.25em; }
 .q-list li { margin: 2px 0; }
-.q-quote { margin: 4px 0 10px; padding-left: 12px; border-left: 3px solid var(--rule-strong); font-style: italic; }
+.q-quote { margin: 4px 0 10px 1.25em; font-style: italic; color: var(--ink-soft); }
 .q-quote p { margin: 0; }
 .q-note { color: var(--ink-soft); font-size: 0.9375rem; font-style: italic; }
 .q-sample { margin: 12px 0 0; }
