@@ -123,7 +123,8 @@
     ["five-days", "Five days", "Open CLY English on five different days.", "#fff1e3", "calendar"],
     ["three-in-a-row", "Three in a row", "Open CLY English three days running.", "#dce8f7", "sun"]
   ];
-  var DRAWN = ["streak-alive", "streak-15", "personal-best", "step-by-step", "final-lap", "five-days"];
+  var DRAWN = ["streak-alive", "streak-5", "streak-15", "comeback", "personal-best", "ten-sets", "whole-exercise", "second-try",
+    "step-by-step", "final-lap", "to-the-top", "tip-collector", "five-days", "three-in-a-row"];
   var BY_ID = {};
   BADGES.forEach(function (b) { BY_ID[b[0]] = b; });
   function isStreak(id) { return id.indexOf("streak-") === 0; }
