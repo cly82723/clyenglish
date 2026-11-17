@@ -87,7 +87,24 @@ test("days in a row are found whatever order they were saved in", () => {
   assert.strictEqual(S.hasRun([], 3), false);
 });
 
-test("practice badges come from finished sets, days visited, steps read and tips seen", () => {
+test("a guide is read once every one of its rows has been opened, and only its own rows count", () => {
+  const rows = ["choose", "method", "crei", "language", "check"];
+  assert.ok(!S.allRead(["choose", "method", "crei", "language"], rows));
+  assert.ok(S.allRead(["check", "choose", "language", "method", "crei"], rows));
+  // steps saved under the old contents list, or rows from another page, don't make up the number
+  assert.ok(!S.allRead(["0", "1", "2", "3", "choose"], rows));
+  // a page with no rows is never "read"
+  assert.ok(!S.allRead(["choose"], []));
+});
+
+test("Part B's five steps and the S.6 final reminders are the rows those pages really have", () => {
+  const fs = require("node:fs"), path = require("node:path");
+  const rowsOf = (file) => [...fs.readFileSync(path.join(__dirname, "..", file), "utf8").matchAll(/<details class="row" id="([^"]+)"/g)].map((m) => m[1]);
+  assert.strictEqual(rowsOf("part-b.html").length, 5);
+  assert.ok(rowsOf("final.html").length > 0);
+});
+
+test("practice badges come from finished sets, days visited and tips seen", () => {
   assert.deepStrictEqual(S.practiceIds({}), []);
   assert.deepStrictEqual(S.practiceIds({ setsDone: { a: 1 } }), ["first-set"]);
   assert.deepStrictEqual(S.practiceIds({ setsDone: { a: 4, b: 3, c: 3 } }), ["first-set", "ten-sets"]);
@@ -95,8 +112,6 @@ test("practice badges come from finished sets, days visited, steps read and tips
   assert.deepStrictEqual(S.practiceIds({ days: [1, 3, 5, 7] }), []);
   assert.deepStrictEqual(S.practiceIds({ days: [1, 3, 5, 7, 9] }), ["five-days"]);
   assert.deepStrictEqual(S.practiceIds({ days: [4, 5, 6] }), ["three-in-a-row"]);
-  assert.deepStrictEqual(S.practiceIds({ stepsRead: ["0", "1", "2", "3"] }), []);
-  assert.deepStrictEqual(S.practiceIds({ stepsRead: ["0", "1", "2", "3", "4"] }), ["step-by-step"]);
   assert.deepStrictEqual(S.practiceIds({ tips: [1, 2, 3, 4, 5, 6, 7, 8, 9] }), []);
   assert.deepStrictEqual(S.practiceIds({ tips: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }), ["tip-collector"]);
 });

@@ -10,7 +10,6 @@
   var DAYS_IN_A_ROW = 3;
   var SETS_FOR_BADGE = 10;
   var SETS_PER_EXERCISE = 5;
-  var PART_B_STEPS = 5;
   var TIPS_FOR_BADGE = 10;
   var FULL_MARKS = 15;
   var STREAK_STEPS = [5, 10, 15];   // weeks in a row that change the streak badge
@@ -67,6 +66,11 @@
     }
     return length <= 1 && sorted.length > 0;
   }
+  // A guide is read once every one of its rows has been opened. Only the rows it has now count, so ids saved by an
+  // older layout of the page never make up the number.
+  function allRead(read, rows) {
+    return rows.length > 0 && rows.every(function (id) { return read.indexOf(id) >= 0; });
+  }
   // Practice and visiting badges from what the pages already keep.
   function practiceIds(facts) {
     var ids = [], sets = facts.setsDone || {}, total = 0, whole = false, days = facts.days || [];
@@ -76,7 +80,6 @@
     if (whole) ids.push("whole-exercise");
     if (days.length >= DAYS_FOR_BADGE) ids.push("five-days");
     if (hasRun(days, DAYS_IN_A_ROW)) ids.push("three-in-a-row");
-    if ((facts.stepsRead || []).length >= PART_B_STEPS) ids.push("step-by-step");
     if ((facts.tips || []).length >= TIPS_FOR_BADGE) ids.push("tip-collector");
     return ids;
   }
@@ -93,7 +96,7 @@
 
   var pure = {
     countedWeeks: countedWeeks, leagueIds: leagueIds, streakId: streakId, weeksToNextStreak: weeksToNextStreak, streakEnds: streakEnds,
-    hasRun: hasRun, practiceIds: practiceIds, addOnce: addOnce, merge: merge
+    hasRun: hasRun, allRead: allRead, practiceIds: practiceIds, addOnce: addOnce, merge: merge
   };
   if (typeof module !== "undefined" && module.exports) { module.exports = pure; return; }
 
@@ -210,16 +213,13 @@
   function update(change) {
     state = merge(Object.assign({}, state, change), load());
     save(state);
-    give(practiceIds({ setsDone: setsDone(), days: state.days, stepsRead: state.steps, tips: state.tips }));
+    give(practiceIds({ setsDone: setsDone(), days: state.days, tips: state.tips }));
     draw();
   }
   function isPage(name) { return new RegExp("(^|/)" + name + "(\\.html)?$").test(location.pathname); }
-  // The steps of a long guide are the groups in its contents; only Part B has the five to read.
-  function stepOf(sectionId) {
-    var link = document.querySelector(".index a[href='#" + (window.CSS && CSS.escape ? CSS.escape(sectionId) : sectionId) + "']");
-    var li = link && link.closest("li");
-    while (li && !li.classList.contains("index-group")) li = li.previousElementSibling;
-    return li ? li.textContent.trim() : null;
+  // the rows of the guide on this page, which a student opens one at a time
+  function rowIds() {
+    return Array.prototype.map.call(document.querySelectorAll("main details.row[id]"), function (row) { return row.id; });
   }
 
   /* ---------- Announcing: a small badge in the corner, never while the league clock runs ---------- */
@@ -304,14 +304,15 @@
   });
   document.addEventListener("cly:read", function (e) {
     if (!e.detail) return;
+    // Part B is five steps and the final reminders a short list: each badge is every row opened at least once
+    var rows = rowIds();
+    if (rows.indexOf(e.detail.id) < 0) return;
     if (isPage("part-b")) {
-      var step = stepOf(e.detail.id);
-      if (step) update({ steps: addOnce(state.steps, step) });
+      update({ steps: addOnce(state.steps, e.detail.id) });
+      if (allRead(state.steps, rows)) give(["step-by-step"]);
     } else if (isPage("final")) {
       update({ final: addOnce(state.final, e.detail.id) });
-      var sections = document.querySelectorAll("[data-tabs] .column > section[id]");
-      var read = Array.prototype.filter.call(sections, function (s) { return state.final.indexOf(s.id) >= 0; }).length;
-      if (sections.length && read >= sections.length) give(["final-lap"]);
+      if (allRead(state.final, rows)) give(["final-lap"]);
     }
   });
 

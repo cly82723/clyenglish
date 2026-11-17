@@ -55,38 +55,11 @@
     });
   }
 
-  // A word of the day highlights just its phrase in the stronger line: the words of the tip
-  // ("alleviate + pressure / a burden") found there, with the small words between them.
-  var SMALL = /^(a|an|the|of|to|on|in|for|with|and|or|your|our|someone|\+|\/)$/;
-  function highlight(el, line, tip) {
-    var stems = tip.split(/[\s+\/]+/).map(bare).filter(function (w) { return w && !SMALL.test(w); })
-      .map(function (w) { return w.length > 4 ? w.replace(/e$/, "") : w; });
-    var words = line.split(" "), hits = [];
-    words.forEach(function (w, i) {
-      var x = bare(w);
-      if (stems.some(function (s) { return x.indexOf(s) === 0; })) hits.push(i);
-    });
-    el.textContent = "";
-    if (!hits.length) { el.textContent = line; return; }
-    // one run: from the first hit, joined to later hits no more than two words away
-    var from = hits[0], to = hits[0];
-    hits.slice(1).forEach(function (i) { if (i - to <= 3) to = i; });
-    var mark = document.createElement("mark");
-    mark.className = "swipe";
-    mark.textContent = words.slice(from, to + 1).join(" ");
-    if (from) el.appendChild(document.createTextNode(words.slice(0, from).join(" ") + " "));
-    el.appendChild(mark);
-    if (to < words.length - 1) el.appendChild(document.createTextNode(" " + words.slice(to + 1).join(" ")));
-    void mark.offsetWidth;
-    mark.classList.add("on");
-  }
-
-  // Three kinds of tip take turns day by day. Day n shows kind n mod 3, and the next tip of that kind,
+  // Two kinds of tip take turns day by day. Day n shows kind n mod 2, and the next tip of that kind,
   // so each kind runs through its whole list before repeating. Nothing to update: the date does it.
   var KINDS = [
     { key: "writing", today: "Writing tip of the day", more: "Writing tip" },
-    { key: "grammar", today: "Grammar tip of the day", more: "Grammar tip" },
-    { key: "vocab", today: "Word of the day", more: "Word to use" }
+    { key: "grammar", today: "Grammar tip of the day", more: "Grammar tip" }
   ];
   function tipAt(tips, n) {
     var kind = KINDS[n % KINDS.length], list = tips[kind.key] || [];
@@ -99,8 +72,8 @@
     var day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
     var at = day;
 
-    // A grammar tip fixes a mistake, so it keeps the cross and the tick. A writing tip or a word of the
-    // day lifts a line that is already correct, so it gets the circled levels instead: 3, then 5.
+    // A grammar tip fixes a mistake, so it keeps the cross and the tick. A writing tip
+    // lifts a line that is already correct, so it gets the circled levels instead: 3, then 5.
     var rows = bubble.querySelectorAll(".bubble-eg li");
     var LOOK = {
       error: [["avoid", "Wrong: "], ["do", "Right: "]],
@@ -110,18 +83,13 @@
       var pick = tipAt(tips, at), t = pick.tip, look = LOOK[pick.kind.key === "grammar" ? "error" : "level"];
       bubble.querySelector(".bubble-label").textContent = at === day ? pick.kind.today : pick.kind.more;
       bubble.setAttribute("data-kind", pick.kind.key);
-      bubble.querySelector(".bubble-tip").textContent = pick.kind.key === "vocab" ? "Use “" + t.tip + "”" : t.tip;
+      bubble.querySelector(".bubble-tip").textContent = t.tip;
       Array.prototype.forEach.call(rows, function (li, i) {
         li.className = look[i][0];
         li.querySelector("[data-say]").textContent = look[i][1];
       });
-      if (pick.kind.key === "vocab") {
-        bubble.querySelector("[data-wrong]").textContent = t.wrong;
-        highlight(bubble.querySelector("[data-right]"), t.right, t.tip);
-      } else {
-        underline(bubble.querySelector("[data-wrong]"), t.wrong, t.right);
-        underline(bubble.querySelector("[data-right]"), t.right, t.wrong);
-      }
+      underline(bubble.querySelector("[data-wrong]"), t.wrong, t.right);
+      underline(bubble.querySelector("[data-right]"), t.right, t.wrong);
       var go = bubble.querySelector(".bubble-go a");
       go.href = t.href;
       go.textContent = "Practise this: " + t.where;

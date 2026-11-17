@@ -416,14 +416,46 @@ All of this lives in `assets/css/motion.css` and `assets/js/motion.js`, uses CSS
 - **Cover tabs:** a tab that is not open swings 9° forward on its bottom hinge under a mouse, 14° when pressed.
 - **Level ladder:** choosing a level by click or tap flips the new line down like a card (0.38s, hinged on its top edge). Whole scripts keep their fade, and keys still change the level at once.
 - **Set marks:** a set finished for the first time is stamped: its square lands from 1.6× with a small turn (0.36s).
-- **Home book:** on a laptop the hub leans up to 1.3° towards the mouse and the fox floats a layer above it. On the first visit of each day the cover is shut for a moment, then opens on its spine (0.7s). It never plays on Back or on a link to part of the page, and a tap or key skips it.
+- **Home notebook:** see "Home: the scroll story" below.
+
+### Phones first (since 2026-11-16)
+Every page is designed and checked at phone width (375px) first, then iPad (768px); the laptop layout follows. Nothing may run past the edge of a phone screen, cover the words a student is reading, or push content down to make room for decoration.
+
+### Navigation (since 2026-11-16)
+Every page carries the same cover tabs: Home · S.3 · S.4 · S.5 & S.6. Every form page carries the mint strip, listing that form's pages: Grammar and Weekly challenge for S.3 and S.4; Part A, Part B, Text types, Past questions, Toolkit, Final reminders and Cut-offs for S.5 & S.6. On phones the strip wraps, up to three to a row, so no link is hidden. Self-study belongs to no form and sits under the home page's list as "Any". While a weekly challenge is running, the strip steps aside with the page title. There are no filters anywhere on the site.
+
+### Home: the scroll story (since 2026-11-16)
+A stage is fixed behind the sheets (`assets/css/story.css`, `assets/js/story.js`, no 3D library). On it, a notebook built from real 3D faces makes one journey, tied to the scroll: it starts shut, facing the reader; it opens on the word of the day; then it shuts and is packed into a small bag, out of the way of everything below. Scrolling back up takes it out again. On iPads and laptops the journey runs across the first three scenes and the notebook is packed before the fox's tip; on phones it is over within a screen and a half, the notebook sits behind the headline and the sheets, the sheets follow one another with no gap, and "Pick your form" shows at the foot of the first screen. Tapping the notebook shows the next word where it stands; once it is packed, the bag stays as a thumb-sized button at the bottom left, and tapping it brings the notebook out, open, over a dimmed page. CLY's fox cut-outs drift past: nine at three depths on wide screens, three soft ones in the background on phones. With reduced motion nothing drifts and a tap simply shows the notebook open.
+
+### Word of the day and the fox's tip (since 2026-11-16)
+Two jobs that never overlap. The notebook holds vocabulary: one word or collocation a day, with a sentence that uses it and its topic, from a list of up to 31 for each month (`assets/js/data/words.js`); every student sees the same word on the same day. The fox gives a writing tip or a grammar tip, alternating by day, each with a weaker and a stronger line. A button beside the headline gives the day's word as plain text, with the weaker sentence and a link to that topic's list.
+
+### Guides as one list (since 2026-11-16)
+Every S.5 and S.6 guide is a single column of rows that open in place (`details.row`, styles in `assets/css/guide.css`, behaviour in `site.js`): no side contents list. One row is open at a time; a first visit shows every row closed; the page remembers the row a student left open; a link to anything inside a row opens it. A closed row shows a ringed mark and its title, and on wider screens an example. Part B is five steps (Choose and plan, Content, Organisation, Language, Put it together); a lesson's parts are numbered blocks: 1 The example, 2 Try it, 3 Why this works, with the reasoning folded. Text types has six rows, each leading with a paragraph-by-paragraph plan and ending with final reminders. Past questions lists every Paper 2 question from 2026 back to 2013 (see below). The Toolkit is the language bank: skills, sentences by text type, and words by topic. Anything that used to be in Part B still opens from its old link.
+
+### Past questions (since 2026-11-16)
+`questions.html` has one row per year, newest first, with the year as the row mark. An open year lists Part A, then Part B: each question is a boxed number, its text type (a link where CLY has a guide for that type), its elective module up to 2023, and a summary in CLY's own words. The summaries are never the exam paper's wording, which belongs to the HKEAA; each year names and links the sources it was written from. The nine questions that have a CLY sample fold it under the question, and a link to such a question opens the fold. The old `samples.html` only forwards here, keeping the `#part` of old links. No filters and no second view by text type.
+
+### Cut-offs (since 2026-11-16)
+`cutoffs.html` lists estimated Paper 2 cut-offs, one row per year, newest first. A table of fourteen years by six levels is too wide for a phone, so it is turned on its side: the year is the row's mark and its heading carries the six level percentages, so the whole table reads without opening anything and nothing scrolls sideways. Opening a year shows the marks and that year's full mark. Percentages lead because the full mark changes each year. A fox-ringed note above the list says the figures are estimates, not official, and a folded note names and links every source. Approximate marks carry ≈; a year that follows a different source says so under its marks. The figures are entered by hand from a table the teacher has checked; never change one without asking.
 
 ### The weekly challenge (since 2026-11-16)
 - **Turning the paper over:** while the league opens the challenge, the ruled back of the paper turns away, and the paper's face arrives in 0.26s. The league's clock starts on the league's side, so the turn fills the wait that was already there.
 - **During the attempt:** held-control feedback only. Nothing else moves.
 - **Handing in:** the paper is passed away (0.5s) while the league marks it; the result arrives like returned work, and the score is underlined twice with a pen stroke. A disqualified attempt gets the plain notice.
-- **Stamp card:** replaces the streak line. One square per week that counted, eight to a row, each inked with a leaf-green tick; a missed week never removes a stamp. Under it, the streak badge the student holds now and how many more weeks in a row the next one needs.
-- **Boards:** rows are dealt in from the top (40ms apart), and the student's own row sits slightly raised.
+- **Stamp card:** replaces the streak line. One square per week that counted, eight to a row, each inked with a leaf-green tick. A missed week ends the streak but never removes a stamp. Under it, the streak badge the student holds now and how many more weeks in a row the next one needs.
+- **Boards:** the top three places are a podium: each wears a gold, silver or bronze pill, and their rows rise as steps (third, second, first) when the table is scrolled to. The student's own row lifts into place and is marked in fox orange wherever it stands. Every other row is still text.
+
+### The league pages as they are scrolled (since 2026-11-16)
+Light and quick, never a pinned journey: students come here every week to do one thing, and "Start the challenge" stays on the first phone screen. Each of these plays once, when it is scrolled to (`assets/js/motion.js` adds `.waits`, then `.arrives`); with reduced motion, or without the observers, everything is simply in place.
+- **The rules** (welcome screen only): five numbered cards, dealt onto the page one after another. The wording is unchanged.
+- **The stamp card** is the league's one 3D object: it lies tilted back like a card on a desk, lifts to face the reader, and its stamps press in in turn. Pressed, it tilts a little; so does a podium step. No motion-sensor tilt.
+- **The countdown to closing** is a small flip clock (days, hours, minutes); a tile turns over when its number changes. A screen reader hears the plain words.
+- **The result:** the marked sheet is turned face up (0.52s), then the mark counts up.
+- **Still:** the timed paper, sign-in and a closed week's review.
+
+### Packing the notebook (home page, since 2026-11-16)
+The notebook shuts where it stands, then crosses in front of the page to the bag: about 55% see-through for the trip, with taps passing straight through it, solid again at the bag's mouth, then it drops in. The bag hops in as the notebook starts to shut, throws its flap right back, and squashes once under the notebook's weight. The packing takes about half a phone screen of scrolling, so a flick cannot skip it.
 - **A closed week's answers:** ticks and crosses are written in one after another (80ms apart, about 1.5s at most); a tap shows the rest at once.
 
 ### Badges (since 2026-11-16; this set on the new-badges branch)
@@ -448,7 +480,8 @@ Practice, reading and visiting badges are kept on the device only.
 - **Do** keep navy-on-cover at AA on every pixel of a cover picture.
 
 ### Don't:
-- **Don't** build hero + CTA + card-grid sections; use the label panel, ruled rows and the ladder.
+- **Don't** build hero + CTA + card-grid sections; use the label panel, ruled rows and the ladder. The home page's scroll story (since 2026-11-16) is the one exception, and it still has no call-to-action strip or card grid.
+- **Don't** add a tab, a strip link or a deeper layer of navigation without CLY's say-so. Getting around is three layers at most: form, page, section.
 - **Don't** put shadows on anything at rest on the paper; only the sheet, the hub and the cover stickers lift, and a control lifts only while it is held.
 - **Don't** move, tilt or lean text that is being read.
 - **Don't** add motion to a timed challenge beyond held-control feedback, or anything that delays the paper.
