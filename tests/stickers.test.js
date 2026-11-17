@@ -104,6 +104,13 @@ test("Part B's five steps and the S.6 final reminders are the rows those pages r
   assert.ok(rowsOf("final.html").length > 0);
 });
 
+test("the line about badges is for new students: their first four days, until they tap it", () => {
+  assert.ok(S.isNewStudent([1], false));
+  assert.ok(S.isNewStudent([1, 2, 3, 4], false));
+  assert.ok(!S.isNewStudent([1, 2, 3, 4, 5], false));
+  assert.ok(!S.isNewStudent([1], true));
+});
+
 test("practice badges come from finished sets, days visited and tips seen", () => {
   assert.deepStrictEqual(S.practiceIds({}), []);
   assert.deepStrictEqual(S.practiceIds({ setsDone: { a: 1 } }), ["first-set"]);

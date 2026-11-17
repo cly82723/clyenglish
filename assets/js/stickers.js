@@ -16,6 +16,8 @@
   var TOAST_MS = 5000;
   var TOAST_FADE_MS = 400;
   var KEY = "cly:stickers";
+  var NEW_FOR_DAYS = 5;              // the home page's line about badges shows on a student's first four days
+  var HINT_KEY = "cly:badges-hint";  // set once the student has followed that line
 
   /* ---------- What earns what: plain functions, tested in tests/stickers.test.js ---------- */
 
@@ -71,6 +73,8 @@
   function allRead(read, rows) {
     return rows.length > 0 && rows.every(function (id) { return read.indexOf(id) >= 0; });
   }
+  // A new student: fewer than NEW_FOR_DAYS days on the site, and hasn't yet followed the line about badges.
+  function isNewStudent(days, tapped) { return !tapped && days.length < NEW_FOR_DAYS; }
   // Practice and visiting badges from what the pages already keep.
   function practiceIds(facts) {
     var ids = [], sets = facts.setsDone || {}, total = 0, whole = false, days = facts.days || [];
@@ -96,7 +100,7 @@
 
   var pure = {
     countedWeeks: countedWeeks, leagueIds: leagueIds, streakId: streakId, weeksToNextStreak: weeksToNextStreak, streakEnds: streakEnds,
-    hasRun: hasRun, allRead: allRead, practiceIds: practiceIds, addOnce: addOnce, merge: merge
+    hasRun: hasRun, allRead: allRead, isNewStudent: isNewStudent, practiceIds: practiceIds, addOnce: addOnce, merge: merge
   };
   if (typeof module !== "undefined" && module.exports) { module.exports = pure; return; }
 
@@ -335,4 +339,16 @@
 
   draw();
   update({ days: addOnce(state.days, today) });
+
+  /* ---------- The home page's line about badges, for new students only ---------- */
+
+  var hint = document.querySelector("[data-badges-new]");
+  if (hint) {
+    var tapped = false;
+    try { tapped = localStorage.getItem(HINT_KEY) === "1"; } catch (e) { /* storage blocked: shown by days alone */ }
+    hint.hidden = !isNewStudent(state.days, tapped);
+    hint.addEventListener("click", function () {
+      try { localStorage.setItem(HINT_KEY, "1"); } catch (e) { /* storage blocked: it shows again next visit */ }
+    });
+  }
 })();
