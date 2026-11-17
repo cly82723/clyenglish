@@ -60,7 +60,9 @@ test("past questions run from 2026 back to 2013, each year with Part A and its P
 });
 
 test("every past question has a text type and a summary, and names an elective only up to 2023", () => {
-  const questions = [...pages["questions.html"].matchAll(/<article class="q" id="y(\d{4})-q(\d+)">\s*<p class="q-head">([\s\S]*?)<\/p>\s*<p class="q-task">([^<]+)</g)];
+  // 2026's are still one-paragraph summaries; every other year has the paper's wording, in paragraphs and lists
+  const questions = [...pages["questions.html"].matchAll(/<article class="q" id="y(\d{4})-q(\d+)">\s*<p class="q-head">([\s\S]*?)<\/p>\s*<(?:p|div) class="q-task">([\s\S]*?)<\/(?:p|div)>\s*(?:<details|<\/article>)/g)]
+    .map(([all, year, n, head, task]) => [all, year, n, head, task.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")]);
   assert.strictEqual(questions.length, 114);
   for (const [, year, n, head, task] of questions) {
     const id = year + " Q" + n;
