@@ -165,23 +165,29 @@
 
 /* ---------- The bag: where the notebook is packed away, and the button that takes it out again ---------- */
 
-.bag {
+/* Two pieces in the same place: .bag-back (the white disc, the bag's back wall, handle and inside) and the button
+   .bag (the bag's front and its flap). story.js gives both the same classes, so they move as one; only their
+   stacking differs, which lets the notebook drop in between. */
+.bag, .bag-back {
   position: fixed; left: 16px; bottom: 16px; z-index: 6;
-  width: 56px; height: 56px; padding: 6px; border: 0; border-radius: 50%; cursor: pointer;
-  background: var(--paper); box-shadow: 0 6px 18px rgb(16 38 59 / 0.25);
+  width: 56px; height: 56px; padding: 4px; border: 0; border-radius: 50%;
   transform-origin: 50% 100%; transition: transform 0.35s var(--ease-out);
 }
-.bag[hidden] { display: none; }
-.bag svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.bag-flap { transform-origin: 32px 14px; transition: transform 0.3s var(--ease-out); }
-/* while the notebook is going in, the bag is larger and its flap is thrown right back */
-.bag.packing { transform: scale(1.6); }
-.bag.lid-up .bag-flap { transform: rotate(-104deg) translate(-5px, -3px); }
+.bag-back { background: var(--paper); box-shadow: 0 6px 18px rgb(16 38 59 / 0.25); pointer-events: none; }
+.bag { background: none; cursor: pointer; }
+.bag[hidden], .bag-back[hidden] { display: none; }
+.bag-art { position: relative; display: block; width: 100%; height: 100%; perspective: 120px; }
+.bag-art img { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* the flap hinges along its top edge, which in the drawing sits 21% of the way down */
+.bag-flap { transform-origin: 50% 21%; transition: transform 0.3s var(--ease-out), filter 0.3s var(--ease-out); }
+/* while the notebook is going in, the bag is larger and its flap is thrown right back over the top */
+.bag.packing, .bag-back.packing { transform: scale(1.6); }
+.bag.lid-up .bag-flap { transform: rotateX(160deg); filter: brightness(0.72); }
 @media (prefers-reduced-motion: no-preference) {
   /* it arrives with a hop as the notebook starts to shut, and takes the notebook's weight when it lands */
-  .bag:not([hidden]) { animation: bag-in 0.4s var(--ease-out); }
+  .bag:not([hidden]), .bag-back:not([hidden]) { animation: bag-in 0.4s var(--ease-out); }
   @keyframes bag-in { from { opacity: 0; transform: translateY(40px) scale(0.6); } }
-  .bag.gulp svg { animation: bag-gulp 0.55s var(--ease-out); transform-origin: 50% 100%; }
+  .bag.gulp .bag-art, .bag-back.gulp .bag-art { animation: bag-gulp 0.55s var(--ease-out); transform-origin: 50% 100%; }
   @keyframes bag-gulp {
     0% { transform: none; }
     28% { transform: scale(1.14, 0.8); }

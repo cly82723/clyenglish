@@ -11,6 +11,7 @@
   if (!stage) return;
   var book = stage.querySelector(".book");
   var bag = document.querySelector("[data-bag]");
+  var bagBack = document.querySelector("[data-bag-back]");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var narrow = window.matchMedia("(max-width: 760px)");
 
@@ -216,6 +217,11 @@
       bag.classList.toggle("gulp", at.packing >= FADES_FROM);
       // from the moment it reaches the mouth the bag is in front of it, so it sinks behind the bag's front
       bag.classList.toggle("swallows", at.packing >= LANDS_AT && !packed);
+    }
+    // the bag's back stays behind the notebook, and moves exactly as the front does
+    if (bagBack && bag) {
+      bagBack.hidden = bag.hidden;
+      ["packing", "gulp"].forEach(function (name) { bagBack.classList.toggle(name, bag.classList.contains(name)); });
     }
     // While it travels the notebook is in front of the page, and taps pass through it. The stickers drifting on
     // the same stage would come forward with it, so they fade out just before it sets off and return afterwards.
