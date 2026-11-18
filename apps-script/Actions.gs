@@ -126,7 +126,7 @@ function board(user, body, nowMs) {
     return { id: w, entrants: ranked.length, rows: visibleRows(ranked, user.email).map(function (r) { return publicRow(r, byEmail, user.email); }),
       gap: gapAbove(ranked, user.email), classes: ranked.length ? classTable(students, ranked) : [] };
   };
-  return { thisWeek: show(week), lastWeek: show(weekId(weekStartMs(week) - 1)), yourClass: String(user.student.Class) };
+  return { thisWeek: show(week), lastWeek: show(weekId(weekStartMs(week) - 1)), yourClass: className(user.student.Class) };
 }
 
 // The season table: points from closed weeks only, for students with points and the student asking.

@@ -281,20 +281,26 @@ function gapAbove(ranked, key) {
   return { place: above.place, marks: marks, seconds: marks ? 0 : Math.max(1, Math.round((me.timeMs - above.timeMs) / 1000)) };
 }
 
-// Classes ranked by their average score, counting every student in the class: anyone who hasn't taken part (or was
-// disqualified) counts as 0, so a class goes up by turning up. students: [{ key, cls }]; ranked: [{ key, score }].
+// A class as typed in the class list, tidied: " 4c " and "4C" are the same class.
+function className(cls) { return String(cls == null ? "" : cls).trim().toUpperCase(); }
+
+// Classes ranked by the average score of the students who took part (a disqualified attempt doesn't count).
+// Level on average, the class with more taking part goes first; a class where nobody took part has no average
+// (null) and comes last. students: [{ key, cls }]; ranked: [{ key, score }].
 function classTable(students, ranked) {
   var scoreOf = {}, byCls = {};
   ranked.forEach(function (r) { scoreOf[r.key] = r.score; });
   students.forEach(function (s) {
-    var c = byCls[s.cls] || (byCls[s.cls] = { cls: s.cls, size: 0, took: 0, total: 0 });
+    var name = className(s.cls);
+    var c = byCls[name] || (byCls[name] = { cls: name, size: 0, took: 0, total: 0 });
     c.size += 1;
     if (s.key in scoreOf) { c.took += 1; c.total += scoreOf[s.key]; }
   });
+  var avg = function (c) { return c.average === null ? -1 : c.average; };
   var rows = Object.keys(byCls).map(function (k) {
     var c = byCls[k];
-    return { cls: c.cls, size: c.size, took: c.took, average: Math.round(c.total / c.size * 10) / 10 };
-  }).sort(function (a, b) { return b.average - a.average || b.took - a.took || (a.cls < b.cls ? -1 : 1); });
+    return { cls: c.cls, size: c.size, took: c.took, average: c.took ? Math.round(c.total / c.took * 10) / 10 : null };
+  }).sort(function (a, b) { return avg(b) - avg(a) || b.took - a.took || (a.cls < b.cls ? -1 : 1); });
   return sharePlaces(rows, function (p, r) { return p.average === r.average; });
 }
 
@@ -307,7 +313,7 @@ function visibleRows(ranked, myKey) {
 if (typeof module !== "undefined") {
   module.exports = { weekId: weekId, weekStartMs: weekStartMs, weekEndMs: weekEndMs, isClosed: isClosed, formatDue: formatDue,
     normalise: normalise, markCloze: markCloze, markProofreading: markProofreading, mark: mark, publicChallenge: publicChallenge,
-    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, shieldedStreak: shieldedStreak, gapAbove: gapAbove, classTable: classTable, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
+    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, shieldedStreak: shieldedStreak, gapAbove: gapAbove, classTable: classTable, className: className, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
     countAway: countAway, overSwitchLimit: overSwitchLimit, answerChanges: answerChanges, timingCheck: timingCheck,
     MIN_AWAY_MS: MIN_AWAY_MS, MAX_SWITCHES: MAX_SWITCHES };
 }

@@ -99,7 +99,7 @@
   var OTHERS = [{ key: YEAR + "A-3", score: 13, timeMs: 512000 }, { key: YEAR + "D-18", score: 11, timeMs: 655000 }, { key: YEAR + "B-7", score: 11, timeMs: 690000 }];
   var ME = { key: YEAR + "C-12", cls: YEAR + "C", number: 12, email: "student@kings.edu.hk" };
   // the classes in test mode: the students above, plus some who haven't taken part
-  var TEST_STUDENTS = OTHERS.map(function (o) { return o.key; }).concat([ME.key, YEAR + "A-5", YEAR + "B-2", YEAR + "C-4", YEAR + "C-20", YEAR + "D-9"])
+  var TEST_STUDENTS = OTHERS.map(function (o) { return o.key; }).concat([ME.key, YEAR + "A-5", YEAR + "B-2", YEAR + "C-4", YEAR + "C-20", YEAR + "D-9", YEAR + "E-1"])
     .map(function (key) { return { key: key, cls: key.split("-")[0] }; });
 
   function testLeague(rules) {

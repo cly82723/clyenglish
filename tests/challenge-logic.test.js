@@ -101,17 +101,27 @@ test("the gap to the place above: marks behind, or seconds behind on the same sc
   assert.strictEqual(L.gapAbove(ranked, "nobody"), null);
 });
 
-test("the class table: every student counts, those who haven't taken part as 0; level averages share a place", () => {
+test("the class table: the average is of those who took part; level averages share a place", () => {
   const students = [
     { key: "a1", cls: "4A" }, { key: "a2", cls: "4A" }, { key: "a3", cls: "4A" }, { key: "a4", cls: "4A" },
     { key: "b1", cls: "4B" }, { key: "b2", cls: "4B" },
-    { key: "c1", cls: "4C" }, { key: "c2", cls: "4C" }
+    { key: "c1", cls: "4C" }, { key: "c2", cls: "4C" },
+    { key: "d1", cls: "4D" }
   ];
   const ranked = [{ key: "a1", score: 15 }, { key: "a2", score: 13 }, { key: "b1", score: 8 }, { key: "b2", score: 6 }, { key: "c1", score: 14 }];
+  // Level on average, more taking part goes first. A class where nobody took part has no average and comes last.
   assert.deepStrictEqual(L.classTable(students, ranked).map(c => [c.cls, c.took, c.size, c.average, c.place]),
-    [["4A", 2, 4, 7, 1], ["4B", 2, 2, 7, 1], ["4C", 1, 2, 7, 1]]);
+    [["4A", 2, 4, 14, 1], ["4C", 1, 2, 14, 1], ["4B", 2, 2, 7, 3], ["4D", 0, 1, null, 4]]);
   const more = ranked.concat([{ key: "c2", score: 10 }]);
-  assert.deepStrictEqual(L.classTable(students, more).map(c => [c.cls, c.average, c.place]), [["4C", 12, 1], ["4A", 7, 2], ["4B", 7, 2]]);
+  assert.deepStrictEqual(L.classTable(students, more).map(c => [c.cls, c.average, c.place]),
+    [["4A", 14, 1], ["4C", 12, 2], ["4B", 7, 3], ["4D", null, 4]]);
+});
+
+test("the class table: class names typed differently in the class list are one class", () => {
+  const students = [{ key: "a1", cls: "4C" }, { key: "a2", cls: " 4c " }, { key: "a3", cls: "4C " }];
+  const rows = L.classTable(students, [{ key: "a1", score: 10 }, { key: "a2", score: 12 }]);
+  assert.deepStrictEqual(rows.map(c => [c.cls, c.took, c.size, c.average]), [["4C", 2, 3, 11]]);
+  assert.strictEqual(L.className(" 4c "), "4C");
 });
 
 test("league: points add up and level points are joint", () => {

@@ -449,17 +449,18 @@
     return h("p", { class: "gap-note" }, h("strong", null, text), " That's your target.");
   }
 
-  // Classes by their average score, where everyone in the class counts: a class rises by turning up.
+  // Classes by the average score of the students who took part. A class where nobody has taken part has no average yet.
   function classTable(week, mine) {
     return h("div", { class: "class-table" },
       h("h3", null, "Classes · " + weekName(week.id)),
       table("Classes by average score", ["Place", "Class", "Took part", "Average"], week.classes.map(function (c) {
         var r = { you: c.cls === mine };
         return h("tr", { class: r.you ? "you" : null },
-          h("td", null, ordinal(c.place)), h("td", null, you(r, c.cls)),
-          h("td", null, c.took + " of " + c.size), h("td", null, h("strong", null, c.average + " / 15")));
+          h("td", null, c.average === null ? "–" : ordinal(c.place)), h("td", null, you(r, c.cls)),
+          h("td", null, c.took + " of " + c.size),
+          h("td", null, c.average === null ? h("span", { class: "meta" }, "No one yet") : h("strong", null, c.average + " / 15")));
       })),
-      h("p", { class: "meta" }, "Everyone in the class counts: anyone who hasn't taken part counts as 0, so the best way up is for the whole class to do the challenge."));
+      h("p", { class: "meta" }, "The average is of the students who took part. Level on average, the class with more taking part goes first."));
   }
 
   function leagueTable(d) {
