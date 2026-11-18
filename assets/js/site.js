@@ -293,18 +293,32 @@
       // every box ticked: stickers.js gives a badge for the weekly self-study list
       if (boxes.length && done === boxes.length) document.dispatchEvent(new CustomEvent("cly:checklist", { detail: list.getAttribute("data-store") }));
     }
+    function store() { try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) { /* storage blocked: still works for this visit */ } }
+    var reset = document.querySelector("[data-reset='" + list.getAttribute("data-store") + "']");
+    var resetLabel = reset ? reset.textContent : "";
+    // clearing can be undone: the button offers the ticks back until a box is ticked again
+    var undo = null;
+    function forgetUndo() { undo = null; if (reset) reset.textContent = resetLabel; }
     boxes.forEach(function (b) {
       b.checked = !!saved[b.id];
       b.addEventListener("change", function () {
         saved[b.id] = b.checked;
-        try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) { /* storage blocked: still works for this visit */ }
+        store();
+        forgetUndo();
         count();
       });
     });
-    var reset = document.querySelector("[data-reset='" + list.getAttribute("data-store") + "']");
     if (reset) reset.addEventListener("click", function () {
-      boxes.forEach(function (b) { b.checked = false; saved[b.id] = false; });
-      try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) {}
+      if (undo) {
+        boxes.forEach(function (b) { b.checked = !!undo[b.id]; saved[b.id] = b.checked; });
+        forgetUndo();
+      } else {
+        if (!boxes.some(function (b) { return b.checked; })) return;
+        undo = {};
+        boxes.forEach(function (b) { undo[b.id] = b.checked; b.checked = false; saved[b.id] = false; });
+        reset.textContent = "Bring the ticks back";
+      }
+      store();
       count();
     });
     count();
@@ -387,8 +401,68 @@
       if (openFor(a.hash.slice(1), true)) { e.preventDefault(); history.pushState(null, "", a.hash); }
     });
     window.addEventListener("hashchange", function () { if (!goToMoved()) openFor(location.hash.slice(1), true); });
+    if (main.hasAttribute("data-row-chip")) rowChip(rows);
     if (goToMoved()) return;
     if (!openFor(location.hash.slice(1), true)) openFor(saved(), false);
+  }
+
+  /* ---------- Where am I: a long open row names its step and lesson part once its heading has scrolled away ---------- */
+  // Tapping the chip goes back to the row's heading, where the row can be closed.
+  var CHIP_LINE = 72;   // px from the top: a heading above this line has been passed
+  var CHIP_DELAY = 60;  // ms after scrolling before the label is checked
+  function rowChip(rows) {
+    var chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "row-chip";
+    chip.hidden = true;
+    document.body.appendChild(chip);
+    var shown = null, label = "", ticking = false;
+
+    function passed(row, selector) {
+      var last = null;
+      row.querySelectorAll(selector).forEach(function (el) { if (el.getBoundingClientRect().top < CHIP_LINE) last = el; });
+      // a lesson can give the chip a shorter name, so the label fits on a phone
+      return last ? (last.getAttribute("data-chip") || last.textContent.replace(/^\s*\d+\s*/, "")).trim() : "";
+    }
+    function labelFor(row) {
+      var kicker = row.querySelector(".row-kicker").textContent;
+      var lesson = passed(row, ".lesson-name");
+      var part = passed(row, ".lesson-part");
+      return (lesson ? kicker.split(" · ")[0] + " · " + lesson : kicker) + (part ? " · " + part : "");
+    }
+    function update() {
+      ticking = false;
+      var row = rows.filter(function (r) { return r.open; })[0];
+      var on = false;
+      if (row) {
+        var top = row.querySelector("summary").getBoundingClientRect().bottom;
+        on = top < 0 && row.getBoundingClientRect().bottom > CHIP_LINE * 2;
+      }
+      chip.hidden = !on;
+      if (!on) { shown = null; return; }
+      var next = labelFor(row);
+      if (row === shown && next === label) return;
+      shown = row;
+      label = next;
+      chip.textContent = "";
+      var arrow = document.createElement("span");
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "↑";
+      chip.appendChild(arrow);
+      chip.appendChild(document.createTextNode(" " + label));
+      chip.setAttribute("aria-label", label + ". Back to the start of this step");
+    }
+    // a short timer, not an animation frame: a label needs no frame-perfect timing, and a timer never stalls
+    function soon() { if (!ticking) { ticking = true; setTimeout(update, CHIP_DELAY); } }
+    window.addEventListener("scroll", soon, { passive: true });
+    window.addEventListener("resize", soon);
+    rows.forEach(function (r) { r.addEventListener("toggle", soon); });
+    chip.addEventListener("click", function () {
+      if (!shown) return;
+      var summary = shown.querySelector("summary");
+      shown.scrollIntoView({ block: "start" });
+      summary.focus({ preventScroll: true });
+    });
   }
 
   document.querySelectorAll("[data-rows]").forEach(initRows);

@@ -194,6 +194,105 @@
     });
   }
 
+  /* ---------- Swap the vague word: tap the swap that makes the sentence exact ---------- */
+  // A wrong swap says why it is still vague; the right one goes into the sentence in place of the vague word.
+  function initSwap(list) {
+    var items = Array.prototype.slice.call(list.querySelectorAll(":scope > li"));
+    var score = document.querySelector("[data-swap-score]");
+    var states = items.map(function (li, n) {
+      var mark = li.querySelector(".vague");
+      var group = li.querySelector(".swap-choices");
+      var buttons = Array.prototype.slice.call(group.querySelectorAll("button"));
+      var note = document.createElement("p");
+      note.className = "swap-note";
+      note.setAttribute("aria-live", "polite");
+      li.appendChild(note);
+      group.setAttribute("role", "group");
+      group.setAttribute("aria-label", "Swaps for sentence " + (n + 1));
+      var state = { li: li, mark: mark, buttons: buttons, note: note, original: mark.textContent };
+      buttons.forEach(function (b) {
+        b.className = "swap-choice";
+        b.setAttribute("aria-pressed", "false");
+        b.addEventListener("click", function () { choose(state, b); });
+      });
+      return state;
+    });
+
+    function choose(state, b) {
+      state.buttons.forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); x.classList.remove("right", "wrong"); });
+      if (!b.hasAttribute("data-ok")) {
+        b.classList.add("wrong");
+        state.note.className = "swap-note hint";
+        state.note.textContent = "Not quite. " + b.getAttribute("data-why");
+        return;
+      }
+      b.classList.add("right");
+      state.mark.textContent = b.textContent;
+      state.mark.classList.add("swapped");
+      state.note.className = "swap-note do";
+      state.note.textContent = "Exact: now the reader can see it.";
+      state.buttons.forEach(function (x) { x.disabled = true; });
+      state.li.classList.add("solved");
+      count();
+    }
+
+    function count() {
+      if (!score) return;
+      var done = states.filter(function (s) { return s.li.classList.contains("solved"); }).length;
+      score.textContent = done ? done + " of " + states.length + " swapped" + (done === states.length ? ". Every sentence is exact now." : "") : "";
+    }
+
+    var again = document.createElement("button");
+    again.type = "button";
+    again.className = "btn-quiet";
+    again.textContent = "Start again";
+    again.addEventListener("click", function () {
+      states.forEach(function (s) {
+        s.mark.textContent = s.original;
+        s.mark.classList.remove("swapped");
+        s.note.className = "swap-note";
+        s.note.textContent = "";
+        s.li.classList.remove("solved");
+        s.buttons.forEach(function (x) { x.disabled = false; x.setAttribute("aria-pressed", "false"); x.classList.remove("right", "wrong"); });
+      });
+      count();
+    });
+    (score || list).insertAdjacentElement("afterend", again);
+  }
+
+  /* ---------- Your one thing for next time: kept on this device, shown at the top of Part B on the next visit ---------- */
+  var ONE_KEY = "cly:partb-one";
+  function initOneThing(box) {
+    var text = box.querySelector("textarea");
+    var out = box.querySelector(".one-thing-saved");
+    var back = document.querySelector("[data-one-thing-back]");
+    var saved = "";
+    try { saved = localStorage.getItem(ONE_KEY) || ""; } catch (e) { saved = ""; }
+    text.value = saved;
+    if (back && saved) {
+      var b = document.createElement("b");
+      b.textContent = "Your one thing: ";
+      back.appendChild(b);
+      back.appendChild(document.createTextNode("next time, I will " + saved));
+      back.hidden = false;
+    }
+    var timer = null;
+    text.addEventListener("input", function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        var value = text.value.trim();
+        try {
+          if (value) localStorage.setItem(ONE_KEY, value); else localStorage.removeItem(ONE_KEY);
+          out.textContent = value ? "Saved. It will be at the top of Part B next time." : "";
+        } catch (e) {
+          out.textContent = "This browser can't keep it, so write it at the top of your next paper.";
+        }
+      }, 400);
+    });
+  }
+
+  document.querySelectorAll("[data-swap]").forEach(initSwap);
+  document.querySelectorAll("[data-one-thing]").forEach(initOneThing);
   document.querySelectorAll("[data-picker]").forEach(initPicker);
   document.querySelectorAll("[data-sets]").forEach(initDrillSets);
   document.querySelectorAll("[data-drill]").forEach(function (box, n) { if (!box.id) box.id = "drill" + (n + 1); initDrill(box); });

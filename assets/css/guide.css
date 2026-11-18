@@ -146,6 +146,93 @@
   .rows-group { margin-top: 36px; }
 }
 
+/* A row's heading is a real h2, so screen readers can move step to step; it looks exactly as the span did.
+   Its example sits under it, in the same column. */
+.rows h2.row-head { margin: 0; font: inherit; line-height: inherit; letter-spacing: 0; text-wrap: wrap; }
+.row > summary > .row-eg { grid-column: 2; }
+
+/* Inside a row: the lesson part is a small label over a rule, and the content heading under it is the bigger line */
+.row-body .lesson-part {
+  margin: 40px 0 12px; padding-top: 14px; border-top: 1px solid var(--rule-strong);
+  font: 700 0.8125rem/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--sky);
+}
+.row-body .lesson-part span { font-size: 0.75rem; letter-spacing: 0; }
+.rows .row-body h4:not(.lesson-part), .rows .row-body h5 {
+  margin: 4px 0 10px; font: 700 var(--step-1)/1.3 var(--font-display); letter-spacing: -0.01em;
+}
+.rows .row-body .ladder-head h4 { margin: 0; font: 600 1rem/1.3 var(--font-display); letter-spacing: 0; }
+/* a step that holds two lessons names each one, and the second starts below a firm line */
+.lesson-title { margin: 0 0 4px; font: 700 0.8125rem/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); scroll-margin-top: 12px; }
+.lesson-title:not(:first-child) { margin-top: 56px; padding-top: 28px; border-top: 2px solid var(--ink); }
+.rows .row-body .lesson-name { margin: 0 0 12px; font: 700 var(--step-2)/1.2 var(--font-display); letter-spacing: -0.02em; }
+
+/* the way on: one wide button at the foot of each step */
+.row-next { margin: 32px 0 0; }
+.row-next a {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 18px;
+  font: 700 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
+  border: 1.5px solid var(--ink); border-radius: 12px; background: var(--paper);
+}
+.row-next a::after { content: "\2193"; font-size: 1.2rem; color: var(--sky); }
+@media (hover: hover) { .row-next a:hover { background: var(--chest); } }
+
+/* where am I: the open step's name, pinned to the top once its heading has gone */
+.row-chip {
+  position: fixed; top: 8px; left: 50%; z-index: 20; transform: translateX(-50%);
+  max-width: calc(100vw - 32px); min-height: 44px; padding: 0 16px;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font: 600 0.875rem/44px var(--font-display); color: var(--ink);
+  background: var(--paper); border: 1px solid var(--ink); border-radius: 999px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(29, 42, 58, 0.12);
+}
+.row-chip span { color: var(--sky); margin-right: 2px; }
+@media (hover: hover) { .row-chip:hover { background: var(--chest); } }
+@media (prefers-reduced-motion: no-preference) { .row-chip:not([hidden]) { animation: fade-in 0.15s ease-out; } }
+
+/* CLY's one-line note with no versions above it */
+.versions .cly:first-child { margin: 0; padding: 0; border: 0; }
+
+/* Swap the vague word: the vague word wears a wavy line, and the exact one replaces it in green */
+.swap-drill { list-style: none; margin: 16px 0 8px; padding: 0; max-width: 68ch; counter-reset: swap; }
+.swap-drill > li { padding: 14px 0; border-bottom: 1px solid var(--rule); counter-increment: swap; }
+.swap-drill > li:first-child { border-top: 1px solid var(--rule); }
+.swap-line { margin: 0 0 10px; font-size: 1.0625rem; }
+.swap-line::before { content: counter(swap) ". "; font-weight: 700; color: var(--ink-soft); }
+mark.vague { background: none; padding: 0; color: inherit; text-decoration: underline wavy var(--avoid); text-decoration-thickness: 1.5px; text-underline-offset: 0.22em; }
+mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); }
+.swap-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.swap-choice {
+  appearance: none; cursor: pointer; min-height: 44px; padding: 8px 14px; text-align: left;
+  font: 400 1rem/1.35 var(--font-body); color: var(--ink);
+  background: var(--paper); border: 1px solid var(--edge); border-radius: 10px;
+}
+@media (hover: hover) { .swap-choice:hover:not(:disabled) { background: var(--chest); border-color: var(--ink); } }
+.swap-choice.wrong { border: 2px solid var(--avoid); color: var(--avoid); }
+.swap-choice.right { border: 2px solid var(--do); background: var(--do); color: var(--paper); }
+.swap-choice:disabled:not(.right) { opacity: 0.5; cursor: default; }
+.swap-note { margin: 8px 0 0; font-weight: 700; }
+.swap-note:empty { display: none; }
+.swap-note.hint { color: var(--sky); }
+.swap-note.do { color: var(--do); }
+.swap-score { margin: 12px 0 4px; font: 600 1rem var(--font-display); color: var(--sky); }
+.swap-score:empty { display: none; }
+.swap-score + .btn-quiet { margin-bottom: 8px; }
+
+/* Your one thing for next time: the page ends on a promise, not a checklist */
+.one-thing { margin: 36px 0 0; padding: 18px 18px 14px; max-width: 68ch; background: var(--rewrite-paper); border: 1.5px dashed var(--sky); border-radius: 12px; }
+.rows .row-body .one-thing h4 { margin: 0 0 6px; }
+.one-thing textarea {
+  display: block; width: 100%; min-height: 64px; padding: 10px 12px; resize: vertical;
+  font: 400 1rem/1.5 var(--font-body); color: var(--ink); background: var(--paper);
+  border: 1px solid var(--ink); border-radius: 8px;
+}
+.one-thing-saved { margin: 8px 0 0; font-size: 0.9375rem; color: var(--do); }
+.one-thing-saved:empty { display: none; }
+.one-thing-back { padding: 10px 14px; background: var(--rewrite-paper); border: 1px dashed var(--sky); border-radius: 10px; }
+.one-thing-back b { color: var(--sky); }
+.no-js .one-thing, .no-js .swap-choices { display: none; }
+@media print { .row-chip, .row-next, .one-thing, .one-thing-back { display: none !important; } }
+
 /* Cut-offs: a year's heading carries its six level percentages, so the whole table reads without opening anything
    and nothing scrolls sideways on a phone. Opening a year shows the marks behind the percentages. */
 .cut-warning { max-width: 68ch; margin: 14px 0 0; padding: 12px 16px; border: 1.5px solid var(--fox); border-radius: 12px; }

@@ -32,7 +32,7 @@ A personal, single-voice guide (CLY) rather than a generic past-paper dump: orig
 
 ## Capabilities and Constraints
 
-- Core content: Part A and Part B guides. Part B is a step-by-step guide built on the three marking domains: Step 0 Choose & plan, Step 1 Content, Step 2 Organisation (CREI paragraphs for argumentative text types; own patterns for reports and stories), Step 3 Language, Step 4 Sample writings.
+- Core content: Part A and Part B guides. Part B is a step-by-step guide built on the three marking domains: Step 1 Choose & plan (two lessons: choosing, then the 10-minute plan), Step 2 Content, Step 3 Organisation (CREI paragraphs for argumentative text types; own patterns for reports and stories), Step 4 Language, Step 5 Put it together (the last five minutes, ending on the student's one thing for next time). Every step is the same three-part lesson: the example, try it, why this works.
 - Sources: any resource that helps students may be used: real past-paper tasks (cited by year and question), examiner reports, textbooks and dictionaries for tasks, ideas and further reading. Model writing on the site is written for the site. Level labels on samples are CLY's estimates, never official marks.
 - Vocabulary is taught through context and collocation, with no Chinese translations.
 - CLY English is a free resource (confirmed 2026-10-27). Do not add lesson sales, pricing, or booking flows.
