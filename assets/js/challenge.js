@@ -287,7 +287,7 @@
     // this week's result once it counts, and the weeks in a row the league reports (this week included once it is done)
     var done = a.status === "done" && !a.away ? { score: a.score } : null;
     var streak = me.streak ? me.streak.current : 0;
-    mine = { history: me.history, week: me.week.id, streak: streak, done: !!done };
+    mine = { history: me.history, week: me.week.id, streak: streak, done: !!done, closesAt: me.week.closesAt };
     stamps = K.countedWeeks(mine.history, mine.week, done).length;
     K.league({ history: mine.history, week: mine.week, done: done, streak: streak });
     var seen = seenStamps(), from = stamps ? Math.floor((stamps - 1) / STAMPS_SHOWN) * STAMPS_SHOWN : 0, squares = [];
@@ -742,7 +742,8 @@
     if (window.CLY_STICKERS && mine) {
       var done = { score: r.score };
       stamps = window.CLY_STICKERS.countedWeeks(mine.history, mine.week, done).length;
-      window.CLY_STICKERS.league({ history: mine.history, week: mine.week, done: done, streak: mine.streak + (mine.done ? 0 : 1) });
+      // fresh: handed in just now, which is what the last-minute badge is about (closesAt says how long was left)
+      window.CLY_STICKERS.league({ history: mine.history, week: mine.week, done: done, streak: mine.streak + (mine.done ? 0 : 1), fresh: !mine.done, closesAt: mine.closesAt });
     }
   }
 
