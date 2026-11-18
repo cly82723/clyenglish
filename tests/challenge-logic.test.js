@@ -230,3 +230,34 @@ test("timing check: a quiet spell between answers then five in a minute, or 14+ 
   assert.strictEqual(L.timingCheck([[30, ["1"]]], 13, 200000), "");
   assert.strictEqual(L.timingCheck([[30, ["1"]]], 15, 300000), "", "exactly 5 minutes is not under 5");
 });
+
+test("shieldedStreak: three quests earn a shield, and a shield covers one missed week", () => {
+  const W = ["2026-11-02", "2026-11-09", "2026-11-16", "2026-11-23", "2026-11-30"];
+  // No quests: the same as streak(), with no shields.
+  assert.deepStrictEqual(L.shieldedStreak([W[0], W[1]], {}, W[3], false), { current: 0, best: 2, shields: 0, toNext: 3, shielded: [] });
+  // Three quests in week 1 earn a shield; week 3 is missed and covered, so the run carries on into week 4.
+  const s = L.shieldedStreak([W[0], W[1], W[3]], { [W[0]]: 3 }, W[4], false);
+  assert.deepStrictEqual(s, { current: 3, best: 3, shields: 0, toNext: 3, shielded: [W[2]] });
+  // A shielded week keeps the run but adds no week to it.
+  assert.strictEqual(L.shieldedStreak([W[0], W[2]], { [W[0]]: 3 }, W[3], false).current, 2);
+});
+
+test("shieldedStreak: shields are held two at most, and never spent on a streak of nothing", () => {
+  const W = ["2026-11-02", "2026-11-09", "2026-11-16", "2026-11-23"];
+  // Nine quests would be three shields, but only two can be held.
+  assert.strictEqual(L.shieldedStreak([W[0]], { [W[0]]: 9 }, W[1], false).shields, 2);
+  // Quests with no streak to protect: the missed week uses no shield.
+  const idle = L.shieldedStreak([], { [W[0]]: 3 }, W[2], false);
+  assert.deepStrictEqual([idle.current, idle.shields, idle.shielded], [0, 1, []]);
+  // Two missed weeks in a row with one shield: the second still ends the run.
+  assert.strictEqual(L.shieldedStreak([W[0]], { [W[0]]: 3 }, W[3], false).current, 0);
+  // This week's quests count towards the next shield before the week is judged.
+  assert.strictEqual(L.shieldedStreak([W[0]], { [W[1]]: 2 }, W[1], false).toNext, 1);
+});
+
+test("shieldedStreak: a shield earned in a week cannot cover that same week", () => {
+  const W = ["2026-11-02", "2026-11-09", "2026-11-16"];
+  // Played week 1, did 3 quests in week 2 but not the challenge: week 2 is missed, the shield comes too late.
+  const s = L.shieldedStreak([W[0]], { [W[1]]: 3 }, W[2], false);
+  assert.deepStrictEqual([s.current, s.shields, s.shielded], [0, 1, []]);
+});

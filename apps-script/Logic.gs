@@ -190,6 +190,38 @@ function streak(weeks, thisWeek, doneThisWeek) {
   return { current: runTo(doneThisWeek ? thisWeek : before(thisWeek)), best: best };
 }
 
+// ---------- Weekly quests and streak shields ----------
+
+var QUESTS_PER_SHIELD = 3;   // every third quest finished earns a shield
+var MAX_SHIELDS = 2;         // a student holds two at most; a shield earned beyond that is lost
+
+// The streak with shields. weeks: the weeks a student handed in; questsByWeek: { weekId: quests finished that week }.
+// Weeks are judged oldest first. A missed week during a run spends a shield if one is held: the run carries on, but
+// the shielded week adds nothing to it and earns no stamp. A shield earned in a week only covers later weeks.
+// This week's quests count towards the next shield before the week is judged.
+function shieldedStreak(weeks, questsByWeek, thisWeek, doneThisWeek) {
+  var quests = questsByWeek || {};
+  var played = {};
+  weeks.forEach(function (w) { played[w] = true; });
+  if (doneThisWeek) played[thisWeek] = true;
+  var next = function (w) { return weekId(weekStartMs(w) + WEEK_MS); };
+  var lastJudged = doneThisWeek ? thisWeek : weekId(weekStartMs(thisWeek) - 1);
+  var all = Object.keys(played).concat(Object.keys(quests)).sort();
+  var run = 0, best = 0, held = 0, progress = 0, shielded = [];
+  var earn = function (n) {
+    progress += Number(n) || 0;
+    while (progress >= QUESTS_PER_SHIELD) { progress -= QUESTS_PER_SHIELD; held = Math.min(MAX_SHIELDS, held + 1); }
+  };
+  for (var w = all[0]; all.length && w <= lastJudged; w = next(w)) {
+    if (played[w]) { run += 1; best = Math.max(best, run); }
+    else if (run > 0 && held > 0) { held -= 1; shielded.push(w); }
+    else run = 0;
+    earn(quests[w]);
+  }
+  if (!doneThisWeek) earn(quests[thisWeek]);
+  return { current: run, best: best, shields: held, toNext: QUESTS_PER_SHIELD - progress, shielded: shielded };
+}
+
 // ---------- Leaving the page ----------
 
 var MIN_AWAY_MS = 3000;   // shorter switches (a glance at a notification) are ignored
@@ -275,7 +307,7 @@ function visibleRows(ranked, myKey) {
 if (typeof module !== "undefined") {
   module.exports = { weekId: weekId, weekStartMs: weekStartMs, weekEndMs: weekEndMs, isClosed: isClosed, formatDue: formatDue,
     normalise: normalise, markCloze: markCloze, markProofreading: markProofreading, mark: mark, publicChallenge: publicChallenge,
-    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, gapAbove: gapAbove, classTable: classTable, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
+    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, shieldedStreak: shieldedStreak, gapAbove: gapAbove, classTable: classTable, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
     countAway: countAway, overSwitchLimit: overSwitchLimit, answerChanges: answerChanges, timingCheck: timingCheck,
     MIN_AWAY_MS: MIN_AWAY_MS, MAX_SWITCHES: MAX_SWITCHES };
 }
