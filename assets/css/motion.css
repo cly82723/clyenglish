@@ -13,7 +13,7 @@
 .sheet { view-transition-name: sheet; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.28s; }
 ::view-transition-group(sheet) { animation-duration: var(--dur-turn); animation-timing-function: var(--ease-out); }
-::view-transition-old(sheet) { animation: leaf-out 0.2s ease-in both; transform-origin: 0 30vh; }
+::view-transition-old(sheet) { animation: leaf-out 0.2s var(--ease-out) both; transform-origin: 0 30vh; }
 ::view-transition-new(sheet) { animation: leaf-in var(--dur-turn) var(--ease-out) both; transform-origin: 0 30vh; }
 @keyframes leaf-out { to { opacity: 0; transform: perspective(1800px) rotateY(-9deg) translateX(-16px); } }
 @keyframes leaf-in { from { opacity: 0; transform: perspective(1800px) rotateY(7deg) translateX(16px); } }

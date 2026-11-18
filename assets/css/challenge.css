@@ -264,12 +264,12 @@ tr.you > td { background: var(--chest); }
 .flip-clock i:last-child { margin-right: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .paper-back.turning::before { animation: paper-away 0.26s ease-in 0.12s forwards; }
+  .paper-back.turning::before { animation: paper-away 0.26s var(--ease-out) 0.12s forwards; }
   @keyframes paper-away { to { transform: perspective(1400px) rotateY(88deg); } }
   /* the face arrives in a quarter of a second: the league's clock is already running, so the turn stays short */
   .paper.turned-in { animation: paper-face 0.26s var(--ease-out); }
   @keyframes paper-face { from { transform: perspective(1400px) rotateY(-80deg); } }
-  .paper-back.handing::before { animation: paper-hand 0.5s ease-in forwards; }
+  .paper-back.handing::before { animation: paper-hand 0.28s var(--ease-out) forwards; }
   @keyframes paper-hand { to { opacity: 0; transform: perspective(1400px) rotateX(64deg) translateY(-70px) scale(0.9); } }
   /* the marked sheet is turned face up (0.52s: challenge.js waits that long before the mark counts up) */
   .handed-in.returned { animation: paper-flip 0.52s var(--ease-out); transform-origin: 0 40%; }
@@ -281,17 +281,17 @@ tr.you > td { background: var(--chest); }
 
   /* the rules are dealt onto the page, one card after another */
   .how .skeleton > li.waits { opacity: 0; }
-  .how .skeleton > li.arrives { animation: card-deal 0.5s var(--ease-out) var(--wait, 0ms) backwards; transform-origin: 50% 0; }
+  .how .skeleton > li.arrives { animation: card-deal 0.34s var(--ease-out) var(--wait, 0ms) backwards; transform-origin: 50% 0; }
   .how .skeleton > li.arrives:nth-child(even) { animation-name: card-deal-right; }
   @keyframes card-deal { from { opacity: 0; transform: perspective(900px) translate(-20px, -44px) rotateX(-56deg) rotate(-5deg); } 55% { opacity: 1; } }
   @keyframes card-deal-right { from { opacity: 0; transform: perspective(900px) translate(20px, -44px) rotateX(-56deg) rotate(5deg); } 55% { opacity: 1; } }
 
   /* the stamp card lies tilted back like a card on a desk, lifts to face the reader, and its stamps press in in turn */
   .stamp-card.waits { opacity: 0.45; transform: perspective(800px) rotateX(44deg) scale(0.94); transform-origin: 50% 100%; }
-  .stamp-card.arrives { animation: card-lift 0.6s var(--ease-out) backwards; transform-origin: 50% 100%; }
+  .stamp-card.arrives { animation: card-lift 0.34s var(--ease-out) backwards; transform-origin: 50% 100%; }
   @keyframes card-lift { from { opacity: 0.45; transform: perspective(800px) rotateX(44deg) scale(0.94); } }
   .stamp-card.waits .stamps li.inked { opacity: 0; }
-  .stamp-card.arrives .stamps li.inked { animation: stamp 0.36s var(--ease-out) calc(0.42s + var(--n, 0) * 90ms) backwards; }
+  .stamp-card.arrives .stamps li.inked { animation: stamp 0.36s var(--ease-out) calc(0.24s + var(--n, 0) * 70ms) backwards; }
   .stamps li:nth-child(2) { --n: 1; } .stamps li:nth-child(3) { --n: 2; } .stamps li:nth-child(4) { --n: 3; }
   .stamps li:nth-child(5) { --n: 4; } .stamps li:nth-child(6) { --n: 5; } .stamps li:nth-child(7) { --n: 6; }
   .stamps li:nth-child(8) { --n: 7; }

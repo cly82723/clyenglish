@@ -256,7 +256,7 @@ mark, .hl {
   padding: 0 2px;
   box-decoration-break: clone; -webkit-box-decoration-break: clone;
 }
-.js mark.swipe { background-size: 0% 100%; transition: background-size 0.9s var(--ease-out); }
+.js mark.swipe { background-size: 0% 100%; transition: background-size 0.5s var(--ease-out); }
 .js mark.swipe.on { background-size: 100% 100%; }
 @media (prefers-reduced-motion: reduce) { .js mark.swipe { transition: none; background-size: 100% 100%; } }
 
@@ -962,16 +962,17 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 }
 
 /* Press feedback: every control gives a little under the finger, then springs back quickly */
-.tabs a, .btn, .btn-quiet, .reset, .chip, .ok-btn, .step-btn, .cell, .letter, .choice, .forms a, .directory a {
+.tabs a, .btn, .btn-quiet, .reset, .chip, .ok-btn, .step-btn, .cell, .letter, .choice, .forms a, .directory a, .row-next a, .swap-choice {
   transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.16s var(--ease-out);
 }
 .tabs a:active, .btn:active:not(:disabled), .btn-quiet:active:not(:disabled), .reset:active,
 .chip:active:not(:disabled), .ok-btn:active:not(:disabled), .step-btn:active:not(:disabled),
 .cell:active, .letter:active:not(:disabled), .forms a:active, .directory a:active { transform: scale(0.97); }
-.choice:active:not(:disabled) { transform: scale(0.98); } /* wide answer rows give less, or they look like they lurch */
+.choice:active:not(:disabled), .row-next a:active, .swap-choice:active:not(:disabled) { transform: scale(0.98); } /* wide rows give less, or they look like they lurch */
 @media (prefers-reduced-motion: reduce) {
   .tabs a:active, .btn:active, .btn-quiet:active, .reset:active, .chip:active, .ok-btn:active,
-  .step-btn:active, .cell:active, .letter:active, .choice:active, .forms a:active, .directory a:active { transform: none; }
+  .step-btn:active, .cell:active, .letter:active, .choice:active, .forms a:active, .directory a:active,
+  .row-next a:active, .swap-choice:active { transform: none; }
 }
 
 /* Marking motion: a tick or cross is drawn in like a pen stroke, left to right, only when it is new.

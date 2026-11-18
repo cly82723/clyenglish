@@ -161,7 +161,8 @@
 .page .tip-day { margin-top: 20px; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .scroll-hint::after { animation: hint 1.8s var(--ease-out) infinite; }
+  /* three draws, then still: a hint that never stops pulls the eye from the page */
+  .scroll-hint::after { animation: hint 1.8s var(--ease-out) 3; }
   @keyframes hint { 0% { transform: scaleY(0); } 60% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
 }
 
@@ -188,7 +189,7 @@
 @media (prefers-reduced-motion: no-preference) {
   /* it arrives with a hop as the notebook starts to shut, and takes the notebook's weight when it lands */
   .bag:not([hidden]), .bag-back:not([hidden]) { animation: bag-in 0.4s var(--ease-out); }
-  @keyframes bag-in { from { opacity: 0; transform: translateY(40px) scale(0.6); } }
+  @keyframes bag-in { from { opacity: 0; transform: translateY(24px) scale(0.9); } }
   .bag.gulp .bag-art, .bag-back.gulp .bag-art { animation: bag-gulp 0.55s var(--ease-out); transform-origin: 50% 100%; }
   @keyframes bag-gulp {
     0% { transform: none; }

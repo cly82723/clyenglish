@@ -186,6 +186,11 @@
 }
 .row-chip span { color: var(--sky); margin-right: 2px; }
 @media (hover: hover) { .row-chip:hover { background: var(--chest); } }
+.row-chip { transition: background-color var(--dur-fast) var(--ease-colour), transform 0.16s var(--ease-out); }
+.row-chip:active { transform: translateX(-50%) scale(0.97); }
+@media (prefers-reduced-motion: reduce) { .row-chip:active { transform: translateX(-50%); } }
+/* the exact word is written in, the way a solved CREI paragraph is rebuilt */
+@media (prefers-reduced-motion: no-preference) { mark.vague.swapped { animation: pen 0.35s var(--ease-out); } }
 @media (prefers-reduced-motion: no-preference) { .row-chip:not([hidden]) { animation: fade-in 0.15s ease-out; } }
 
 /* CLY's one-line note with no versions above it */
