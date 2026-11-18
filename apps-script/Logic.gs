@@ -237,6 +237,35 @@ function timingCheck(events, score, timeMs) {
 // Time taken counts from the server's start time and never beyond the limit.
 function timeTaken(startedMs, submittedMs, limitMs) { return Math.max(0, Math.min(submittedMs - startedMs, limitMs)); }
 
+// How far a student is behind the place above them in a ranked week: { place, marks, seconds }, or null in first place
+// (or not in the list). Level on marks, the gap is the time. A row level with them is skipped, since they share its place.
+function gapAbove(ranked, key) {
+  var i = -1;
+  ranked.forEach(function (r, j) { if (r.key === key) i = j; });
+  if (i < 0 || ranked[i].place === 1) return null;
+  var me = ranked[i], above = null;
+  for (var j = i - 1; j >= 0 && !above; j--) if (ranked[j].place < me.place) above = ranked[j];
+  var marks = above.score - me.score;
+  return { place: above.place, marks: marks, seconds: marks ? 0 : Math.max(1, Math.round((me.timeMs - above.timeMs) / 1000)) };
+}
+
+// Classes ranked by their average score, counting every student in the class: anyone who hasn't taken part (or was
+// disqualified) counts as 0, so a class goes up by turning up. students: [{ key, cls }]; ranked: [{ key, score }].
+function classTable(students, ranked) {
+  var scoreOf = {}, byCls = {};
+  ranked.forEach(function (r) { scoreOf[r.key] = r.score; });
+  students.forEach(function (s) {
+    var c = byCls[s.cls] || (byCls[s.cls] = { cls: s.cls, size: 0, took: 0, total: 0 });
+    c.size += 1;
+    if (s.key in scoreOf) { c.took += 1; c.total += scoreOf[s.key]; }
+  });
+  var rows = Object.keys(byCls).map(function (k) {
+    var c = byCls[k];
+    return { cls: c.cls, size: c.size, took: c.took, average: Math.round(c.total / c.size * 10) / 10 };
+  }).sort(function (a, b) { return b.average - a.average || b.took - a.took || (a.cls < b.cls ? -1 : 1); });
+  return sharePlaces(rows, function (p, r) { return p.average === r.average; });
+}
+
 // What a student may see of a ranked list: the places that earn points, and their own row.
 // Everyone else only counts towards "N took part", so a low score is never shown to classmates.
 function visibleRows(ranked, myKey) {
@@ -246,7 +275,7 @@ function visibleRows(ranked, myKey) {
 if (typeof module !== "undefined") {
   module.exports = { weekId: weekId, weekStartMs: weekStartMs, weekEndMs: weekEndMs, isClosed: isClosed, formatDue: formatDue,
     normalise: normalise, markCloze: markCloze, markProofreading: markProofreading, mark: mark, publicChallenge: publicChallenge,
-    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
+    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, gapAbove: gapAbove, classTable: classTable, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
     countAway: countAway, overSwitchLimit: overSwitchLimit, answerChanges: answerChanges, timingCheck: timingCheck,
     MIN_AWAY_MS: MIN_AWAY_MS, MAX_SWITCHES: MAX_SWITCHES };
 }

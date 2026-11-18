@@ -87,7 +87,7 @@
       if (!r.ok) throw new Error(r.status);
       return r.text();
     }).then(function (src) {
-      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows, streak: streak, countAway: countAway, overSwitchLimit: overSwitchLimit, MAX_SWITCHES: MAX_SWITCHES, MIN_AWAY_MS: MIN_AWAY_MS };")();
+      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows, streak: streak, gapAbove: gapAbove, classTable: classTable, countAway: countAway, overSwitchLimit: overSwitchLimit, MAX_SWITCHES: MAX_SWITCHES, MIN_AWAY_MS: MIN_AWAY_MS };")();
     }).catch(function () { throw { message: "Test mode couldn't load the marking rules. Open the page from the website or a local server, not as a file." }; });
   }
 
@@ -98,6 +98,9 @@
   var YEAR = S.form.slice(2);
   var OTHERS = [{ key: YEAR + "A-3", score: 13, timeMs: 512000 }, { key: YEAR + "D-18", score: 11, timeMs: 655000 }, { key: YEAR + "B-7", score: 11, timeMs: 690000 }];
   var ME = { key: YEAR + "C-12", cls: YEAR + "C", number: 12, email: "student@kings.edu.hk" };
+  // the classes in test mode: the students above, plus some who haven't taken part
+  var TEST_STUDENTS = OTHERS.map(function (o) { return o.key; }).concat([ME.key, YEAR + "A-5", YEAR + "B-2", YEAR + "C-4", YEAR + "C-20", YEAR + "D-9"])
+    .map(function (key) { return { key: key, cls: key.split("-")[0] }; });
 
   function testLeague(rules) {
     var passages = {
@@ -210,9 +213,10 @@
       board: function () {
         finishIfExpired();
         var all = ranked();
-        var shown = { id: week(), entrants: all.length, rows: rules.visibleRows(all, ME.key).map(boardRow) };
-        var none = { id: week(), entrants: 0, rows: [] };
-        return st.closed ? { thisWeek: none, lastWeek: shown } : { thisWeek: shown, lastWeek: none };
+        var shown = { id: week(), entrants: all.length, rows: rules.visibleRows(all, ME.key).map(boardRow),
+          gap: rules.gapAbove(all, ME.key), classes: rules.classTable(TEST_STUDENTS, all) };
+        var none = { id: week(), entrants: 0, rows: [], gap: null, classes: [] };
+        return Object.assign(st.closed ? { thisWeek: none, lastWeek: shown } : { thisWeek: shown, lastWeek: none }, { yourClass: ME.cls });
       },
       league: function () {
         if (!st.closed) return { weeks: 0, entrants: 0, rows: [] };

@@ -115,15 +115,18 @@ function submit(user, body, nowMs) {
   return { score: Number(done.Score), outOf: 15, timeSec: Number(done["Time (s)"]) };
 }
 
-// This week's board so far, and last week's final one: the top five places and the student's own row.
+// This week's board so far, and last week's final one: the top five places and the student's own row,
+// how far the student is behind the place above them (never who is there), and the classes by average score.
 function board(user, body, nowMs) {
   var p = playing(body, nowMs), sn = p.sn, week = p.week;
   var byEmail = labels();
+  var students = readRows("Students").map(function (s) { return { key: String(s.Email).toLowerCase(), cls: String(s.Class) }; });
   var show = function (w) {
     var ranked = w && inSeason(sn, w) ? rankingFor(w, sn, nowMs, byEmail) : [];
-    return { id: w, entrants: ranked.length, rows: visibleRows(ranked, user.email).map(function (r) { return publicRow(r, byEmail, user.email); }) };
+    return { id: w, entrants: ranked.length, rows: visibleRows(ranked, user.email).map(function (r) { return publicRow(r, byEmail, user.email); }),
+      gap: gapAbove(ranked, user.email), classes: ranked.length ? classTable(students, ranked) : [] };
   };
-  return { thisWeek: show(week), lastWeek: show(weekId(weekStartMs(week) - 1)) };
+  return { thisWeek: show(week), lastWeek: show(weekId(weekStartMs(week) - 1)), yourClass: String(user.student.Class) };
 }
 
 // The season table: points from closed weeks only, for students with points and the student asking.
