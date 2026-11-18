@@ -12,12 +12,19 @@
   var SETS_PER_EXERCISE = 5;
   var TIPS_FOR_BADGE = 10;
   var FULL_MARKS = 15;
+  var SETS_FOR_POTATO = 25;
+  var PAGES_FOR_SNIFFER = 8;
+  var FIXES_FOR_THINKING = 5;
+  var VISITS_FOR_SIX_SEVEN = 67;
+  var BADGES_FOR_CALL_ME = 10;
+  var TAPS_FOR_SHH = 15;             // tips asked for in one visit to the home page
   var STREAK_STEPS = [5, 10, 15];   // weeks in a row that change the streak badge
   var TOAST_MS = 5000;
   var TOAST_FADE_MS = 400;
   var KEY = "cly:stickers";
   var NEW_FOR_DAYS = 5;              // the home page's line about badges shows on a student's first four days
   var HINT_KEY = "cly:badges-hint";  // set once the student has followed that line
+  var VISIT_KEY = "cly:visit-counted"; // per browser session: one open of the site counts once, however many pages it has
 
   /* ---------- What earns what: plain functions, tested in tests/stickers.test.js ---------- */
 
@@ -37,7 +44,11 @@
     weeks.forEach(function (w, i) {
       var prev = weeks[i - 1];
       ids["first-challenge"] = true;
+      var next = weeks[i + 1];
       if (prev && dayOf(w.week) - dayOf(prev.week) > 7) ids.comeback = true;          // a week was missed in between
+      if (prev && dayOf(w.week) - dayOf(prev.week) === 7) ids["hehe-again"] = true;   // two weeks running
+      // a lower score than the week before, then the very next week handed in too
+      if (prev && next && w.score < prev.score && dayOf(next.week) - dayOf(w.week) === 7) ids["shake-it-off"] = true;
       if (prev && w.score > prev.score) ids.climber = true;                           // higher than the week before
       // higher than every earlier week, or full marks again, since 15 out of 15 can't be beaten
       if (i > 1 && (w.score > best || w.score === FULL_MARKS)) ids["personal-best"] = true;
@@ -75,6 +86,19 @@
   }
   // A new student: fewer than NEW_FOR_DAYS days on the site, and hasn't yet followed the line about badges.
   function isNewStudent(days, tapped) { return !tapped && days.length < NEW_FOR_DAYS; }
+  // Handed in with 24 hours or less left before the week closes.
+  function lastMinute(closesAt, now) { return typeof closesAt === "number" && now <= closesAt && closesAt - now <= DAY_MS; }
+  // Ten other badges earned. The badge for it is not one of the ten.
+  function collectorIds(earned) {
+    var others = Object.keys(earned || {}).filter(function (id) { return id !== "call-me"; });
+    return others.length >= BADGES_FOR_CALL_ME ? ["call-me"] : [];
+  }
+  // "grammar" for /site/grammar.html, /site/grammar or /grammar.html; "index" for the home page however it was opened.
+  function pageName(pathname) {
+    var path = String(pathname || "");
+    if (path.slice(-1) === "/") return "index";   // a folder is its home page
+    return (path.split("/").pop() || "").replace(/.html$/, "") || "index";
+  }
   // Practice and visiting badges from what the pages already keep.
   function practiceIds(facts) {
     var ids = [], sets = facts.setsDone || {}, total = 0, whole = false, days = facts.days || [];
@@ -82,9 +106,13 @@
     if (total >= 1) ids.push("first-set");
     if (total >= SETS_FOR_BADGE) ids.push("ten-sets");
     if (whole) ids.push("whole-exercise");
+    if (total >= SETS_FOR_POTATO) ids.push("potato");
     if (days.length >= DAYS_FOR_BADGE) ids.push("five-days");
     if (hasRun(days, DAYS_IN_A_ROW)) ids.push("three-in-a-row");
     if ((facts.tips || []).length >= TIPS_FOR_BADGE) ids.push("tip-collector");
+    if ((facts.pages || []).length >= PAGES_FOR_SNIFFER) ids.push("sniffer");
+    if (facts.fixes >= FIXES_FOR_THINKING) ids.push("thinking");
+    if (facts.visits >= VISITS_FOR_SIX_SEVEN) ids.push("six-seven");
     return ids;
   }
   function addOnce(list, item) { return list.indexOf(item) < 0 ? list.concat([item]) : list; }
@@ -94,13 +122,15 @@
     var streak = !saved.streak || (mine.streak && mine.streak.ends >= saved.streak.ends) ? mine.streak : saved.streak;
     return {
       earned: Object.assign({}, saved.earned, mine.earned), days: union(mine.days, saved.days), steps: union(mine.steps, saved.steps),
-      final: union(mine.final, saved.final), tips: union(mine.tips, saved.tips), streak: streak || null
+      final: union(mine.final, saved.final), tips: union(mine.tips, saved.tips), streak: streak || null,
+      pages: union(mine.pages || [], saved.pages || []), visits: Math.max(mine.visits || 0, saved.visits || 0), fixes: Math.max(mine.fixes || 0, saved.fixes || 0)
     };
   }
 
   var pure = {
     countedWeeks: countedWeeks, leagueIds: leagueIds, streakId: streakId, weeksToNextStreak: weeksToNextStreak, streakEnds: streakEnds,
-    hasRun: hasRun, allRead: allRead, isNewStudent: isNewStudent, practiceIds: practiceIds, addOnce: addOnce, merge: merge
+    hasRun: hasRun, allRead: allRead, isNewStudent: isNewStudent, practiceIds: practiceIds, addOnce: addOnce, merge: merge,
+    lastMinute: lastMinute, collectorIds: collectorIds, pageName: pageName
   };
   if (typeof module !== "undefined" && module.exports) { module.exports = pure; return; }
 
@@ -129,10 +159,21 @@
     ["to-the-top", "To the top", "Climb the home-page sentence from Level 2 to Level 5**.", "#1a64c4", "flag"],
     ["tip-collector", "Tip collector", "Read ten of the fox's tips.", "#ffe4c8", "bulb"],
     ["five-days", "Five days", "Open CLY English on five different days.", "#fff1e3", "calendar"],
-    ["three-in-a-row", "Three in a row", "Open CLY English three days running.", "#dce8f7", "sun"]
+    ["three-in-a-row", "Three in a row", "Open CLY English three days running.", "#dce8f7", "sun"],
+    ["hehe-again", "Hehe, again", "Do the weekly challenge two weeks in a row.", "#ffd9cf", "star"],
+    ["shake-it-off", "Shake it off", "Score lower than the week before, then do the very next challenge anyway.", "#cfd8e6", "sun"],
+    ["last-minute", "Last-minute prayer", "Hand in the weekly challenge in the last 24 hours before it closes.", "#e6cfdc", "flag"],
+    ["saved-it", "Saved it", "Fix three wrong answers in one go: press Check and watch them all turn right.", "#c8e4fa", "tick"],
+    ["potato", "Potato", "Finish 25 practice sets.", "#c8e4fa", "book"],
+    ["call-me", "Call me", "Earn 10 other badges.", "#ffb9a6", "star"],
+    ["thinking", "Thinking it through", "Get an answer wrong, read the hint and fix it, 5 times.", "#d2e3bf", "pencil"],
+    ["sniffer", "Sniffer", "Open 8 different pages of CLY English.", "#d4eec3", "book"],
+    ["six-seven", "Six seven", "Open CLY English 67 times. A visit counts once however many pages you open.", "#c9dcff", "calendar"],
+    ["shh", "Shh", "You kept asking the fox for another tip. Shh, that was the secret.", "#e6cfdc", "bulb", "A secret. Keep exploring, and see what the fox does.", true]
   ];
   var DRAWN = ["streak-alive", "streak-5", "streak-10", "streak-15", "first-challenge", "comeback", "personal-best", "climber", "full-marks", "top-five", "first-set", "ten-sets", "whole-exercise", "second-try", "checklist-done",
-    "step-by-step", "final-lap", "to-the-top", "tip-collector", "five-days", "three-in-a-row"];
+    "step-by-step", "final-lap", "to-the-top", "tip-collector", "five-days", "three-in-a-row",
+    "hehe-again", "shake-it-off", "last-minute", "saved-it", "potato", "call-me", "thinking", "sniffer", "six-seven", "shh"];
   var BY_ID = {};
   BADGES.forEach(function (b) { BY_ID[b[0]] = b; });
   function isStreak(id) { return id.indexOf("streak-") === 0; }
@@ -176,12 +217,14 @@
   /* ---------- What this browser remembers ---------- */
 
   function list(v) { return Array.isArray(v) ? v : []; }
+  function count(v) { return Number(v) > 0 ? Math.floor(Number(v)) : 0; }
   function load() {
     var v = null;
     try { v = JSON.parse(localStorage.getItem(KEY)); } catch (e) { v = null; }
     v = v && typeof v === "object" ? v : {};
     var streak = v.streak && typeof v.streak.n === "number" && typeof v.streak.ends === "number" ? { n: v.streak.n, ends: v.streak.ends } : null;
-    return { earned: v.earned && typeof v.earned === "object" ? v.earned : {}, days: list(v.days), steps: list(v.steps), final: list(v.final), tips: list(v.tips), streak: streak };
+    return { earned: v.earned && typeof v.earned === "object" ? v.earned : {}, days: list(v.days), steps: list(v.steps), final: list(v.final), tips: list(v.tips), streak: streak,
+      pages: list(v.pages), visits: count(v.visits), fixes: count(v.fixes) };
   }
   function save(state) {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage blocked: badges last for this visit only */ }
@@ -208,6 +251,8 @@
     if (!added.length) return;
     var earned = Object.assign({}, state.earned);
     added.forEach(function (id) { earned[id] = today; });
+    // the badge for ten others comes with the one that makes ten
+    collectorIds(earned).forEach(function (id) { if (!earned[id]) { earned[id] = today; added.push(id); } });
     state = merge(Object.assign({}, state, { earned: earned }), load());
     fresh = fresh.concat(added);
     save(state);
@@ -217,7 +262,7 @@
   function update(change) {
     state = merge(Object.assign({}, state, change), load());
     save(state);
-    give(practiceIds({ setsDone: setsDone(), days: state.days, tips: state.tips }));
+    give(practiceIds({ setsDone: setsDone(), days: state.days, tips: state.tips, pages: state.pages, visits: state.visits, fixes: state.fixes }));
     draw();
   }
   function isPage(name) { return new RegExp("(^|/)" + name + "(\\.html)?$").test(location.pathname); }
@@ -274,20 +319,21 @@
     grid.textContent = "";
     BADGES.forEach(function (b) {
       var streak = isStreak(b[0]), earned = streak ? holding === b[0] : !!state.earned[b[0]];
+      var hidden = b[6] === true && !earned;   // a secret badge keeps its name until it is earned
       if (earned) have += 1;
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "sticker" + (earned ? " earned" : "");
-      btn.setAttribute("aria-label", b[1] + (earned ? (streak ? ", held now" : ", earned") : ", not earned yet"));
+      btn.setAttribute("aria-label", (hidden ? "Secret badge" : b[1]) + (earned ? (streak ? ", held now" : ", earned") : ", not earned yet"));
       btn.innerHTML = earned ? art(b) : '<span class="sticker-art"></span>';
       btn.addEventListener("click", function () {
         grid.querySelectorAll("[aria-pressed]").forEach(function (x) { x.removeAttribute("aria-pressed"); });
         btn.setAttribute("aria-pressed", "true");
         caption.textContent = "";
         var name = document.createElement("strong");
-        name.textContent = b[1] + ": ";
+        name.textContent = (hidden ? "Secret" : b[1]) + ": ";
         caption.appendChild(name);
-        caption.appendChild(document.createTextNode(b[2] + (earned ? (streak ? " You hold it now: miss a week and it goes." : " Earned!") : "")));
+        caption.appendChild(document.createTextNode(hidden ? b[5] : b[2] + (earned ? (streak ? " You hold it now: miss a week and it goes." : " Earned!") : "")));
       });
       var li = document.createElement("li");
       li.appendChild(btn);
@@ -300,9 +346,16 @@
   /* ---------- Listening to the pages ---------- */
 
   document.addEventListener("cly:set-done", function () { update({}); });
-  document.addEventListener("cly:second-try", function () { give(["second-try"]); });
+  document.addEventListener("cly:second-try", function () {
+    update({ fixes: state.fixes + 1 });
+    give(["second-try"]);
+  });
+  // three wrong answers turned right by one press of Check (practice-core.js)
+  document.addEventListener("cly:fixed-many", function () { give(["saved-it"]); });
   document.addEventListener("cly:top", function () { give(["to-the-top"]); });
   document.addEventListener("cly:checklist", function (e) { if (e.detail === "week") give(["checklist-done"]); });
+  var taps = 0;   // tips asked for since this page opened; the secret badge is for the student who keeps going
+  document.addEventListener("cly:tip", function () { taps += 1; if (taps >= TAPS_FOR_SHH) give(["shh"]); });
   document.addEventListener("cly:tip", function (e) {
     if (typeof e.detail === "number" && state.tips.length < TIPS_FOR_BADGE) update({ tips: addOnce(state.tips, e.detail) });
   });
@@ -327,6 +380,7 @@
       var before = held(), n = Number(o.streak) || 0;
       update({ streak: { n: n, ends: streakEnds(o.week, !!o.done) } });
       give(leagueIds(countedWeeks(o.history, o.week, o.done)));
+      if (o.fresh && lastMinute(o.closesAt, Date.now())) give(["last-minute"]);
       var now = held();
       if (now && now !== before) { fresh = fresh.concat([now]); announce(); }
     },
@@ -338,7 +392,11 @@
   };
 
   draw();
-  update({ days: addOnce(state.days, today) });
+  // One open of the site counts once, not once per page: a browser session is the unit. If the browser won't say
+  // whether this session has been counted, it isn't, so a student can't run up the number by reloading.
+  var counted = true;
+  try { counted = sessionStorage.getItem(VISIT_KEY) === "1"; sessionStorage.setItem(VISIT_KEY, "1"); } catch (e) { counted = true; }
+  update({ days: addOnce(state.days, today), pages: addOnce(state.pages, pageName(location.pathname)), visits: state.visits + (counted ? 0 : 1) });
 
   /* ---------- The home page's line about badges, for new students only ---------- */
 

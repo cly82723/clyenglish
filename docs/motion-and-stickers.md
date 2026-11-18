@@ -53,3 +53,35 @@ Started 2026-11-16. The live site still has the first set (one sticker every two
 - "Tip collector" counts tips asked for with "Another tip"; the tip already showing when the page opens is not counted.
 - Not checked in a browser: this session had no browser tools. The rules are covered by `tests/stickers.test.js` and a headless run of the script.
 - Anyone who earned a first-set sticker on the live site keeps the badges whose ids did not change (first set, ten sets, whole exercise, five days); the school-year stickers disappear.
+
+## Meme badges (branch `meme-badges`, not live)
+
+Started 2026-11-18. Ten more badges, one for each reaction picture CLY drew, so the sheet now has 31. The rules are in `assets/js/stickers.js`; the drawings are in `images/stickers/<badge id>.png`, resized to 512 pixels like the others.
+
+| Badge | id | Earned by | Where it is detected |
+| --- | --- | --- | --- |
+| Hehe, again | `hehe-again` | Handing in the weekly challenge two weeks in a row, with no missed week between | League history (`leagueIds`) |
+| Shake it off | `shake-it-off` | A lower score than the week before, then the very next week handed in too | League history (`leagueIds`) |
+| Last-minute prayer | `last-minute` | Handing in during the last 24 hours before the week closes | `challenge.js` tells the league call that the paper was handed in just now and when the week closes |
+| Saved it | `saved-it` | Fixing three wrong answers with one press of Check | `practice-core.js` sends `cly:fixed-many` |
+| Potato | `potato` | Finishing 25 practice sets | Set counts already kept by the pages |
+| Call me | `call-me` | Earning 10 other badges | Worked out when a badge is given |
+| Thinking it through | `thinking` | Fixing an answer after its hint, 5 times | Counts `cly:second-try`, which the badge "Second try" already used once |
+| Sniffer | `sniffer` | Opening 8 different pages | A list of page names, saved with the badges |
+| Six seven | `six-seven` | Opening the site 67 times | A visit counter, saved with the badges |
+| Shh (secret) | `shh` | Asking the fox for another tip 15 times in one visit to the home page | Counted in `stickers.js` from `cly:tip` |
+
+Choices worth knowing:
+
+- **A visit is a browser session.** Opening five pages in a sitting is one visit, and a reload is not a visit, so 67 takes about two months of daily use. If the browser cannot say whether a session was already counted, it is not counted.
+- **Pages are named, not addressed.** `grammar`, `grammar.html` and `/site/grammar` are the same page, and any folder is the home page, so the same page opened two ways counts once.
+- **The two league badges only count weeks that were handed in one after the other.** "Hehe, again" and "Shake it off" both need the weeks to be exactly seven days apart, so a missed week gives "Comeback" and neither of these.
+- **The secret badge has no name on the sheet** until it is earned. Its circle reads "Secret badge" to screen readers and its caption says to keep exploring.
+- **Hints are shown automatically after a wrong Check.** There is nothing for a student to "open", so no badge is earned by opening hints. "Thinking it through" is earned by what they do with the hint.
+- **"Hehe, again" and "Shake it off" have their caption** ("hehe", "not hehe") drawn into the picture, the only badges with writing on them. At 64 pixels on the sheet the words are tiny; the site has no larger view of a badge yet, so they read properly only in the picture file.
+- **Nothing is awarded for late-night use**, since the students are 14 to 18.
+- **Existing students keep what they have.** The saved record gains `pages`, `visits` and `fixes`; an older saved record without them reads as empty, and two tabs merge by union and by the larger count.
+
+The two captioned drawings came from pictures with a solid black background, which was cut out to transparent (the white die-cut edge is kept); the cut-out was checked on the sheet but not at the edge of every curve.
+
+Not verified: Safari and real phones, and the live league. Last-minute prayer relies on `closesAt` from the league's week data (already sent to the page); it was tested as a rule, not against the live league. The tests are in `tests/stickers.test.js`.

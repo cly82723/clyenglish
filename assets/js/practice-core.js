@@ -74,16 +74,18 @@
     this.ids = ids; this.isCorrect = isCorrect; this.isTried = isTried;
     this.marks = {}; this.tries = {}; this.checked = false;
   }
+  var FIXED_AT_ONCE = 3;   // wrong answers turned right by one press of Check that earn a badge (stickers.js)
   Checks.prototype.check = function () {
-    var self = this;
+    var self = this, fixed = 0;
     this.ids.forEach(function (id) {
       if (!self.isTried(id)) { delete self.marks[id]; return; }
       var ok = self.isCorrect(id);
       // wrong before, right now: the hint was read and the answer fixed (stickers.js gives a badge for the first one)
-      if (ok && self.tries[id] > 0 && self.marks[id] !== true) document.dispatchEvent(new CustomEvent("cly:second-try"));
+      if (ok && self.tries[id] > 0 && self.marks[id] !== true) { fixed += 1; document.dispatchEvent(new CustomEvent("cly:second-try")); }
       self.marks[id] = ok;
       self.tries[id] = (self.tries[id] || 0) + (ok ? 0 : 1);
     });
+    if (fixed >= FIXED_AT_ONCE) document.dispatchEvent(new CustomEvent("cly:fixed-many", { detail: fixed }));
     this.checked = true;
   };
   Checks.prototype.clearMark = function (id) { delete this.marks[id]; };

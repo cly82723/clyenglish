@@ -140,8 +140,81 @@ test("what another tab saved is kept when this tab saves, and the later streak w
 
   // Assert
   assert.deepStrictEqual(both, {
-    earned: { climber: 11, "first-set": 10 }, days: [10, 11], steps: ["Step 0", "Step 1"], final: ["a", "b"], tips: [1, 2], streak: { n: 3, ends: 200 }
+    earned: { climber: 11, "first-set": 10 }, days: [10, 11], steps: ["Step 0", "Step 1"], final: ["a", "b"], tips: [1, 2], streak: { n: 3, ends: 200 }, pages: [], visits: 0, fixes: 0
   });
   assert.deepStrictEqual(S.merge({ ...mine, streak: null }, saved).streak, { n: 2, ends: 100 });
   assert.deepStrictEqual(mine.days, [10]);
+});
+
+/* ---------- The meme badges ---------- */
+
+test("hehe-again: handing in two weeks running, with no gap between them", () => {
+  assert.ok(!S.leagueIds([week("2026-11-02", 8)]).includes("hehe-again"));
+  assert.ok(S.leagueIds([week("2026-11-02", 8), week("2026-11-09", 8)]).includes("hehe-again"));
+  // a missed week in between is not two in a row
+  assert.ok(!S.leagueIds([week("2026-11-02", 8), week("2026-11-16", 8)]).includes("hehe-again"));
+});
+
+test("shake-it-off: a lower score than the week before, then the very next week handed in", () => {
+  const dipThenNext = S.leagueIds([week("2026-11-02", 10), week("2026-11-09", 6), week("2026-11-16", 6)]);
+  assert.ok(dipThenNext.includes("shake-it-off"));
+  // the same score is not a dip
+  assert.ok(!S.leagueIds([week("2026-11-02", 10), week("2026-11-09", 10), week("2026-11-16", 10)]).includes("shake-it-off"));
+  // a dip with nothing handed in afterwards earns nothing yet
+  assert.ok(!S.leagueIds([week("2026-11-02", 10), week("2026-11-09", 6)]).includes("shake-it-off"));
+  // a missed week after the dip is a comeback, not this badge
+  assert.ok(!S.leagueIds([week("2026-11-02", 10), week("2026-11-09", 6), week("2026-11-23", 8)]).includes("shake-it-off"));
+});
+
+test("last-minute: handed in during the last 24 hours before the week closes, and not after it", () => {
+  const closes = Date.parse("2026-11-23T00:00:00Z"), hour = 36e5;
+  assert.strictEqual(S.lastMinute(closes, closes - 2 * hour), true);
+  assert.strictEqual(S.lastMinute(closes, closes - 24 * hour), true);
+  assert.strictEqual(S.lastMinute(closes, closes - 25 * hour), false);
+  assert.strictEqual(S.lastMinute(closes, closes + hour), false);
+  assert.strictEqual(S.lastMinute(undefined, closes), false);
+});
+
+test("potato, sniffer, thinking and six-seven come from sets, pages, fixes and visits", () => {
+  assert.ok(!S.practiceIds({ setsDone: { a: 12, b: 12 } }).includes("potato"));
+  assert.ok(S.practiceIds({ setsDone: { a: 12, b: 13 } }).includes("potato"));
+  assert.ok(!S.practiceIds({ pages: ["a", "b", "c", "d", "e", "f", "g"] }).includes("sniffer"));
+  assert.ok(S.practiceIds({ pages: ["a", "b", "c", "d", "e", "f", "g", "h"] }).includes("sniffer"));
+  assert.ok(!S.practiceIds({ fixes: 4 }).includes("thinking"));
+  assert.ok(S.practiceIds({ fixes: 5 }).includes("thinking"));
+  assert.ok(!S.practiceIds({ visits: 66 }).includes("six-seven"));
+  assert.ok(S.practiceIds({ visits: 67 }).includes("six-seven"));
+});
+
+test("call-me: ten other badges earned, and the badge itself is not one of the ten", () => {
+  const nine = Object.fromEntries(["a", "b", "c", "d", "e", "f", "g", "h", "i"].map((id) => [id, 1]));
+  assert.deepStrictEqual(S.collectorIds(nine), []);
+  assert.deepStrictEqual(S.collectorIds({ ...nine, j: 1 }), ["call-me"]);
+  assert.deepStrictEqual(S.collectorIds({ ...nine, "call-me": 1 }), []);
+});
+
+test("a page is named the same whatever way it was opened", () => {
+  assert.strictEqual(S.pageName("/cly-english-v2/grammar.html"), "grammar");
+  assert.strictEqual(S.pageName("/cly-english-v2/grammar"), "grammar");
+  assert.strictEqual(S.pageName("/"), "index");
+  assert.strictEqual(S.pageName("/cly-english-v2/"), "index");
+  assert.strictEqual(S.pageName("/cly-english-v2/index.html"), "index");
+});
+
+test("visits, pages and fixes from two tabs are merged by union and by the larger count", () => {
+  const a = { earned: {}, days: [], steps: [], final: [], tips: [], streak: null, pages: ["grammar"], visits: 4, fixes: 2 };
+  const b = { earned: {}, days: [], steps: [], final: [], tips: [], streak: null, pages: ["index"], visits: 6, fixes: 1 };
+  const both = S.merge(a, b);
+  assert.deepStrictEqual(both.pages, ["grammar", "index"]);
+  assert.strictEqual(both.visits, 6);
+  assert.strictEqual(both.fixes, 2);
+});
+
+test("every meme badge has a picture, a name and a way to earn it in the badge list", () => {
+  const fs = require("node:fs"), path = require("node:path");
+  const src = fs.readFileSync(path.join(__dirname, "..", "assets", "js", "stickers.js"), "utf8");
+  for (const id of ["hehe-again", "shake-it-off", "shh", "last-minute", "saved-it", "potato", "call-me", "thinking", "sniffer", "six-seven"]) {
+    assert.ok(src.includes('["' + id + '",'), id + " is in the badge list");
+    assert.ok(fs.existsSync(path.join(__dirname, "..", "images", "stickers", id + ".png")), id + ".png exists");
+  }
 });
