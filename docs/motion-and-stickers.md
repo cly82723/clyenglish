@@ -85,3 +85,26 @@ Choices worth knowing:
 The two captioned drawings came from pictures with a solid black background, which was cut out to transparent (the white die-cut edge is kept); the cut-out was checked on the sheet but not at the edge of every curve.
 
 Not verified: Safari and real phones, and the live league. Last-minute prayer relies on `closesAt` from the league's week data (already sent to the page); it was tested as a rule, not against the live league. The tests are in `tests/stickers.test.js`.
+
+## Meme swaps (branch `meme-badges`, not live)
+
+Started 2026-11-18. Ten finished meme pictures took over ten of the original badges, so the sheet stays at 31. The badge ids do not change, so what students have already earned stays; only the drawing and name change.
+
+| Badge id | Now called | Meme | Rule |
+| --- | --- | --- | --- |
+| `full-marks` | An IQ too high? | the chalkboard fox | unchanged: 15 out of 15 |
+| `streak-10` | Tung Tung (secret) | the wooden guard with a bat | unchanged: 10 weeks in a row, but secret |
+| `comeback` | Son | "son" with the crying emoji | unchanged: miss a week, then come back |
+| `second-try` | Sad second try | the grey tearful face | unchanged |
+| `top-five` | Gyat | tongue out | unchanged |
+| `to-the-top` | Oh god | looking up in fear | unchanged: Level 2 to Level 5** |
+| `tip-collector` | Thinker | finger on the temple | unchanged: ten tips |
+| `final-lap` | I guess, bro | pinching the nose | unchanged |
+| `whole-exercise` | Dum | the Patrick body | unchanged |
+| `checklist-done` becomes `low-cortisol` | Low cortisol | arms behind the head | **new rule:** hand in the weekly challenge in the first 48 hours of the week |
+
+- **Checklist badge:** the self-study checklist no longer gives a badge. A student who already had it keeps one, because `legacyEarned` turns it into `low-cortisol` when the saved record is read, once, and it counts once toward "Call me". Low cortisol is the calm opposite of Last-minute prayer. It is worked out at hand-in, from `closesAt` (the week starts seven days before it).
+- **Shaped stickers:** none of the ten pictures is a circle, so each badge is cut in its own shape: a rounded white die-cut border and a thin navy ring around the picture. The sheet shows it at the picture's own proportions (the sizes are in `SHAPES` in `stickers.js` and are checked against each file by a test). Until it is earned, a shaped badge shows a dashed outline of the same shape, so the slot hints at what it will be.
+- **A secret streak step:** at 10 weeks the sheet shows an empty outline called "Secret badge", and the league page's note about the next badge says "A secret badge is waiting further on" instead of naming 10 weeks (`nextStreakText`). The name appears only once it is held. Shh is secret in the same way.
+- **The old drawings:** the ten replaced pictures are kept as small copies in `images/fox/badge-<id>.png` (256 pixels, about 100 KB each) and drift in the home page's background with the fox stickers: four soft ones in the far layer, three in the middle, three near. Phones are unchanged (still the three stickers), and they are lazy-loaded.
+- **Not verified:** Safari and real phones; the live league (low-cortisol is tested as a rule). The background was checked at 375, 768 and 1280 pixels in the app's browser, not on a slow phone.

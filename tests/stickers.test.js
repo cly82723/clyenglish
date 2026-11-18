@@ -218,3 +218,70 @@ test("every meme badge has a picture, a name and a way to earn it in the badge l
     assert.ok(fs.existsSync(path.join(__dirname, "..", "images", "stickers", id + ".png")), id + ".png exists");
   }
 });
+
+/* ---------- The meme swaps: early hand-in, secret steps, shaped stickers ---------- */
+
+test("low-cortisol: handed in during the first 48 hours of the week, and not after", () => {
+  const day = 864e5, closes = Date.parse("2026-11-23T00:00:00Z"), starts = closes - 7 * day;
+  assert.strictEqual(S.earlyHandIn(closes, starts + 1), true);
+  assert.strictEqual(S.earlyHandIn(closes, starts + 2 * day), true);
+  assert.strictEqual(S.earlyHandIn(closes, starts + 2 * day + 1), false);
+  assert.strictEqual(S.earlyHandIn(closes, closes - 3 * 36e5), false);
+  // before the week has started, or with no closing time, is not early
+  assert.strictEqual(S.earlyHandIn(closes, starts - 1), false);
+  assert.strictEqual(S.earlyHandIn(undefined, starts), false);
+});
+
+test("a student who ticked the whole checklist keeps a badge: it becomes low-cortisol, once, and counts once", () => {
+  const before = { "checklist-done": 20700, "first-set": 20701 };
+  const after = S.legacyEarned(before);
+  assert.deepStrictEqual(after, { "low-cortisol": 20700, "first-set": 20701 });
+  // the list it was given is left alone, and a badge already earned is not written over
+  assert.deepStrictEqual(before, { "checklist-done": 20700, "first-set": 20701 });
+  assert.deepStrictEqual(S.legacyEarned({ "checklist-done": 20700, "low-cortisol": 20800 }), { "low-cortisol": 20800 });
+  assert.deepStrictEqual(S.legacyEarned({ "first-set": 1 }), { "first-set": 1 });
+});
+
+test("the ten-week streak step is a secret: the note about the next badge never names it", () => {
+  assert.ok(S.secret.includes("streak-10"));
+  assert.strictEqual(S.nextStreakText(3), "2 more weeks in a row for the 5-week badge.");
+  assert.strictEqual(S.nextStreakText(4), "1 more week in a row for the 5-week badge.");
+  for (const n of [5, 6, 9]) {
+    const note = S.nextStreakText(n);
+    assert.ok(!/10/.test(note), "week " + n + " does not give the secret away: " + note);
+    assert.ok(/secret/i.test(note));
+  }
+  assert.strictEqual(S.nextStreakText(10), "5 more weeks in a row for the 15-week badge.");
+  assert.strictEqual(S.nextStreakText(15), "That is the top streak badge.");
+});
+
+test("a badge drawn in its picture's own shape is listed with that shape, and the shape is the file's", () => {
+  const fs = require("node:fs"), path = require("node:path");
+  const ids = Object.keys(S.shapes);
+  assert.ok(ids.length >= 10, "the ten memes are shaped");
+  for (const id of ids) {
+    const png = fs.readFileSync(path.join(__dirname, "..", "images", "stickers", id + ".png"));
+    const wide = png.readUInt32BE(16), high = png.readUInt32BE(20);
+    assert.deepStrictEqual(S.shapes[id], [wide, high], id + " is " + wide + "x" + high);
+    assert.ok(Math.max(wide, high) <= 512, id + " is no larger than 512");
+  }
+});
+
+test("the swapped badges keep their ids, so what students already earned stays", () => {
+  const fs = require("node:fs"), path = require("node:path");
+  const src = fs.readFileSync(path.join(__dirname, "..", "assets", "js", "stickers.js"), "utf8");
+  for (const id of ["full-marks", "streak-10", "comeback", "second-try", "top-five", "to-the-top", "tip-collector", "final-lap", "whole-exercise", "low-cortisol"]) {
+    assert.ok(src.includes('["' + id + '",'), id + " is in the badge list");
+    assert.ok(S.shapes[id], id + " is drawn in its picture's shape");
+  }
+  assert.ok(!src.includes('["checklist-done",'), "the checklist badge is gone from the list");
+});
+
+test("the secret list is the two secret badges, and each of them has a hint in the badge list", () => {
+  const fs = require("node:fs"), path = require("node:path");
+  const src = fs.readFileSync(path.join(__dirname, "..", "assets", "js", "stickers.js"), "utf8");
+  assert.deepStrictEqual(S.secret, ["streak-10", "shh"]);
+  assert.match(src, /\["streak-10", "Tung Tung", [^\]]*"A secret\. [^\]]*"\]/);
+  assert.match(src, /\["shh", "Shh", [^\]]*"A secret\. [^\]]*"\]/);
+  assert.ok(!src.includes('"10 weeks in a row"'), "the secret step never names itself as 10 weeks");
+});

@@ -18,6 +18,7 @@
   var VISITS_FOR_SIX_SEVEN = 67;
   var BADGES_FOR_CALL_ME = 10;
   var TAPS_FOR_SHH = 15;             // tips asked for in one visit to the home page
+  var EARLY_MS = 2 * DAY_MS;         // handed in within this long of the week starting is early
   var STREAK_STEPS = [5, 10, 15];   // weeks in a row that change the streak badge
   var TOAST_MS = 5000;
   var TOAST_FADE_MS = 400;
@@ -25,6 +26,14 @@
   var NEW_FOR_DAYS = 5;              // the home page's line about badges shows on a student's first four days
   var HINT_KEY = "cly:badges-hint";  // set once the student has followed that line
   var VISIT_KEY = "cly:visit-counted"; // per browser session: one open of the site counts once, however many pages it has
+
+  // Secret badges show a dashed outline and no name until they are earned. A streak step can be secret too.
+  var SECRET = ["streak-10", "shh"];
+  // A badge that is not a circle is drawn in the shape of its picture: its width and height in pixels, as the file is.
+  var SHAPES = {
+    "full-marks": [512, 300], "streak-10": [512, 512], comeback: [512, 354], "second-try": [512, 512], "top-five": [414, 512],
+    "to-the-top": [299, 512], "tip-collector": [299, 512], "final-lap": [512, 300], "whole-exercise": [391, 512], "low-cortisol": [512, 300]
+  };
 
   /* ---------- What earns what: plain functions, tested in tests/stickers.test.js ---------- */
 
@@ -86,6 +95,29 @@
   }
   // A new student: fewer than NEW_FOR_DAYS days on the site, and hasn't yet followed the line about badges.
   function isNewStudent(days, tapped) { return !tapped && days.length < NEW_FOR_DAYS; }
+  // Handed in within the first 48 hours of the week, which starts seven days before it closes.
+  function earlyHandIn(closesAt, now) {
+    if (typeof closesAt !== "number") return false;
+    var elapsed = now - (closesAt - 7 * DAY_MS);
+    return elapsed >= 0 && elapsed <= EARLY_MS;
+  }
+  // The self-study checklist badge became low-cortisol. A student who had it keeps one, and it counts once.
+  function legacyEarned(earned) {
+    var out = Object.assign({}, earned);
+    if (!("checklist-done" in out)) return out;
+    var day = out["checklist-done"];
+    delete out["checklist-done"];
+    if (!out["low-cortisol"]) out["low-cortisol"] = day;
+    return out;
+  }
+  // The line about the next streak badge. A secret step is not named, so the note never gives it away.
+  function nextStreakText(n) {
+    var next = STREAK_STEPS.filter(function (s) { return s > n; })[0];
+    if (!next) return "That is the top streak badge.";
+    if (SECRET.indexOf("streak-" + next) >= 0) return "Keep it going. A secret badge is waiting further on.";
+    var left = next - n;
+    return left + (left === 1 ? " more week" : " more weeks") + " in a row for the " + next + "-week badge.";
+  }
   // Handed in with 24 hours or less left before the week closes.
   function lastMinute(closesAt, now) { return typeof closesAt === "number" && now <= closesAt && closesAt - now <= DAY_MS; }
   // Ten other badges earned. The badge for it is not one of the ten.
@@ -130,7 +162,8 @@
   var pure = {
     countedWeeks: countedWeeks, leagueIds: leagueIds, streakId: streakId, weeksToNextStreak: weeksToNextStreak, streakEnds: streakEnds,
     hasRun: hasRun, allRead: allRead, isNewStudent: isNewStudent, practiceIds: practiceIds, addOnce: addOnce, merge: merge,
-    lastMinute: lastMinute, collectorIds: collectorIds, pageName: pageName
+    lastMinute: lastMinute, collectorIds: collectorIds, pageName: pageName,
+    earlyHandIn: earlyHandIn, legacyEarned: legacyEarned, nextStreakText: nextStreakText, secret: SECRET, shapes: SHAPES
   };
   if (typeof module !== "undefined" && module.exports) { module.exports = pure; return; }
 
@@ -141,23 +174,23 @@
   var BADGES = [
     ["streak-alive", "Flawless streak", "Do the weekly challenge every week. You hold this until you reach 5 weeks in a row.", "#e8f5ec", "flame"],
     ["streak-5", "5 weeks in a row", "Do the weekly challenge 5 weeks in a row.", "#ffe4c8", "star"],
-    ["streak-10", "10 weeks in a row", "Do the weekly challenge 10 weeks in a row.", "#dce8f7", "medal"],
+    ["streak-10", "Tung Tung", "Do the weekly challenge 10 weeks in a row. A sentry never misses a night.", "#dce8f7", "medal", "A secret. Keep your streak going and see who is on guard."],
     ["streak-15", "15 weeks in a row", "Do the weekly challenge 15 weeks in a row.", "#6b4596", "crown"],
     ["first-challenge", "First challenge", "Hand in your first weekly challenge.", "#dcefe2", "flag"],
-    ["comeback", "Comeback", "Miss a week, then come back and do the next challenge.", "#dce8f7", "sun"],
+    ["comeback", "Son", "Miss a week, then come back and do the next challenge. He is disappointed, but he is glad you are back.", "#dce8f7", "sun"],
     ["personal-best", "Personal best", "Beat your own best score in the weekly challenge, or get 15 out of 15 again. Counts from your third week.", "#6b4596", "star"],
     ["climber", "Climber", "Score higher than you did the week before.", "#dce8f7", "steps"],
-    ["full-marks", "Full marks", "Score 15 out of 15 in a weekly challenge.", "#ffe4c8", "tick"],
-    ["top-five", "Top five", "Finish a week in the top five. It shows after the week closes.", "#1a64c4", "medal"],
+    ["full-marks", "An IQ too high?", "Score 15 out of 15 in a weekly challenge.", "#ffe4c8", "tick"],
+    ["top-five", "Gyat", "Finish a week in the top five. It shows after the week closes.", "#1a64c4", "medal"],
     ["first-set", "First set", "Finish one practice set.", "#dcefe2", "tick"],
     ["ten-sets", "Ten sets", "Finish ten practice sets.", "#dce8f7", "book"],
-    ["whole-exercise", "Whole exercise", "Finish all five sets of one exercise.", "#ffe4c8", "medal"],
-    ["second-try", "Second try", "Get an answer wrong, read the hint, and fix it.", "#dce8f7", "pencil"],
-    ["checklist-done", "Checklist done", "Tick every item on the weekly self-study checklist.", "#e8f5ec", "tick"],
+    ["whole-exercise", "Dum", "Finish all five sets of one exercise.", "#ffe4c8", "medal"],
+    ["second-try", "Sad second try", "Get an answer wrong, read the hint, and fix it.", "#dce8f7", "pencil"],
+    ["low-cortisol", "Low cortisol", "Hand in the weekly challenge in the first 48 hours of the week, with all the time in the world.", "#e8f5ec", "tick"],
     ["step-by-step", "Step by step", "Read all five steps of the Part B guide.", "#e8f5ec", "steps"],
-    ["final-lap", "Final lap", "Read every section of the S.6 final reminders.", "#6b4596", "flag"],
-    ["to-the-top", "To the top", "Climb the home-page sentence from Level 2 to Level 5**.", "#1a64c4", "flag"],
-    ["tip-collector", "Tip collector", "Read ten of the fox's tips.", "#ffe4c8", "bulb"],
+    ["final-lap", "I guess, bro", "Read every section of the S.6 final reminders.", "#6b4596", "flag"],
+    ["to-the-top", "Oh god", "Climb the home-page sentence from Level 2 to Level 5**.", "#1a64c4", "flag"],
+    ["tip-collector", "Thinker", "Read ten of the fox's tips.", "#ffe4c8", "bulb"],
     ["five-days", "Five days", "Open CLY English on five different days.", "#fff1e3", "calendar"],
     ["three-in-a-row", "Three in a row", "Open CLY English three days running.", "#dce8f7", "sun"],
     ["hehe-again", "Hehe, again", "Do the weekly challenge two weeks in a row.", "#ffd9cf", "star"],
@@ -169,9 +202,9 @@
     ["thinking", "Thinking it through", "Get an answer wrong, read the hint and fix it, 5 times.", "#d2e3bf", "pencil"],
     ["sniffer", "Sniffer", "Open 8 different pages of CLY English.", "#d4eec3", "book"],
     ["six-seven", "Six seven", "Open CLY English 67 times. A visit counts once however many pages you open.", "#c9dcff", "calendar"],
-    ["shh", "Shh", "You kept asking the fox for another tip. Shh, that was the secret.", "#e6cfdc", "bulb", "A secret. Keep exploring, and see what the fox does.", true]
+    ["shh", "Shh", "You kept asking the fox for another tip. Shh, that was the secret.", "#e6cfdc", "bulb", "A secret. Keep exploring, and see what the fox does."]
   ];
-  var DRAWN = ["streak-alive", "streak-5", "streak-10", "streak-15", "first-challenge", "comeback", "personal-best", "climber", "full-marks", "top-five", "first-set", "ten-sets", "whole-exercise", "second-try", "checklist-done",
+  var DRAWN = ["streak-alive", "streak-5", "streak-10", "streak-15", "first-challenge", "comeback", "personal-best", "climber", "full-marks", "top-five", "first-set", "ten-sets", "whole-exercise", "second-try", "low-cortisol",
     "step-by-step", "final-lap", "to-the-top", "tip-collector", "five-days", "three-in-a-row",
     "hehe-again", "shake-it-off", "last-minute", "saved-it", "potato", "call-me", "thinking", "sniffer", "six-seven", "shh"];
   var BY_ID = {};
@@ -207,11 +240,20 @@
       '<ellipse cx="32" cy="51.5" rx="2.8" ry="2.2" fill="' + INK + '"/>' +
       '<g transform="translate(40 39)">' + PROPS[b[4]] + '</g></svg>';
   }
+  // The width over the height of a shaped sticker, to three places, for the stylesheet.
+  function ratio(shape) { return Math.round(shape[0] / shape[1] * 1000) / 1000; }
   // The picture for a badge, as markup built only from the constants above.
   function art(b) {
-    return DRAWN.indexOf(b[0]) >= 0
-      ? '<span class="sticker-art drawn"><img src="images/stickers/' + b[0] + '.png" alt="" width="64" height="64" loading="lazy"></span>'
-      : '<span class="sticker-art">' + standIn(b) + '</span>';
+    var shape = SHAPES[b[0]];
+    if (DRAWN.indexOf(b[0]) < 0) return '<span class="sticker-art">' + standIn(b) + '</span>';
+    var size = shape || [64, 64];
+    return '<span class="sticker-art drawn' + (shape ? ' shaped" style="--ar:' + ratio(shape) : '') + '"><img src="images/stickers/' + b[0] +
+      '.png" alt="" width="' + size[0] + '" height="' + size[1] + '" loading="lazy"></span>';
+  }
+  // An empty outline for a badge not earned yet: the same shape as its picture.
+  function blank(b) {
+    var shape = SHAPES[b[0]];
+    return '<span class="sticker-art' + (shape ? ' shaped" style="--ar:' + ratio(shape) + '"' : '"') + '></span>';
   }
 
   /* ---------- What this browser remembers ---------- */
@@ -223,7 +265,7 @@
     try { v = JSON.parse(localStorage.getItem(KEY)); } catch (e) { v = null; }
     v = v && typeof v === "object" ? v : {};
     var streak = v.streak && typeof v.streak.n === "number" && typeof v.streak.ends === "number" ? { n: v.streak.n, ends: v.streak.ends } : null;
-    return { earned: v.earned && typeof v.earned === "object" ? v.earned : {}, days: list(v.days), steps: list(v.steps), final: list(v.final), tips: list(v.tips), streak: streak,
+    return { earned: v.earned && typeof v.earned === "object" ? legacyEarned(v.earned) : {}, days: list(v.days), steps: list(v.steps), final: list(v.final), tips: list(v.tips), streak: streak,
       pages: list(v.pages), visits: count(v.visits), fixes: count(v.fixes) };
   }
   function save(state) {
@@ -319,13 +361,13 @@
     grid.textContent = "";
     BADGES.forEach(function (b) {
       var streak = isStreak(b[0]), earned = streak ? holding === b[0] : !!state.earned[b[0]];
-      var hidden = b[6] === true && !earned;   // a secret badge keeps its name until it is earned
+      var hidden = SECRET.indexOf(b[0]) >= 0 && !earned;   // a secret badge keeps its name until it is earned
       if (earned) have += 1;
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "sticker" + (earned ? " earned" : "");
+      btn.className = "sticker" + (earned ? " earned" : "") + (SHAPES[b[0]] ? " shaped" : "");
       btn.setAttribute("aria-label", (hidden ? "Secret badge" : b[1]) + (earned ? (streak ? ", held now" : ", earned") : ", not earned yet"));
-      btn.innerHTML = earned ? art(b) : '<span class="sticker-art"></span>';
+      btn.innerHTML = earned ? art(b) : blank(b);
       btn.addEventListener("click", function () {
         grid.querySelectorAll("[aria-pressed]").forEach(function (x) { x.removeAttribute("aria-pressed"); });
         btn.setAttribute("aria-pressed", "true");
@@ -353,7 +395,6 @@
   // three wrong answers turned right by one press of Check (practice-core.js)
   document.addEventListener("cly:fixed-many", function () { give(["saved-it"]); });
   document.addEventListener("cly:top", function () { give(["to-the-top"]); });
-  document.addEventListener("cly:checklist", function (e) { if (e.detail === "week") give(["checklist-done"]); });
   var taps = 0;   // tips asked for since this page opened; the secret badge is for the student who keeps going
   document.addEventListener("cly:tip", function () { taps += 1; if (taps >= TAPS_FOR_SHH) give(["shh"]); });
   document.addEventListener("cly:tip", function (e) {
@@ -381,11 +422,13 @@
       update({ streak: { n: n, ends: streakEnds(o.week, !!o.done) } });
       give(leagueIds(countedWeeks(o.history, o.week, o.done)));
       if (o.fresh && lastMinute(o.closesAt, Date.now())) give(["last-minute"]);
+      if (o.fresh && earlyHandIn(o.closesAt, Date.now())) give(["low-cortisol"]);
       var now = held();
       if (now && now !== before) { fresh = fresh.concat([now]); announce(); }
     },
     countedWeeks: countedWeeks,
     weeksToNextStreak: weeksToNextStreak,
+    nextStreakText: nextStreakText,
     // the streak badge held for n weeks in a row, as markup for the stamp card, or "" for none
     streakArt: function (n) { var id = streakId(n); return id ? art(BY_ID[id]) : ""; },
     streakName: function (n) { var id = streakId(n); return id ? BY_ID[id][1] : ""; }
