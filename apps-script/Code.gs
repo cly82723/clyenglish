@@ -16,13 +16,14 @@ var CONFIG = {
   MAX_ANSWER_CHARS: 60
 };
 
-var WRITES = ["verifyCode", "signOut", "start", "save", "away", "submit"];
+var WRITES = ["verifyCode", "signOut", "start", "save", "away", "submit", "questStart", "questAnswer"];
 var NO_SIGN_IN = ["sendCode", "verifyCode"];
 
 // Looked up per request: Apps Script loads files one by one, so Actions.gs may not exist yet when this file runs.
 function actionFor(name) {
   var actions = { sendCode: sendCode, verifyCode: verifyCode, signOut: signOut,
-    me: me, start: start, save: save, away: away, submit: submit, board: board, league: league, review: review };
+    me: me, start: start, save: save, away: away, submit: submit, board: board, league: league, review: review,
+    quests: quests, questStart: questStart, questAnswer: questAnswer };
   return actions.hasOwnProperty(name) ? actions[name] : null;
 }
 

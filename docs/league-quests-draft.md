@@ -1,6 +1,6 @@
 # Weekly quests: draft for CLY to approve
 
-Status: **draft, not live.** Nothing here is on the site until CLY approves the content.
+Status: **built** (18 Nov 2026). Each week's content stays a draft until CLY sets it to `approved` in the QuestSets tab.
 Applies to both leagues (S.3 and S.4). The timed weekly challenge is never changed or delayed by quests.
 
 ## The rules (approved 2026-11-18)
@@ -13,7 +13,7 @@ Applies to both leagues (S.3 and S.4). The timed weekly challenge is never chang
 - A shield earned in a week only covers later weeks.
 - Class points: each quest a student finishes adds to their class's quest total, shown beside the class table.
 
-Built so far (branch `league-quests`): the shield rule `shieldedStreak()` in `apps-script/Logic.gs`, with tests.
+Built: the rules and marking in `apps-script/Logic.gs`, the actions in `Actions.gs`, the page in `assets/js/challenge-quests.js`, the content in `assets/js/data/league-quests.js` (rows for the sheet: `node tools/quests-tsv.js <folder>`). One change from this draft: proofreading lines are typed out corrected, which works better on a phone than tapping words.
 
 ## The four kinds
 

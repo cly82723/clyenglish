@@ -7,6 +7,9 @@ var TABS = {
   Attempts: ["Week", "Email", "Class", "Number", "Started", "Submitted", "Score", "Time (s)", "Switches", "Away (s)", "Reopened", "Late", "Disqualified", "Answers",
     "Last seen", "Timeline", "Check"], // added Nov 2026: always after Answers, so older sheets keep their columns
   Challenges: ["Week", "Format", "Status", "Title", "Data"],
+  // added 18 Nov 2026: the weekly quests (a tab is made the first time it is used, so older sheets need no setup)
+  QuestSets: ["Week", "Kind", "Status", "Title", "Data"],
+  QuestResults: ["Week", "Email", "Class", "Kind", "Tries", "Passed", "Passage", "Started", "Updated", "Answers"],
   Sessions: ["Token hash", "Email", "Created"]
 };
 

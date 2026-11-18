@@ -271,3 +271,106 @@ test("shieldedStreak: a shield earned in a week cannot cover that same week", ()
   const s = L.shieldedStreak([W[0]], { [W[1]]: 3 }, W[2], false);
   assert.deepStrictEqual([s.current, s.shields, s.shielded], [0, 1, []]);
 });
+
+// ---------- Weekly quests ----------
+
+const sprint = { title: "Our class trip", lines: [
+  ["Last Friday, our class [[go>went]] to the Wetland Park."], ["We took the MTR to Tin Shui Wai."],
+  ["I have never seen so [[much>many]] birds."], ["One of my classmates [[were>was]] excited."],
+  ["We watched the mudflats for an hour."], ["We visited the exhibition about [[the>]] climate change."],
+  ["It was the best trip we have ever [[went>been]] on."], ["Our teacher told us to keep quiet."]] };
+
+test("quests: a proofreading sprint passes with four of five fixed and no correct line changed", () => {
+  const fixedLines = { 0: "Last Friday, our class went to the Wetland Park.", 2: "I have never seen so many birds.",
+    3: "One of my classmates was excited.", 5: "We visited the exhibition about climate change." };
+  const r = L.markSprint(sprint, fixedLines);
+  assert.deepStrictEqual([r.found, r.errors, r.changedRight, r.passed], [4, 5, 0, true]);
+  // a correct line "fixed" fails the sprint, even with every mistake found
+  const all = Object.assign({}, fixedLines, { 6: "It was the best trip we have ever been on.", 1: "We took the MTR to Tin Shui Wai station." });
+  assert.deepStrictEqual([L.markSprint(sprint, all).found, L.markSprint(sprint, all).changedRight, L.markSprint(sprint, all).passed], [5, 1, false]);
+  // an untouched line, or the line typed back unchanged, is not a change
+  assert.strictEqual(L.markSprint(sprint, { 1: "we took the MTR to Tin Shui Wai" }).changedRight, 0);
+  assert.strictEqual(L.markSprint(sprint, {}).passed, false);
+});
+
+const words = { title: "Words of the week", paragraphs: [["Clubs ", 1, " a sense of belonging, and the school must ", 2, " the problem."]],
+  gaps: { 1: { first: "f", answers: ["foster", "fosters"] }, 2: { first: "t", answers: ["tackle"] } } };
+
+test("quests: words of the week need all but one gap, spelt exactly, with or without the given first letter", () => {
+  assert.deepStrictEqual(L.markWords(words, { 1: "Fosters", 2: "tackel" }), { right: { 1: true, 2: false }, score: 1, outOf: 2, passed: true });
+  assert.strictEqual(L.markWords(words, { 1: "osters", 2: "ackle" }).score, 2);
+  assert.strictEqual(L.markWords(words, { 1: "fostar", 2: "" }).passed, false);
+});
+
+const ladder = { title: "Homework", start: "Homework is bad for students.", rungs: [
+  { to: "5", options: ["a", "b", "c"], answer: 1, reasons: ["x", "y", "z"], reason: 1 },
+  { to: "5**", options: ["a", "b", "c"], answer: 0, reasons: ["x", "y", "z"], reason: 1 }] };
+
+test("quests: the level-up ladder needs the right rewrite and the right reason on every rung", () => {
+  assert.strictEqual(L.markLadder(ladder, { 0: { pick: 1, reason: 1 }, 1: { pick: 0, reason: 1 } }).passed, true);
+  const r = L.markLadder(ladder, { 0: { pick: 1, reason: 0 }, 1: { pick: 2, reason: 1 } });
+  assert.deepStrictEqual([r.passed, r.rungs], [false, [{ rewrite: true, reason: false }, { rewrite: false, reason: true }]]);
+});
+
+test("quests: fixing last week's mistakes uses the student's wrong items, or the five most missed", () => {
+  assert.deepStrictEqual(L.missedItems(cloze, { 1: "are held", 2: "aren't give" }), ["2"]);
+  assert.deepStrictEqual(L.missedItems(proof, { 0: { type: "replace", at: 1, word: "have" }, 1: { type: "ok" } }), ["2", "3"]);
+  // most missed first; level misses keep the paper's order
+  const others = [{ 1: "are held", 2: "x" }, { 1: "x", 2: "x" }, {}];
+  assert.deepStrictEqual(L.hardestItems(cloze, others, 5), ["2", "1"]);
+  assert.deepStrictEqual(L.hardestItems(cloze, others, 1), ["2"]);
+  // a cloze item is right in the usual way; a proofreading line is typed out whole, fixed
+  assert.deepStrictEqual(L.markFix(cloze, ["2"], { 2: "aren't given" }), { right: { 2: true }, passed: true });
+  assert.deepStrictEqual(L.markFix(proof, ["2", "3"], { 2: "He made me stand up.", 3: "She is in charge the club." }),
+    { right: { 2: true, 3: false }, passed: false });
+});
+
+test("quests: what the student sees has no answers in it", () => {
+  const pub = L.publicQuest("words", words);
+  assert.deepStrictEqual(pub.gaps, { 1: { first: "f" }, 2: { first: "t" } });
+  assert.ok(!JSON.stringify(L.publicQuest("ladder", ladder)).includes("answer"));
+  assert.deepStrictEqual(L.publicQuest("sprint", sprint).lines[0], "Last Friday, our class go to the Wetland Park.");
+  const fix = L.publicFix(cloze, ["2"], { 2: "aren't give" });
+  assert.deepStrictEqual(fix.items, [{ id: "2", text: "The exams … in May and we [2] enough time.", yours: "aren't give" }]);
+  assert.deepStrictEqual(L.publicFix(proof, ["2"], {}).items, [{ id: "2", text: "He made me to stand up.", yours: "" }]);
+});
+
+test("quests: passed quests count per week and per class", () => {
+  const rows = [{ week: "2026-11-23", key: "a", passed: true }, { week: "2026-11-23", key: "a", passed: false }, { week: "2026-11-23", key: "b", passed: true }, { week: "2026-11-30", key: "a", passed: true }];
+  assert.deepStrictEqual(L.questsByWeek(rows, "a"), { "2026-11-23": 1, "2026-11-30": 1 });
+  assert.deepStrictEqual(L.classQuests([{ key: "a", cls: "4C" }, { key: "b", cls: " 4c" }, { key: "c", cls: "4A" }], rows.filter(r => r.week === "2026-11-23")), { "4C": 2 });
+});
+
+test("quests: every week in the quest bank is well formed and can be passed", () => {
+  global.window = {};
+  require("../assets/js/data/league-quests.js");
+  const bank = global.window.CLY_QUESTS_BANK;
+  for (const form of Object.keys(bank)) for (const week of Object.keys(bank[form])) {
+    const q = bank[form][week], at = form + " " + week;
+    assert.strictEqual(L.weekId(Date.parse(week + "T12:00:00+08:00")), week, at + " is not a Monday");
+    assert.ok(q.sprint.passages.length >= 2, at + ": a failed sprint needs a fresh passage");
+    q.sprint.passages.forEach((p) => {
+      const fixed = {};
+      p.lines.forEach((l, i) => { if (L.parseProofLine(l[0]).error) fixed[i] = L.parseProofLine(l[0]).fixed.join(" "); });
+      const r = L.markSprint(p, fixed);
+      assert.deepStrictEqual([r.errors, r.found, r.passed], [5, 5, true], at + " " + p.title);
+      assert.strictEqual(p.lines.length, 8, at + " " + p.title + " has eight lines");
+    });
+    const gapIds = q.words.paragraphs.flat().filter((x) => typeof x === "number").map(String);
+    assert.deepStrictEqual(gapIds.sort(), Object.keys(q.words.gaps).sort(), at + ": every gap in the text has an answer");
+    Object.values(q.words.gaps).forEach((g) => g.answers.forEach((a) => assert.ok(a.startsWith(g.first), at + ": " + a)));
+    const full = {}; Object.keys(q.words.gaps).forEach((id) => { full[id] = q.words.gaps[id].answers[0]; });
+    assert.ok(L.markWords(q.words, full).passed);
+    q.ladder.rungs.forEach((r) => assert.ok(r.options[r.answer] && r.reasons[r.reason], at + " ladder"));
+  }
+});
+
+test("quests: three a week; with last week's mistakes to fix, one of the other kinds rests, in turn", () => {
+  const all = ["sprint", "words", "ladder"];
+  const rest = (w) => all.filter((k) => L.questKindsFor(w, all, true).indexOf(k) < 0);
+  const weeks = ["2026-11-23", "2026-11-30", "2026-12-07"];
+  assert.deepStrictEqual(weeks.map((w) => L.questKindsFor(w, all, true).length), [2, 2, 2]);
+  assert.deepStrictEqual(weeks.map((w) => rest(w)[0]).sort(), all.slice().sort(), "each kind rests once in three weeks");
+  assert.deepStrictEqual(L.questKindsFor("2026-11-23", all, false), all);
+  assert.deepStrictEqual(L.questKindsFor("2026-11-23", ["words", "ladder"], true), ["words", "ladder"]);
+});

@@ -304,6 +304,153 @@ function classTable(students, ranked) {
   return sharePlaces(rows, function (p, r) { return p.average === r.average; });
 }
 
+// ---------- Weekly quests: marking (the rules and shields are with the streak above) ----------
+// A proofreading line in a quest is typed out whole, corrected. A line typed back unchanged (case, spaces and
+// end punctuation aside) is not a change.
+
+var QUEST_KINDS = ["fix", "sprint", "words", "ladder"];
+var FIX_FALLBACK_ITEMS = 5;   // nothing of their own to fix: the items most students missed last week
+
+function proofText(line) { return parseProofLine(line[0]).words.join(" "); }
+function acceptedLines(challenge, i) {
+  var line = parseProofLine(challenge.lines[i][0]);
+  return [line.fixed.join(" ")].concat((challenge.alsoRight && challenge.alsoRight[i]) || []).map(normalise);
+}
+
+// sprint: { title, lines } as in a proofreading challenge. answers: { lineIndex: "the line as typed" }.
+// Passes with all but one mistake corrected and no correct line changed.
+function markSprint(sprint, answers) {
+  var found = 0, errors = 0, changedRight = 0;
+  sprint.lines.forEach(function (l, i) {
+    var typed = answers && answers[i] != null ? normalise(answers[i]) : null;
+    var original = normalise(proofText(l));
+    if (parseProofLine(l[0]).error) {
+      errors += 1;
+      if (typed !== null && acceptedLines(sprint, i).indexOf(typed) >= 0) found += 1;
+    } else if (typed !== null && typed !== original) changedRight += 1;
+  });
+  return { found: found, errors: errors, changedRight: changedRight, passed: errors > 0 && found >= errors - 1 && changedRight === 0 };
+}
+
+// words: { paragraphs, gaps: { id: { first, answers } } }. Spelt exactly; typing the given first letter is optional.
+function markWords(set, answers) {
+  var right = {};
+  Object.keys(set.gaps).forEach(function (id) {
+    var gap = set.gaps[id], typed = normalise((answers && answers[id]) || "");
+    var accepted = gap.answers.map(normalise);
+    right[id] = !!typed && (accepted.indexOf(typed) >= 0 || accepted.indexOf(normalise(gap.first + typed)) >= 0);
+  });
+  var outOf = Object.keys(right).length, score = countTrue(right);
+  return { right: right, score: score, outOf: outOf, passed: outOf > 0 && score >= outOf - 1 };
+}
+
+// ladder: { start, rungs: [{ to, options, answer, reasons, reason }] }. answers: { rung: { pick, reason } }.
+function markLadder(set, answers) {
+  var rungs = set.rungs.map(function (r, i) {
+    var a = (answers && answers[i]) || {};
+    return { rewrite: Number(a.pick) === r.answer, reason: Number(a.reason) === r.reason };
+  });
+  return { rungs: rungs, passed: rungs.every(function (r) { return r.rewrite && r.reason; }) };
+}
+
+// The items of a challenge a student got wrong, as ids in the paper's order.
+function missedItems(challenge, answers) {
+  var right = mark(challenge, answers).right;
+  return Object.keys(right).filter(function (id) { return !right[id]; });
+}
+
+// The items most students got wrong, most missed first (level: the paper's order). answerSets: one per attempt.
+function hardestItems(challenge, answerSets, n) {
+  var ids = Object.keys(mark(challenge, {}).right), misses = {};
+  ids.forEach(function (id) { misses[id] = 0; });
+  answerSets.forEach(function (answers) { missedItems(challenge, answers).forEach(function (id) { misses[id] += 1; }); });
+  return ids.slice().sort(function (a, b) { return misses[b] - misses[a] || ids.indexOf(a) - ids.indexOf(b); }).slice(0, n);
+}
+
+// A cloze item is marked as in the challenge; a proofreading line is typed out whole, corrected.
+function markFix(challenge, ids, answers) {
+  var right = {};
+  if (challenge.format === "cloze") {
+    var all = markCloze(challenge, answers).right;
+    ids.forEach(function (id) { right[id] = all[id]; });
+  } else {
+    ids.forEach(function (id) {
+      var typed = normalise((answers && answers[id]) || "");
+      right[id] = !!typed && acceptedLines(challenge, Number(id)).indexOf(typed) >= 0;
+    });
+  }
+  return { right: right, passed: ids.length > 0 && ids.every(function (id) { return right[id]; }) };
+}
+
+// After two wrong tries at an item, the hint names the rule; never the answer.
+function fixHint(challenge, id) {
+  if (challenge.format === "cloze") {
+    var b = challenge.blanks[id] || {};
+    return b.hint || b.why || (b.verb ? "Think about the form of “" + b.verb + "” this sentence needs." : "");
+  }
+  var line = challenge.lines[Number(id)] || [];
+  return line[3] || line[2] || "";
+}
+
+// What the student sees of a quest: never its answers.
+function publicQuest(kind, set) {
+  if (kind === "sprint") return { title: set.title, lines: set.lines.map(proofText) };
+  if (kind === "words") {
+    var gaps = {};
+    Object.keys(set.gaps).forEach(function (id) { gaps[id] = { first: set.gaps[id].first }; });
+    return { title: set.title, paragraphs: set.paragraphs, gaps: gaps };
+  }
+  if (kind === "ladder") return { title: set.title, start: set.start, rungs: set.rungs.map(function (r) { return { to: r.to, options: r.options, reasons: r.reasons }; }) };
+  return null;
+}
+
+// Fixing last week's mistakes: each item in its sentence (other blanks shown as "…"), with what the student wrote.
+function publicFix(challenge, ids, mine) {
+  var yours = function (a, words) {
+    if (typeof a === "string") return a;
+    var m = validMark(a, words ? words.length : 0);
+    return words && m.type !== "none" ? applyMark(words, m).join(" ") : "";
+  };
+  if (challenge.format === "cloze") {
+    var items = ids.map(function (id) {
+      var para = challenge.paragraphs.filter(function (parts) { return parts.indexOf(Number(id)) >= 0; })[0] || [];
+      var text = para.map(function (p) { return typeof p !== "number" ? p : String(p) === String(id) ? "[" + id + "]" : "…"; }).join("");
+      // just the sentence that holds the blank, so a long paragraph doesn't fill a phone screen
+      var sentence = text.split(/(?<=[.!?][”"']?)\s+(?=[A-Z“"‘])/).filter(function (s) { return s.indexOf("[" + id + "]") >= 0; })[0];
+      return { id: String(id), text: (sentence || text).trim(), yours: yours((mine || {})[id]) };
+    });
+    return { format: "cloze", title: challenge.title, bank: publicChallenge(challenge).bank, items: items };
+  }
+  return { format: "proofreading", title: challenge.title, items: ids.map(function (id) {
+    var words = parseProofLine(challenge.lines[Number(id)][0]).words;
+    return { id: String(id), text: words.join(" "), yours: yours((mine || {})[id], words) };
+  }) };
+}
+
+// The quest kinds that run in a week, besides fixing last week's mistakes: three quests a week in all, so with
+// something to fix one of the others rests, a different one each week. available: the kinds with content this week.
+function questKindsFor(week, available, hasFix) {
+  if (!hasFix || available.length <= 2) return available.slice(0, 3);
+  var resting = QUEST_KINDS.slice(1)[Math.round(weekStartMs(week) / WEEK_MS) % 3];
+  var out = available.filter(function (k) { return k !== resting; });
+  return out.slice(0, 2);
+}
+
+// rows: [{ week, key, passed }]. Quests passed by one student, week by week, for shieldedStreak.
+function questsByWeek(rows, key) {
+  var out = {};
+  rows.forEach(function (r) { if (r.key === key && r.passed) out[r.week] = (out[r.week] || 0) + 1; });
+  return out;
+}
+
+// Quests passed in a week by each class's students: { cls: n }.
+function classQuests(students, rows) {
+  var clsOf = {}, out = {};
+  students.forEach(function (s) { clsOf[s.key] = className(s.cls); });
+  rows.forEach(function (r) { if (r.passed && clsOf[r.key]) out[clsOf[r.key]] = (out[clsOf[r.key]] || 0) + 1; });
+  return out;
+}
+
 // What a student may see of a ranked list: the places that earn points, and their own row.
 // Everyone else only counts towards "N took part", so a low score is never shown to classmates.
 function visibleRows(ranked, myKey) {
@@ -313,7 +460,10 @@ function visibleRows(ranked, myKey) {
 if (typeof module !== "undefined") {
   module.exports = { weekId: weekId, weekStartMs: weekStartMs, weekEndMs: weekEndMs, isClosed: isClosed, formatDue: formatDue,
     normalise: normalise, markCloze: markCloze, markProofreading: markProofreading, mark: mark, publicChallenge: publicChallenge,
-    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, shieldedStreak: shieldedStreak, gapAbove: gapAbove, classTable: classTable, className: className, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
+    rankWeek: rankWeek, leagueTable: leagueTable, streak: streak, shieldedStreak: shieldedStreak, gapAbove: gapAbove, classTable: classTable, className: className,
+    markSprint: markSprint, markWords: markWords, markLadder: markLadder, missedItems: missedItems, hardestItems: hardestItems,
+    markFix: markFix, fixHint: fixHint, publicQuest: publicQuest, publicFix: publicFix, questsByWeek: questsByWeek, classQuests: classQuests,
+    QUEST_KINDS: QUEST_KINDS, questKindsFor: questKindsFor, FIX_FALLBACK_ITEMS: FIX_FALLBACK_ITEMS, timeTaken: timeTaken, parseProofLine: parseProofLine, visibleRows: visibleRows,
     countAway: countAway, overSwitchLimit: overSwitchLimit, answerChanges: answerChanges, timingCheck: timingCheck,
     MIN_AWAY_MS: MIN_AWAY_MS, MAX_SWITCHES: MAX_SWITCHES };
 }
