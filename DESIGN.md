@@ -411,7 +411,7 @@ A 3px ink outline with 3px offset and 4px corners; navy on the cover too.
 
 ### The book as an object (since 2026-11-16)
 All of this lives in `assets/css/motion.css` and `assets/js/motion.js`, uses CSS 3D only (no library), and is switched off by the device's reduced-motion setting, which leaves the fades above.
-- **Page turns:** moving between pages turns the sheet on its left edge (0.34s) while the cover cross-fades, using the browser's cross-page view transitions. Browsers without them load the page at once. Sections of one page turn the same way (0.3s, 6°).
+- **Page turns:** moving between pages is a book page turning (0.34s, `--ease-turn: cubic-bezier(0.32, 0.72, 0, 1)`): the next page lies solid underneath and the old one swings away on its left edge to edge-on, darkening slightly; going back (Back, or an earlier page in the reading order) swings the earlier page back over the current one. The hinge is level with the middle of the screen. Never a cross-fade of two pages. Browsers without cross-page view transitions load the page at once. Opening a row turns its body in the same way (0.3s, 6°), from the right going on and from the left going back; closing is instant.
 - **Held controls:** a pressed choice, chip, button, cell or directory link lifts 2px and tilts up to 7° towards the finger, with the Held shadow, then lands flat. Wide rows tilt 3°.
 - **Cover tabs:** a tab that is not open swings 9° forward on its bottom hinge under a mouse, 14° when pressed.
 - **Level ladder:** choosing a level by click or tap flips the new line down like a card (0.38s, hinged on its top edge). Whole scripts keep their fade, and keys still change the level at once.

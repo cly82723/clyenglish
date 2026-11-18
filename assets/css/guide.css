@@ -129,8 +129,13 @@
 }
 @media (hover: hover) { .row-links a:hover { background: var(--chest); border-color: var(--ink); } }
 @media (min-width: 761px) { .row-body { padding-left: 52px; } }
+/* opening a row turns to it like a page: from the right going on, from the left going back (site.js marks which) */
 @media (prefers-reduced-motion: no-preference) {
-  .row[open] > .row-body { animation: note-in 0.24s var(--ease-out); }
+  .row[open] > .row-body { animation: page-next 0.3s var(--ease-out); transform-origin: 0 120px; }
+  .row.turn-prev[open] > .row-body { animation-name: page-prev; transform-origin: 100% 120px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .row[open] > .row-body { animation: fade-in 0.15s ease-out; }
 }
 @media print {
   .rows-foot { display: none !important; }

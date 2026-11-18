@@ -371,9 +371,12 @@
       return true;
     }
 
-    rows.forEach(function (row) {
+    var lastOpened = -1;   // the row opened most recently: a row after it turns in forward, a row before it turns back
+    rows.forEach(function (row, n) {
       row.addEventListener("toggle", function () {
         if (!row.open) { if (saved() === row.id) saved(""); return; }
+        row.classList.toggle("turn-prev", n < lastOpened);
+        lastOpened = n;
         // browsers without named details: shut the others here
         rows.forEach(function (other) { if (other !== row) other.open = false; });
         saved(row.id);
