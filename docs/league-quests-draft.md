@@ -85,6 +85,6 @@ Why is it better? ☐ It uses a harder word · ☑ **It shows the cost in a scen
 
 ## Questions for CLY
 
-1. Are the four kinds and their pass marks right?
-2. Should S.3's quests be the same kinds, with easier passages?
-3. May the league reuse last week's five hardest items for students with nothing to fix?
+1. Are the four kinds and their pass marks right? **Yes, as drafted (CLY, 2026-11-18).**
+2. Should S.3's quests be the same kinds, with easier passages? **Yes (CLY, 2026-11-18).**
+3. May the league reuse last week's five hardest items for students with nothing to fix? **Yes (CLY, 2026-11-18).**
