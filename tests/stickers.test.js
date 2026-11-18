@@ -285,3 +285,34 @@ test("the secret list is the two secret badges, and each of them has a hint in t
   assert.match(src, /\["shh", "Shh", [^\]]*"A secret\. [^\]]*"\]/);
   assert.ok(!src.includes('"10 weeks in a row"'), "the secret step never names itself as 10 weeks");
 });
+
+/* ---------- Zooming in on a badge: the words that come with it ---------- */
+
+const row = (id, name, how, hint) => (hint ? [id, name, how, "#fff", "tick", hint] : [id, name, how, "#fff", "tick"]);
+
+test("a badge's words are its name and how it is earned, and say Earned once it is", () => {
+  const b = row("first-set", "First set", "Finish one practice set.");
+  assert.deepStrictEqual(S.describe(b, false), { name: "First set", text: "Finish one practice set.", hidden: false });
+  assert.deepStrictEqual(S.describe(b, true), { name: "First set", text: "Finish one practice set. Earned!", hidden: false });
+});
+
+test("a streak badge that is held says it goes if a week is missed", () => {
+  const b = row("streak-5", "5 weeks in a row", "Do the weekly challenge 5 weeks in a row.");
+  assert.strictEqual(S.describe(b, true).text, "Do the weekly challenge 5 weeks in a row. You hold it now: miss a week and it goes.");
+});
+
+test("a secret badge shows no name and only its hint until it is earned, then everything", () => {
+  const b = row("shh", "Shh", "You kept asking the fox for another tip.", "A secret. Keep exploring.");
+  assert.deepStrictEqual(S.describe(b, false), { name: "Secret", text: "A secret. Keep exploring.", hidden: true });
+  assert.deepStrictEqual(S.describe(b, true), { name: "Shh", text: "You kept asking the fox for another tip. Earned!", hidden: false });
+  const step = row("streak-10", "Tung Tung", "10 weeks in a row.", "A secret. Keep going.");
+  assert.strictEqual(S.describe(step, false).name, "Secret");
+  assert.ok(!S.describe(step, false).text.includes("10"), "the hint never names the step");
+  assert.strictEqual(S.describe(step, true).name, "Tung Tung");
+});
+
+test("a badge that is not secret never shows as secret, earned or not", () => {
+  const b = row("climber", "Climber", "Score higher than you did the week before.");
+  assert.strictEqual(S.describe(b, false).hidden, false);
+  assert.strictEqual(S.describe(b, false).name, "Climber");
+});

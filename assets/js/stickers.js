@@ -118,6 +118,13 @@
     var left = next - n;
     return left + (left === 1 ? " more week" : " more weeks") + " in a row for the " + next + "-week badge.";
   }
+  // The words that go with a badge, on the line under the sheet and in the zoomed card: its name and how it is earned.
+  // A secret badge not yet earned has no name and only its hint; a held streak badge says it goes if a week is missed.
+  function describe(b, earned) {
+    var hidden = SECRET.indexOf(b[0]) >= 0 && !earned, streak = b[0].indexOf("streak-") === 0;
+    if (hidden) return { name: "Secret", text: b[5], hidden: true };
+    return { name: b[1], text: b[2] + (earned ? (streak ? " You hold it now: miss a week and it goes." : " Earned!") : ""), hidden: false };
+  }
   // Handed in with 24 hours or less left before the week closes.
   function lastMinute(closesAt, now) { return typeof closesAt === "number" && now <= closesAt && closesAt - now <= DAY_MS; }
   // Ten other badges earned. The badge for it is not one of the ten.
@@ -163,7 +170,7 @@
     countedWeeks: countedWeeks, leagueIds: leagueIds, streakId: streakId, weeksToNextStreak: weeksToNextStreak, streakEnds: streakEnds,
     hasRun: hasRun, allRead: allRead, isNewStudent: isNewStudent, practiceIds: practiceIds, addOnce: addOnce, merge: merge,
     lastMinute: lastMinute, collectorIds: collectorIds, pageName: pageName,
-    earlyHandIn: earlyHandIn, legacyEarned: legacyEarned, nextStreakText: nextStreakText, secret: SECRET, shapes: SHAPES
+    earlyHandIn: earlyHandIn, legacyEarned: legacyEarned, nextStreakText: nextStreakText, describe: describe, secret: SECRET, shapes: SHAPES
   };
   if (typeof module !== "undefined" && module.exports) { module.exports = pure; return; }
 
@@ -371,11 +378,13 @@
       btn.addEventListener("click", function () {
         grid.querySelectorAll("[aria-pressed]").forEach(function (x) { x.removeAttribute("aria-pressed"); });
         btn.setAttribute("aria-pressed", "true");
+        var said = describe(b, earned);
         caption.textContent = "";
         var name = document.createElement("strong");
-        name.textContent = (hidden ? "Secret" : b[1]) + ": ";
+        name.textContent = said.name + ": ";
         caption.appendChild(name);
-        caption.appendChild(document.createTextNode(hidden ? b[5] : b[2] + (earned ? (streak ? " You hold it now: miss a week and it goes." : " Earned!") : "")));
+        caption.appendChild(document.createTextNode(said.text));
+        openZoom(b, earned);
       });
       var li = document.createElement("li");
       li.appendChild(btn);
@@ -383,6 +392,43 @@
     });
     count.textContent = have + " of " + BADGES.length;
     sheet.hidden = false;
+  }
+
+  /* ---------- Zooming in: a badge and its words, large, in a card over the page ---------- */
+
+  // A browser without <dialog> keeps the line under the sheet, which has the same words.
+  var zoom = null;
+  function buildZoom() {
+    if (typeof HTMLDialogElement === "undefined" || !document.createElement("dialog").showModal) return null;
+    var dialog = document.createElement("dialog"), card = document.createElement("div"), close = document.createElement("button");
+    var art = document.createElement("div"), name = document.createElement("h3"), text = document.createElement("p");
+    dialog.className = "sticker-zoom";
+    dialog.setAttribute("aria-labelledby", "sticker-zoom-name");
+    card.className = "sticker-zoom-card";
+    close.type = "button";
+    close.className = "sticker-zoom-close";
+    close.setAttribute("aria-label", "Close");
+    close.textContent = "×";
+    art.className = "sticker-zoom-art";
+    art.setAttribute("aria-hidden", "true");   // the picture says nothing the name and words do not
+    name.id = "sticker-zoom-name";
+    card.appendChild(close); card.appendChild(art); card.appendChild(name); card.appendChild(text);
+    dialog.appendChild(card);
+    document.body.appendChild(dialog);
+    close.addEventListener("click", function () { dialog.close(); });
+    // a tap on the dimmed page outside the card closes it too; Escape closes it as for any dialog
+    dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
+    return { dialog: dialog, art: art, name: name, text: text };
+  }
+  function openZoom(b, earned) {
+    zoom = zoom || buildZoom();
+    if (!zoom) return;
+    var said = describe(b, earned);
+    zoom.art.innerHTML = earned ? art(b) : blank(b);
+    zoom.art.classList.toggle("empty", !earned);
+    zoom.name.textContent = said.name;
+    zoom.text.textContent = said.text;
+    if (!zoom.dialog.open) zoom.dialog.showModal();
   }
 
   /* ---------- Listening to the pages ---------- */
