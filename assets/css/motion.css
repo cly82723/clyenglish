@@ -108,6 +108,12 @@ html[data-turn="back"]::view-transition-new(sheet) {
 .sticker-art.drawn { position: relative; }
 .sticker-art.drawn img { position: absolute; left: -12.5%; top: -12.5%; width: 125%; height: 125%; max-width: none; }
 .sticker.earned .sticker-art.drawn { box-shadow: none; }
+/* a badge that is not a circle keeps the shape of its picture: a die-cut sticker, and a dashed outline of that same shape until it is earned */
+.sticker.shaped { display: grid; place-items: center; border-radius: 12%; }
+/* a little larger than a circle, as a drawn circle is, since a wide or tall shape fills less of its square */
+.sticker-art.shaped { flex: none; width: calc(120% * min(1, var(--ar))); aspect-ratio: var(--ar); border-radius: 12%; }
+.sticker-art.drawn.shaped img { position: static; left: auto; top: auto; width: 100%; height: 100%; border-radius: 12%; }
+.sticker-toast .sticker-art.shaped { width: calc(52px * min(1, var(--ar))); }
 /* a sticker still to earn is a dashed outline; an earned one keeps a pencil edge, so its white rim shows on white paper */
 .sticker:not(.earned) .sticker-art { border: 1.5px dashed var(--ring); }
 .sticker.earned .sticker-art { box-shadow: 0 0 0 1px var(--edge); }
@@ -156,3 +162,37 @@ html[data-turn="back"]::view-transition-new(sheet) {
 @media (prefers-reduced-motion: reduce) {
   .sticker-toast, .sticker-toast.show { transform: none; transition: opacity 0.15s ease-out; }
 }
+
+/* ---------- A badge zoomed in: the picture and its words, large, in a card over the dimmed page ---------- */
+
+.sticker-zoom { padding: 0; border: 0; background: none; color: var(--ink); max-width: none; max-height: none; overflow: visible; }
+.sticker-zoom::backdrop { background: rgb(16 38 59 / 0.62); }
+.sticker-zoom-card {
+  position: relative; box-sizing: border-box; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 32px); max-height: calc(100svh - 32px); overflow: auto;
+  display: grid; justify-items: center; gap: 12px; padding: 28px 20px 24px; text-align: center;
+  background: var(--paper); border: 1px solid var(--ink); border-radius: 18px; box-shadow: 0 18px 40px rgb(16 38 59 / 0.35);
+}
+.sticker-zoom-close {
+  appearance: none; position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: none; color: var(--ink); font: 400 1.9rem/1 var(--font-display); cursor: pointer;
+}
+/* the area is as wide as the longest side may be and as tall as the picture, so a wide picture leaves no empty band */
+.sticker-zoom-art { --zoom: min(340px, 72vw, 44vh); --zoom: min(340px, 72vw, 44svh); width: var(--zoom); display: grid; justify-items: center; margin-top: 6px; }
+/* a round badge keeps clear space round its circle for the ears, so it is shown a little smaller to fit the same square */
+.sticker-zoom-art .sticker-art:not(.shaped) { width: 80%; }
+.sticker-zoom-art .sticker-art.shaped { width: calc(100% * min(1, var(--ar))); }
+.sticker-zoom-art.empty .sticker-art { display: grid; place-items: center; border: 2px dashed var(--ring); }
+.sticker-zoom-art.empty .sticker-art::after { content: "?"; font: 800 4rem/1 var(--font-display); color: var(--ring); }
+.sticker-zoom h3 { margin: 0; font-size: var(--step-2); line-height: 1.15; }
+.sticker-zoom p { margin: 0; max-width: 34ch; font-size: 1.0625rem; line-height: 1.5; }
+@keyframes sticker-zoom-in { from { opacity: 0; transform: scale(0.86); } }
+@keyframes sticker-zoom-fade { from { opacity: 0; } }
+/* the card arrives with its picture and words together, and then stands perfectly still; with reduced motion it only fades */
+@media (prefers-reduced-motion: no-preference) {
+  .sticker-zoom[open] .sticker-zoom-card { animation: sticker-zoom-in 0.24s var(--ease-out); }
+  .sticker-zoom[open]::backdrop { animation: sticker-zoom-fade 0.2s ease-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sticker-zoom[open] .sticker-zoom-card, .sticker-zoom[open]::backdrop { animation: sticker-zoom-fade 0.15s ease-out; }
+}
+@media print { .sticker-zoom { display: none; } }

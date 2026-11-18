@@ -298,7 +298,7 @@
     }
     seenStamps(stamps);
     // the streak badge the student holds now, and how far the next one is
-    var toNext = K.weeksToNextStreak(streak), badge = null;
+    var badge = null;
     if (streak) { badge = h("span", { class: "stamp-badge", "aria-hidden": "true" }); badge.innerHTML = K.streakArt(streak); }
     var holding = streak ? "You hold the “" + K.streakName(streak) + "” badge. " : "";
     return h("div", { class: "stamp-card" + (stamps ? " on" : "") },
@@ -306,7 +306,7 @@
       h("ol", { class: "stamps" }, squares),
       h("p", { class: "stamp-next" }, h("strong", null, plural(stamps, "stamp") + "."), " One for every week that counts."),
       h("div", { class: "stamp-streak" }, badge, h("div", null, note,
-        h("p", { class: "stamp-next" }, holding + (toNext ? plural(toNext, "more week") + " in a row for the " + (streak + toNext) + "-week badge." : "That is the top streak badge.")))));
+        h("p", { class: "stamp-next" }, holding + K.nextStreakText(streak)))));
   }
 
   // Kept up to date while the page is open, so it never says "1 day" on Sunday night.
