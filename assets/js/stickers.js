@@ -37,14 +37,17 @@
 
   /* ---------- What earns what: plain functions, tested in tests/stickers.test.js ---------- */
 
+  // A score or a point total as a number: the league sends numbers, but a figure that arrives as text ("15") is the same figure.
+  function figure(v) { return typeof v === "string" && v.trim() !== "" && isFinite(Number(v)) ? Number(v) : v; }
+
   function dayOf(week) { return Math.round(Date.parse(week + "T00:00:00Z") / DAY_MS); }
 
   // The weeks that counted, oldest first: every closed week that wasn't disqualified, plus this week once it is
   // handed in and counts (done: { score }). Each is { week, score, points }.
   function countedWeeks(history, thisWeek, done) {
     var weeks = (history || []).filter(function (r) { return !r.disqualified; })
-      .map(function (r) { return { week: r.week, score: r.score, points: r.points || 0 }; });
-    if (done && !weeks.some(function (w) { return w.week === thisWeek; })) weeks = weeks.concat([{ week: thisWeek, score: done.score, points: 0 }]);
+      .map(function (r) { return { week: r.week, score: figure(r.score), points: Number(r.points) || 0 }; });
+    if (done && !weeks.some(function (w) { return w.week === thisWeek; })) weeks = weeks.concat([{ week: thisWeek, score: figure(done.score), points: 0 }]);
     return weeks.sort(function (a, b) { return dayOf(a.week) - dayOf(b.week); });
   }
   // League badges that are kept for good, from those weeks.

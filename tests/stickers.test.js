@@ -316,3 +316,26 @@ test("a badge that is not secret never shows as secret, earned or not", () => {
   assert.strictEqual(S.describe(b, false).hidden, false);
   assert.strictEqual(S.describe(b, false).name, "Climber");
 });
+
+/* ---------- Full marks that came from an older week ---------- */
+
+test("full marks is found in any earlier week, whatever came before or after it, including a disqualified week", () => {
+  const history = [
+    week("2026-11-02", 15),
+    { week: "2026-11-09", disqualified: true },
+    week("2026-11-16", 9)
+  ];
+  const ids = S.leagueIds(S.countedWeeks(history, "2026-11-23", null));
+  assert.ok(ids.includes("full-marks"));
+  assert.ok(ids.includes("first-challenge"));
+});
+
+test("a score that arrives as text still counts as full marks, and is never counted twice", () => {
+  const history = [{ week: "2026-11-02", score: "15", points: "3" }, { week: "2026-11-09", score: "9", points: "0" }];
+  const weeks = S.countedWeeks(history, "2026-11-16", { score: "15" });
+  assert.deepStrictEqual(weeks.map((w) => w.score), [15, 9, 15]);
+  assert.deepStrictEqual(weeks.map((w) => w.points), [3, 0, 0]);
+  const ids = S.leagueIds(weeks);
+  assert.ok(ids.includes("full-marks"));
+  assert.ok(ids.includes("top-five"));
+});
