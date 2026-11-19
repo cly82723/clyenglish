@@ -24,10 +24,9 @@ function me(user, body, nowMs) {
     limitMs: CONFIG.TIME_LIMIT_MS,
     rules: switchRule(week),
     history: past,
-    // Only the student sees their streak; it is never on the board or in the league. A week that didn't count doesn't keep it going,
-    // unless a shield earned with quests covers it (Logic.gs, shieldedStreak).
-    streak: shieldedStreak(past.filter(function (h) { return !h.disqualified; }).map(function (h) { return h.week; }),
-      questsByWeek(questRows(), user.email), week, !!(attempt && attempt.Submitted && !isTrue(attempt.Disqualified)))
+    // Only the student sees their streak; it is never on the board or in the league. A week that didn't count doesn't keep it going.
+    streak: streak(past.filter(function (h) { return !h.disqualified; }).map(function (h) { return h.week; }), week,
+      !!(attempt && attempt.Submitted && !isTrue(attempt.Disqualified)))
   };
 }
 
@@ -125,7 +124,7 @@ function board(user, body, nowMs) {
   var show = function (w) {
     var ranked = w && inSeason(sn, w) ? rankingFor(w, sn, nowMs, byEmail) : [];
     return { id: w, entrants: ranked.length, rows: visibleRows(ranked, user.email).map(function (r) { return publicRow(r, byEmail, user.email); }),
-      gap: gapAbove(ranked, user.email), classes: ranked.length ? withQuests(classTable(students, ranked), students, w) : [] };
+      gap: gapAbove(ranked, user.email), classes: ranked.length ? classTable(students, ranked) : [] };
   };
   return { thisWeek: show(week), lastWeek: show(weekId(weekStartMs(week) - 1)), yourClass: className(user.student.Class) };
 }
@@ -153,152 +152,4 @@ function review(user, body, nowMs) {
   var attempt = myAttempt(week, user.email);
   var answers = attempt ? parseAnswers(attempt.Answers) : {};
   return { challenge: challenge, answers: answers, right: mark(challenge, answers).right };
-}
-
-// ---------- Weekly quests: three a week, marked by the league; they earn shields and class points, never league points ----------
-
-var SPRINT_MS = 5 * 60 * 1000;        // the proofreading sprint's clock
-var SPRINT_GRACE_MS = 30 * 1000;      // network delay allowed after it
-var MAX_LINE_CHARS = 200;             // a proofreading line typed out whole
-
-// Every quest result as { week, key, passed }, for the streak's shields and the class points.
-function questRows() {
-  return readRows("QuestResults").map(function (r) { return { week: dayString(r.Week), key: String(r.Email).toLowerCase(), passed: isTrue(r.Passed) }; });
-}
-
-function myQuestRow(week, email, kind) {
-  return readRows("QuestResults").filter(function (r) {
-    return dayString(r.Week) === week && String(r.Email).toLowerCase() === email && String(r.Kind) === kind;
-  })[0] || null;
-}
-
-// The classes' quest points for a week, added to the class table's rows.
-function withQuests(rows, students, week) {
-  var points = classQuests(students, questRows().filter(function (r) { return r.week === week; }));
-  return rows.map(function (c) { return Object.assign({}, c, { quests: points[c.cls] || 0 }); });
-}
-
-// Fixing last week's mistakes: the student's own wrong items, or the five most missed if they have none.
-function fixQuest(user, sn, week) {
-  var last = weekId(weekStartMs(week) - 1);
-  var challenge = inSeason(sn, last) ? challengeFor(last, sn) : null;
-  if (!challenge) return null;
-  var own = myAttempt(last, user.email);
-  var mine = own && own.Submitted && !isTrue(own.Disqualified) ? parseAnswers(own.Answers) : null;
-  var ids = mine ? missedItems(challenge, mine) : [];
-  var ownMistakes = ids.length > 0;
-  if (!ownMistakes) {
-    var others = attemptsFor(last).filter(function (a) { return a.Submitted && !isTrue(a.Disqualified); }).map(function (a) { return parseAnswers(a.Answers); });
-    ids = hardestItems(challenge, others, FIX_FALLBACK_ITEMS);
-  }
-  return { kind: "fix", title: ownMistakes ? "Fix last week's mistakes" : "Last week's hardest items", challenge: challenge, ids: ids,
-    shown: Object.assign(publicFix(challenge, ids, ownMistakes ? mine : {}), { own: ownMistakes }) };
-}
-
-// This week's quests: fixing last week, and the approved sets for the week (QuestSets tab) that are not resting.
-function weekQuests(user, sn, week) {
-  var fix = fixQuest(user, sn, week);
-  var sets = {};
-  readRows("QuestSets").forEach(function (r) {
-    var kind = String(r.Kind).toLowerCase();
-    if (dayString(r.Week) === week && /^approved$/i.test(r.Status) && QUEST_KINDS.indexOf(kind) > 0 && !sets[kind]) {
-      sets[kind] = { kind: kind, title: r.Title, set: JSON.parse(r.Data) };
-    }
-  });
-  var kinds = questKindsFor(week, QUEST_KINDS.slice(1).filter(function (k) { return sets[k]; }), !!fix);
-  return (fix ? [fix] : []).concat(kinds.map(function (k) {
-    var q = sets[k];
-    // the sprint's lines come only when its clock starts (questStart)
-    q.shown = k === "sprint" ? { title: q.set.title, passages: q.set.passages.length, minutes: SPRINT_MS / 60000 } : publicQuest(k, q.set);
-    return q;
-  }));
-}
-
-function questFor(user, sn, week, kind) {
-  var q = weekQuests(user, sn, week).filter(function (x) { return x.kind === kind; })[0];
-  if (!q) throw new UserError("That quest isn't on this week's list.");
-  return q;
-}
-
-function rowFor(user, week, kind) {
-  var row = myQuestRow(week, user.email, kind);
-  if (row) return row;
-  appendRow("QuestResults", { Week: week, Email: user.email, Class: user.student.Class, Kind: kind, Tries: 0, Passed: "" });
-  return myQuestRow(week, user.email, kind);
-}
-
-// This week's quests, with how far the student has got, and their shields.
-function quests(user, body, nowMs) {
-  var p = playing(body, nowMs), week = p.week;
-  var list = p.active ? weekQuests(user, p.sn, week) : [];
-  var past = history(user.email, p.sn, nowMs);
-  var attempt = myAttempt(week, user.email);
-  var st = shieldedStreak(past.filter(function (h) { return !h.disqualified; }).map(function (h) { return h.week; }),
-    questsByWeek(questRows(), user.email), week, !!(attempt && attempt.Submitted && !isTrue(attempt.Disqualified)));
-  return {
-    week: week,
-    quests: list.map(function (q) {
-      var r = myQuestRow(week, user.email, q.kind);
-      return { kind: q.kind, title: q.title, passed: !!r && isTrue(r.Passed), tries: r ? Number(r.Tries) || 0 : 0, quest: q.shown };
-    }),
-    shields: st.shields, toNext: st.toNext, maxShields: MAX_SHIELDS, perShield: QUESTS_PER_SHIELD
-  };
-}
-
-// The sprint's clock starts here; each try gets the next passage, so a failed try can't be learnt by heart.
-function questStart(user, body, nowMs) {
-  var p = playing(body, nowMs);
-  if (!p.active) throw new UserError("The league is not running this week.");
-  if (body.kind !== "sprint") throw new UserError("Only the sprint has a clock.");
-  var q = questFor(user, p.sn, p.week, "sprint"), row = rowFor(user, p.week, "sprint");
-  if (isTrue(row.Passed)) return { passed: true };
-  var n = (Number(row.Tries) || 0) % q.set.passages.length;
-  updateRow("QuestResults", row._row, { Started: new Date(nowMs), Passage: n, Updated: new Date(nowMs) });
-  var passage = q.set.passages[n];
-  return { title: passage.title, lines: publicQuest("sprint", passage).lines, remainingMs: SPRINT_MS };
-}
-
-// Only what each quest takes: words as short text, lines as longer text, ladder choices as numbers.
-function cleanQuestAnswers(kind, answers) {
-  var out = {};
-  Object.keys(answers || {}).slice(0, 20).forEach(function (id) {
-    var a = answers[id];
-    if (kind === "ladder") out[id] = { pick: Number(a && a.pick), reason: Number(a && a.reason) };
-    else if (a != null) out[id] = String(a).slice(0, kind === "words" ? CONFIG.MAX_ANSWER_CHARS : MAX_LINE_CHARS);
-  });
-  return out;
-}
-
-// Marks a try. A wrong answer gets a hint, never the answer.
-function questAnswer(user, body, nowMs) {
-  var p = playing(body, nowMs);
-  if (!p.active) throw new UserError("The league is not running this week.");
-  var kind = String(body.kind || "");
-  var q = questFor(user, p.sn, p.week, kind), row = rowFor(user, p.week, kind);
-  var tries = Number(row.Tries) || 0;
-  if (isTrue(row.Passed)) return { passed: true, tries: tries };
-  var answers = cleanQuestAnswers(kind, body.answers), out;
-  if (kind === "fix") {
-    var f = markFix(q.challenge, q.ids, answers), wrong = q.ids.filter(function (id) { return !f.right[id]; });
-    var hints = {};
-    // after two wrong tries, the hint names the rule
-    if (tries + 1 >= 2) wrong.forEach(function (id) { hints[id] = fixHint(q.challenge, id); });
-    out = { passed: f.passed, wrong: wrong, hints: hints };
-  } else if (kind === "sprint") {
-    if (!row.Started) throw new UserError("Start the sprint first: its clock starts when you do.");
-    var late = nowMs - msOf(row.Started) > SPRINT_MS + SPRINT_GRACE_MS;
-    var s = markSprint(q.set.passages[Number(row.Passage) || 0], answers);
-    out = { passed: s.passed && !late, found: s.found, errors: s.errors, changedRight: s.changedRight, timeUp: late };
-  } else if (kind === "words") {
-    var w = markWords(q.set, answers);
-    out = { passed: w.passed, score: w.score, outOf: w.outOf, wrong: Object.keys(w.right).filter(function (id) { return !w.right[id]; }) };
-  } else {
-    var l = markLadder(q.set, answers);
-    out = { passed: l.passed, rungs: l.rungs };
-  }
-  // a sprint try ends here: the next try starts a fresh clock on a fresh passage
-  updateRow("QuestResults", row._row, { Tries: tries + 1, Passed: out.passed ? "yes" : "", Updated: new Date(nowMs),
-    Answers: JSON.stringify(answers), Started: kind === "sprint" ? "" : row.Started });
-  out.tries = tries + 1;
-  return out;
 }

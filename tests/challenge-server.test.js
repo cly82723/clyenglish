@@ -9,8 +9,6 @@ const crypto = require("crypto");
 
 const FILES = ["Logic.gs", "Sheets.gs", "Auth.gs", "Code.gs", "Actions.gs", "Setup.gs"];
 const HKT = 8 * 3600 * 1000;
-// the weeks-in-a-row part of a streak; shields have tests of their own
-const runOf = st => ({ current: st.current, best: st.best });
 
 // A sheet stores rows as arrays; like Google Sheets, a typed "YYYY-MM-DD" becomes a Date at Hong Kong midnight.
 function fakeSheet(RealDate) {
@@ -262,16 +260,16 @@ test("streak: counts weeks handed in, one after another, and only the student se
     s.call("amy@kings.edu.hk", "submit", { answers: {} });
   };
   s.at("2026-11-03T10:00:00+08:00");
-  assert.deepStrictEqual(runOf(s.call("amy@kings.edu.hk", "me").data.streak), { current: 0, best: 0 });
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 0, best: 0 });
   playWeek("2026-11-03");
-  assert.deepStrictEqual(runOf(s.call("amy@kings.edu.hk", "me").data.streak), { current: 1, best: 1 });
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 1, best: 1 });
   playWeek("2026-11-10");
   // Week 3, not done yet: the streak of 2 is still alive.
   s.at("2026-11-17T10:00:00+08:00");
-  assert.deepStrictEqual(runOf(s.call("amy@kings.edu.hk", "me").data.streak), { current: 2, best: 2 });
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 2, best: 2 });
   // Week 3 skipped: by week 4 it has gone, and the best stays.
   s.at("2026-11-24T10:00:00+08:00");
-  assert.deepStrictEqual(runOf(s.call("amy@kings.edu.hk", "me").data.streak), { current: 0, best: 2 });
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 0, best: 2 });
   assert.ok(!JSON.stringify(s.call("amy@kings.edu.hk", "board").data).includes("streak"));
 });
 
@@ -435,7 +433,7 @@ test("a week that didn't count is listed without a score and doesn't keep the st
   s.call("amy@kings.edu.hk", "away", { ms: 5000 });
   s.call("amy@kings.edu.hk", "away", { ms: 5000 });
   s.call("amy@kings.edu.hk", "submit", { answers: { 1: "are held" } });
-  assert.deepStrictEqual(runOf(s.call("amy@kings.edu.hk", "me").data.streak), { current: 0, best: 0 });
+  assert.deepStrictEqual(s.call("amy@kings.edu.hk", "me").data.streak, { current: 0, best: 0 });
   s.at("2026-11-24T10:00:00+08:00");
   const me = s.call("amy@kings.edu.hk", "me").data;
   assert.deepStrictEqual(me.history, [{ week: "2026-11-16", disqualified: true, entrants: 0 }]);
@@ -500,107 +498,3 @@ test("an older sheet with no header for the new columns still reads them", () =>
   assert.strictEqual(JSON.stringify(s.sheets.Attempts.rows[0].slice(-3)), JSON.stringify(["Last seen", "Timeline", "Check"]));
 });
 
-
-// ---------- Weekly quests ----------
-
-global.window = global.window || {};
-require("../assets/js/data/league-quests.js");
-const QBANK = global.window.CLY_QUESTS_BANK["S.4"]["2026-11-23"];
-const right = {
-  fix: () => ({ 2: "aren't given" }),
-  sprint: lines => {
-    const p = QBANK.sprint.passages.find(x => x.lines.length === lines.length && x.lines.every((l, i) => lines[i] === l[0].replace(/\[\[([^\]>]*)>[^\]]*\]\]/, "$1").replace(/\s+/g, " ").trim()));
-    const out = {};
-    p.lines.forEach((l, i) => { const m = l[0].match(/\[\[/); if (m) out[i] = l[0].replace(/\[\[[^\]>]*>([^\]]*)\]\]/, "$1").replace(/\s+/g, " ").trim(); });
-    return out;
-  },
-  words: () => { const out = {}; Object.keys(QBANK.words.gaps).forEach(id => { out[id] = QBANK.words.gaps[id].answers[0]; }); return out; },
-  ladder: () => ({ 0: { pick: QBANK.ladder.rungs[0].answer, reason: QBANK.ladder.rungs[0].reason }, 1: { pick: QBANK.ladder.rungs[1].answer, reason: QBANK.ladder.rungs[1].reason } })
-};
-
-function questLeague() {
-  const s = league();
-  s.enrol("amy@kings.edu.hk", "4C", 12);
-  s.enrol("bob@kings.edu.hk", "4c ", 3);
-  ["sprint", "words", "ladder"].forEach(kind => s.set("QuestSets", { Week: "2026-11-09", Kind: kind, Status: "approved", Title: QBANK[kind].title, Data: JSON.stringify(QBANK[kind]) }));
-  // week 1: Amy gets blank 2 wrong
-  s.at("2026-11-03T10:00:00+08:00");
-  s.call("amy@kings.edu.hk", "start", { pledged: true });
-  s.call("amy@kings.edu.hk", "submit", { answers: { 1: "are held", 2: "aren't give" } });
-  s.at("2026-11-10T10:00:00+08:00");
-  return s;
-}
-
-test("quests: three a week, starting with the student's own mistakes from last week, and never an answer", () => {
-  const s = questLeague();
-  const q = s.call("amy@kings.edu.hk", "quests").data;
-  assert.strictEqual(q.quests.length, 3);
-  assert.deepStrictEqual([q.quests[0].kind, q.quests[0].title], ["fix", "Fix last week's mistakes"]);
-  assert.deepStrictEqual(q.quests[0].quest.items.map(i => [i.id, i.yours]), [["2", "aren't give"]]);
-  const seen = JSON.stringify(q);
-  assert.ok(!seen.includes("aren't given") && !seen.includes("\"answers\"") && !seen.includes("\"answer\""), "no answers in what the page gets");
-  assert.ok(!q.quests.some(x => x.kind === "sprint" && x.quest.lines), "the sprint's lines wait for its clock");
-  // Bob didn't play last week: he gets the items most students missed
-  assert.strictEqual(s.call("bob@kings.edu.hk", "quests").data.quests[0].title, "Last week's hardest items");
-});
-
-test("quests: a wrong try gets which items are wrong, and after two tries a hint that names the rule", () => {
-  const s = questLeague();
-  const first = s.call("amy@kings.edu.hk", "questAnswer", { kind: "fix", answers: { 2: "are given" } }).data;
-  assert.deepStrictEqual([first.passed, first.wrong, first.hints], [false, ["2"], {}]);
-  const second = s.call("amy@kings.edu.hk", "questAnswer", { kind: "fix", answers: { 2: "are given" } }).data;
-  assert.ok(second.hints["2"] && !second.hints["2"].includes("aren't given"));
-  assert.strictEqual(s.call("amy@kings.edu.hk", "questAnswer", { kind: "fix", answers: right.fix() }).data.passed, true);
-  assert.strictEqual(s.call("amy@kings.edu.hk", "quests").data.quests[0].passed, true);
-  assert.match(s.call("amy@kings.edu.hk", "questAnswer", { kind: "nope", answers: {} }).error, /isn't on this week's list/);
-});
-
-test("quests: the sprint has a five-minute clock, and a try after it doesn't pass; the next try is a new passage", () => {
-  const s = questLeague();
-  // the sprint rests in the week of 9 November, so this plays the week of 16 November
-  ["sprint", "words", "ladder"].forEach(kind => s.set("QuestSets", { Week: "2026-11-16", Kind: kind, Status: "approved", Title: QBANK[kind].title, Data: JSON.stringify(QBANK[kind]) }));
-  s.at("2026-11-17T10:00:00+08:00");
-  assert.ok(s.call("amy@kings.edu.hk", "quests").data.quests.some(x => x.kind === "sprint"));
-  assert.match(s.call("amy@kings.edu.hk", "questAnswer", { kind: "sprint", answers: {} }).error, /Start the sprint first/);
-  const one = s.call("amy@kings.edu.hk", "questStart", { kind: "sprint" }).data;
-  s.at("2026-11-17T10:06:00+08:00");
-  const late = s.call("amy@kings.edu.hk", "questAnswer", { kind: "sprint", answers: right.sprint(one.lines) }).data;
-  assert.deepStrictEqual([late.passed, late.timeUp, late.found], [false, true, 5]);
-  const two = s.call("amy@kings.edu.hk", "questStart", { kind: "sprint" }).data;
-  assert.notStrictEqual(two.title, one.title);
-  s.at("2026-11-17T10:09:00+08:00");
-  assert.strictEqual(s.call("amy@kings.edu.hk", "questAnswer", { kind: "sprint", answers: right.sprint(two.lines) }).data.passed, true);
-});
-
-test("quests: three passed quests earn a shield, and the class table counts its quests", () => {
-  const s = questLeague();
-  const list = s.call("amy@kings.edu.hk", "quests").data.quests;
-  list.forEach(q => {
-    const answers = q.kind === "sprint" ? right.sprint(s.call("amy@kings.edu.hk", "questStart", { kind: "sprint" }).data.lines) : right[q.kind]();
-    assert.strictEqual(s.call("amy@kings.edu.hk", "questAnswer", { kind: q.kind, answers }).data.passed, true, q.kind);
-  });
-  const after = s.call("amy@kings.edu.hk", "quests").data;
-  assert.deepStrictEqual([after.shields, after.toNext], [1, 3]);
-  assert.strictEqual(s.call("amy@kings.edu.hk", "me").data.streak.shields, 1);
-  // Bob passes one too; "4c " is the same class as "4C"
-  s.call("bob@kings.edu.hk", "questAnswer", { kind: "ladder", answers: right.ladder() });
-  s.call("amy@kings.edu.hk", "start", { pledged: true });
-  s.call("amy@kings.edu.hk", "submit", { answers: {} });
-  const classes = s.call("amy@kings.edu.hk", "board").data.thisWeek.classes;
-  const ladderOn = list.some(q => q.kind === "ladder");
-  assert.deepStrictEqual(classes.map(c => [c.cls, c.quests]), [["4C", ladderOn ? 4 : 3]]);
-});
-
-test("quests: a shield keeps the streak alive through a missed week, without adding a week", () => {
-  const s = questLeague();
-  s.call("amy@kings.edu.hk", "quests").data.quests.forEach(q => {
-    const answers = q.kind === "sprint" ? right.sprint(s.call("amy@kings.edu.hk", "questStart", { kind: "sprint" }).data.lines) : right[q.kind]();
-    s.call("amy@kings.edu.hk", "questAnswer", { kind: q.kind, answers });
-  });
-  s.call("amy@kings.edu.hk", "start", { pledged: true });
-  s.call("amy@kings.edu.hk", "submit", { answers: {} });
-  // week 3 (16 Nov) missed; in week 4 the streak of 2 is still alive, and the shield is spent
-  s.at("2026-11-24T10:00:00+08:00");
-  const st = s.call("amy@kings.edu.hk", "me").data.streak;
-  assert.deepStrictEqual([st.current, st.shields, st.shielded], [2, 0, ["2026-11-16"]]);
-});

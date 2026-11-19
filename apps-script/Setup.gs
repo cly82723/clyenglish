@@ -36,7 +36,7 @@ function scheduleYearlyWipe() {
 }
 
 function wipeSeasonData() {
-  ["Students", "Attempts", "League", "Sessions", "QuestResults"].forEach(function (name) {
+  ["Students", "Attempts", "League", "Sessions"].forEach(function (name) {
     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
     if (sh && sh.getLastRow() > 1) sh.deleteRows(2, sh.getLastRow() - 1);
   });

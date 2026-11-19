@@ -87,9 +87,7 @@
       if (!r.ok) throw new Error(r.status);
       return r.text();
     }).then(function (src) {
-      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows, streak: streak, gapAbove: gapAbove, classTable: classTable, countAway: countAway, overSwitchLimit: overSwitchLimit, MAX_SWITCHES: MAX_SWITCHES, MIN_AWAY_MS: MIN_AWAY_MS, " +
-        "shieldedStreak: shieldedStreak, markSprint: markSprint, markWords: markWords, markLadder: markLadder, missedItems: missedItems, hardestItems: hardestItems, " +
-        "markFix: markFix, fixHint: fixHint, publicQuest: publicQuest, publicFix: publicFix, FIX_FALLBACK_ITEMS: FIX_FALLBACK_ITEMS, MAX_SHIELDS: MAX_SHIELDS, QUESTS_PER_SHIELD: QUESTS_PER_SHIELD };")();
+      return new Function(src + "\nreturn { mark: mark, publicChallenge: publicChallenge, rankWeek: rankWeek, timeTaken: timeTaken, weekId: weekId, weekEndMs: weekEndMs, visibleRows: visibleRows, streak: streak, gapAbove: gapAbove, classTable: classTable, countAway: countAway, overSwitchLimit: overSwitchLimit, MAX_SWITCHES: MAX_SWITCHES, MIN_AWAY_MS: MIN_AWAY_MS };")();
     }).catch(function () { throw { message: "Test mode couldn't load the marking rules. Open the page from the website or a local server, not as a file." }; });
   }
 
@@ -110,7 +108,7 @@
       proofreading: Object.assign({ format: "proofreading" }, window.CLY_PROOFREADING[0])
     };
     var st, signedIn = false;
-    function reset(format) { st = { format: format || "cloze", shiftMs: 0, closed: false, attempt: null, quests: {} }; }
+    function reset(format) { st = { format: format || "cloze", shiftMs: 0, closed: false, attempt: null }; }
     reset();
     var now = function () { return Date.now() + st.shiftMs; };
     var week = function () { return rules.weekId(Date.now()); };
@@ -157,30 +155,6 @@
       var mine = st.closed && ranked().filter(function (r) { return r.key === ME.key; })[0];
       return mine ? [{ week: week(), score: mine.score, place: mine.place, points: mine.points, entrants: OTHERS.length + 1 }] : [];
     }
-
-    // Quests in test mode: "fix" uses this week's test paper as if it were last week's, and all three other kinds show
-    // (on the real league one of them rests each week), so every kind can be tried.
-    var SPRINT_MS = 5 * 60 * 1000, SPRINT_GRACE_MS = 30 * 1000;
-    var bank = (window.CLY_QUESTS_BANK || {})[S.form] || {};
-    var bankWeek = bank[Object.keys(bank).sort()[0]] || {};
-    function testQuests() {
-      var ch = challenge(), a = st.attempt, mine = a && a.submitted && !a.dq ? a.answers : null;
-      var ids = mine ? rules.missedItems(ch, mine) : [], own = ids.length > 0;
-      if (!own) ids = rules.hardestItems(ch, [], rules.FIX_FALLBACK_ITEMS);
-      var list = [{ kind: "fix", title: own ? "Fix last week's mistakes" : "Last week's hardest items", challenge: ch, ids: ids, shown: Object.assign(rules.publicFix(ch, ids, own ? mine : {}), { own: own }) }];
-      ["sprint", "words", "ladder"].forEach(function (k) {
-        if (!bankWeek[k]) return;
-        list.push({ kind: k, title: bankWeek[k].title, set: bankWeek[k],
-          shown: k === "sprint" ? { title: bankWeek[k].title, passages: bankWeek[k].passages.length, minutes: SPRINT_MS / 60000 } : rules.publicQuest(k, bankWeek[k]) });
-      });
-      return list;
-    }
-    function testQuest(kind) {
-      var q = testQuests().filter(function (x) { return x.kind === kind; })[0];
-      if (!q) fail("That quest isn't on this week's list.");
-      return q;
-    }
-    function questState(kind) { return st.quests[kind] || (st.quests[kind] = { tries: 0, passed: false, started: 0, passage: 0 }); }
 
     var actions = {
       sendCode: function (b) {
@@ -251,49 +225,6 @@
             fourths: r.place === 4 ? 1 : 0, fifths: r.place === 5 ? 1 : 0, place: r.place, you: r.key === ME.key };
         }) };
       },
-      quests: function () {
-        var done = 0;
-        Object.keys(st.quests).forEach(function (k) { if (st.quests[k].passed) done += 1; });
-        var past = history().filter(function (r) { return !r.disqualified; }).map(function (r) { return r.week; });
-        var sh = rules.shieldedStreak(past, done ? (function () { var o = {}; o[week()] = done; return o; })() : {}, week(), summary().status === "done");
-        return { week: week(), quests: testQuests().map(function (q) {
-          var r = st.quests[q.kind] || {};
-          return { kind: q.kind, title: q.title, passed: !!r.passed, tries: r.tries || 0, quest: q.shown };
-        }), shields: sh.shields, toNext: sh.toNext, maxShields: rules.MAX_SHIELDS, perShield: rules.QUESTS_PER_SHIELD };
-      },
-      questStart: function (b) {
-        if (b.kind !== "sprint") fail("Only the sprint has a clock.");
-        var q = testQuest("sprint"), r = questState("sprint");
-        if (r.passed) return { passed: true };
-        r.passage = r.tries % q.set.passages.length;
-        r.started = now();
-        var p = q.set.passages[r.passage];
-        return { title: p.title, lines: rules.publicQuest("sprint", p).lines, remainingMs: SPRINT_MS };
-      },
-      questAnswer: function (b) {
-        var kind = String(b.kind || ""), q = testQuest(kind), r = questState(kind), a = b.answers || {}, out;
-        if (r.passed) return { passed: true, tries: r.tries };
-        if (kind === "fix") {
-          var f = rules.markFix(q.challenge, q.ids, a), wrong = q.ids.filter(function (id) { return !f.right[id]; }), hints = {};
-          if (r.tries + 1 >= 2) wrong.forEach(function (id) { hints[id] = rules.fixHint(q.challenge, id); });
-          out = { passed: f.passed, wrong: wrong, hints: hints };
-        } else if (kind === "sprint") {
-          if (!r.started) fail("Start the sprint first: its clock starts when you do.");
-          var late = now() - r.started > SPRINT_MS + SPRINT_GRACE_MS, s = rules.markSprint(q.set.passages[r.passage], a);
-          out = { passed: s.passed && !late, found: s.found, errors: s.errors, changedRight: s.changedRight, timeUp: late };
-          r.started = 0;
-        } else if (kind === "words") {
-          var w = rules.markWords(q.set, a);
-          out = { passed: w.passed, score: w.score, outOf: w.outOf, wrong: Object.keys(w.right).filter(function (id) { return !w.right[id]; }) };
-        } else {
-          var l = rules.markLadder(q.set, a);
-          out = { passed: l.passed, rungs: l.rungs };
-        }
-        r.tries += 1;
-        r.passed = out.passed;
-        out.tries = r.tries;
-        return out;
-      },
       review: function () {
         if (!st.closed) fail("Answers appear after the week closes on Sunday night.");
         var answers = (st.attempt && st.attempt.answers) || {};
@@ -332,6 +263,6 @@
   // Test mode is for the teacher's own computer only (tools/serve.js); on the published site ?test does nothing.
   var testing = /[?&]test\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   window.CLY_LEAGUE = testing
-    ? Promise.all([loadRules(), loadScript("assets/js/data/grammar-tense-cloze.js"), loadScript("assets/js/data/grammar-proofreading.js"), loadScript("assets/js/data/league-quests.js"), S.testCloze ? loadScript(S.testCloze) : null]).then(function (r) { return testLeague(r[0]); })
+    ? Promise.all([loadRules(), loadScript("assets/js/data/grammar-tense-cloze.js"), loadScript("assets/js/data/grammar-proofreading.js"), S.testCloze ? loadScript(S.testCloze) : null]).then(function (r) { return testLeague(r[0]); })
     : Promise.resolve(league);
 })();

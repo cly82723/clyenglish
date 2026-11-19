@@ -201,8 +201,6 @@
           h("p", null, "Signed in as ", h("strong", null, me.student.label)),
           h("button", { type: "button", class: "link-btn", onclick: signOut }, "Sign out")));
         el.appendChild(thisWeek(me));
-        // The weekly quests (challenge-quests.js): they load on their own, and stay hidden if the web app has none.
-        if (window.CLY_QUESTS && me.season.active) el.appendChild(window.CLY_QUESTS.section(league));
         // The board loads after the page draws, so the scroll waits until there is a board to scroll to.
         var lg = boards(me, tab || "board", toBoards ? function () { lg.scrollIntoView({ block: "start" }); } : null);
         el.appendChild(lg);

@@ -84,12 +84,7 @@ A classmate who types someone else's email gets nowhere without access to that i
 - **Sessions tab**: one row per signed-in device. You can ignore it. Deleting a row signs that device out. It never holds anything that could be used to sign in.
 - **CLY League → Show attempts week by week**: writes a tidy **Weekly** tab: one block per week (newest first) with the challenge's name and how many counted, then each student in class and number order with their score, time, status (Counted, Not counted or In progress), switches, time away, Check note, Late and start time. Run it again whenever you want it up to date. It only reads Attempts, so it's safe at any time; make any changes (like clearing Disqualified) in Attempts, not in Weekly.
 - **CLY League → Show league table**: writes the season table, with emails, into a **League** tab, so you know who to give prizes to.
-- **QuestSets tab** (the weekly quests, since 18 November 2026): one row per quest set, like Challenges.
-  - `Week`: the Monday it runs. `Kind`: `sprint`, `words` or `ladder`. `Status`: `approved` to run it, `draft` to keep it back. `Data`: I prepare it.
-  - To add a week: open `C:UsersCaLcly-league-bankquestss4-quests.tsv` (or `s3-quests.tsv`) in Notepad, Ctrl+A, Ctrl+C, then in the sheet make a tab called **QuestSets** (if there isn't one yet), click cell A1 and paste. Read each set, then change its Status to `approved`.
-  - Each week runs three quests: fixing last week's mistakes (made by the league from last week's challenge, no row needed) and two of the three kinds. The third rests that week, in turn, so approve all three.
-- **QuestResults tab**: one row per student per quest, written by the league: tries, whether they passed, and their last answers. You can ignore it.
-- **31 August**: the Students, Attempts, League, Sessions and QuestResults tabs are cleared automatically. Challenges and season dates are kept. **CLY League → Delete all student data now** does the same thing straight away.
+- **31 August**: the Students, Attempts, League and Sessions tabs are cleared automatically. Challenges and season dates are kept. **CLY League → Delete all student data now** does the same thing straight away.
 
 ## The S.3 league: a second copy
 
