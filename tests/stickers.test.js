@@ -100,7 +100,9 @@ test("a guide is read once every one of its rows has been opened, and only its o
 test("Part B's five steps and the S.6 final reminders are the rows those pages really have", () => {
   const fs = require("node:fs"), path = require("node:path");
   const rowsOf = (file) => [...fs.readFileSync(path.join(__dirname, "..", file), "utf8").matchAll(/<details class="row" id="([^"]+)"/g)].map((m) => m[1]);
-  assert.strictEqual(rowsOf("part-b.html").length, 5);
+  // Part B's five steps are pages of their own, linked from the hub in order
+  const hub = fs.readFileSync(path.join(__dirname, "..", "part-b.html"), "utf8");
+  assert.deepStrictEqual([...hub.matchAll(/<a class="row step-link" id="go-([^"]+)"/g)].map((m) => m[1]), ["choose", "method", "crei", "language", "check"]);
   assert.ok(rowsOf("final.html").length > 0);
 });
 

@@ -295,3 +295,65 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
   .row-body th, .row-body td { padding: 10px 6px; overflow-wrap: anywhere; hyphens: auto; }
   .row-body th:first-child, .row-body td:first-child { padding-left: 0; }
 }
+
+/* ---------- Part B as a hub of steps, each step its own page ---------- */
+.steps { margin-top: 20px; }
+.step-link {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) 24px; gap: 0 12px; align-items: start;
+  padding: 14px 0; color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent;
+}
+.step-link::after { content: "\2192"; grid-column: 3; grid-row: 1; justify-self: end; margin-top: 4px; font: 800 1.4rem/1 var(--font-display); color: var(--sky); }
+.step-link > .row-eg { grid-column: 2; }
+.step-link > .step-done { grid-column: 2; grid-row: 3; margin-top: 6px; font: 700 0.875rem/1.3 var(--font-display); color: var(--leaf-deep); }
+.step-link > .step-done::before { content: "\2713\00a0"; }
+.step-link.is-done .row-mark { background: var(--chest); border-color: var(--leaf); color: var(--leaf-deep); }
+.step-link.is-suggested .row-mark { background: var(--leaf); border-color: var(--leaf); color: #fff; }
+.step-suggest { font: 700 0.875rem/1.3 var(--font-display); color: var(--leaf-deep); }
+@media (hover: hover) { .step-link:hover .row-title { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; } }
+.step-link:focus-visible { outline-offset: 2px; }
+@media (max-width: 760px) { .step-link > .row-eg { display: none; } }
+.step-back { margin: 0 0 14px; font: 600 0.9375rem/1.3 var(--font-display); }
+.step-back a { color: var(--sky); }
+.step-back a::before { content: "\2190\00a0"; }
+.step-page > .row-kicker { margin: 0 0 4px; }
+.step-page > .title { margin-top: 0; }
+@media (min-width: 761px) { .step-lesson.row-body { padding-left: 0; } }
+
+/* ---------- The opener: one "which is stronger?" question ---------- */
+.opener { margin: 20px 0 28px; max-width: 68ch; padding: 16px; border: 1.5px solid var(--ink); border-radius: 14px; background: var(--paper); }
+.opener[hidden] { display: none; }
+.opener-kicker { margin: 0 0 4px; font: 700 0.8125rem/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--sky); }
+.opener-q { margin: 0 0 12px; font: 700 var(--step-1)/1.3 var(--font-display); letter-spacing: -0.01em; }
+.opener-choices { display: grid; gap: 10px; }
+.opener-choice {
+  display: block; width: 100%; min-height: 52px; padding: 12px 14px; text-align: left;
+  font: 400 1rem/1.55 var(--font-body); color: var(--ink); background: var(--paper);
+  border: 1.5px solid var(--edge); border-radius: 12px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) { .opener-choice:not(:disabled):hover { background: var(--chest); border-color: var(--ink); } }
+.opener-choice:disabled { cursor: default; opacity: 1; color: var(--ink); }
+.opener-tag { display: block; margin-bottom: 2px; font: 700 0.8125rem/1.3 var(--font-display); color: var(--ink-soft); }
+.opener-choice.is-stronger { background: var(--chest); border-color: var(--leaf); }
+.opener-choice.is-stronger .opener-tag { color: var(--leaf-deep); }
+.opener-choice.is-pick:not(.is-stronger) { border-style: dashed; border-color: var(--ink-soft); }
+.opener-reveal { margin-top: 14px; }
+.opener-reveal[hidden] { display: none; }
+.opener-reveal p { margin: 0 0 8px; max-width: 62ch; }
+.opener-verdict { font: 700 1rem/1.4 var(--font-display); }
+.opener-skip { margin: 12px 0 0; }
+.opener-skip[hidden] { display: none; }
+@media (min-width: 761px) { .opener-choices { grid-template-columns: 1fr 1fr; } }
+
+.goal { margin: 0 0 24px; padding: 12px 16px; max-width: 68ch; background: var(--chest); border-radius: 12px; font: 400 1rem/1.5 var(--font-body); }
+.goal b { font-family: var(--font-display); }
+
+.hub-check { margin-top: 16px; }
+.hub-check .opener { margin: 12px 0; }
+.hub-check-lead { margin: 0 0 8px; color: var(--ink-soft); }
+.hub-check-result { margin: 8px 0 12px; font: 700 1rem/1.4 var(--font-display); }
+.hub-check-result[hidden] { display: none; }
+
+/* without scripts the lesson and the answers simply show */
+.no-js [data-lesson][hidden], .no-js .opener-reveal[hidden] { display: block; }
+.no-js .opener-skip { display: none; }

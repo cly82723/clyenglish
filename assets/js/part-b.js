@@ -262,6 +262,14 @@
 
   /* ---------- Your one thing for next time: kept on this device, shown at the top of Part B on the next visit ---------- */
   var ONE_KEY = "cly:partb-one";
+  // writing the one thing is how the last step is finished: the hub ticks it (opener.js keeps the other ticks)
+  function finishStep() {
+    try {
+      var done = JSON.parse(localStorage.getItem("cly:partb-done")) || [];
+      if (done.indexOf("check") < 0) { done.push("check"); localStorage.setItem("cly:partb-done", JSON.stringify(done)); }
+    } catch (e) { /* storage blocked: the tick is simply not kept */ }
+    document.dispatchEvent(new CustomEvent("cly:step-done", { detail: "check" }));
+  }
   function initOneThing(box) {
     var text = box.querySelector("textarea");
     var out = box.querySelector(".one-thing-saved");
@@ -283,6 +291,7 @@
         var value = text.value.trim();
         try {
           if (value) localStorage.setItem(ONE_KEY, value); else localStorage.removeItem(ONE_KEY);
+          if (value) finishStep();
           out.textContent = value ? "Saved. It will be at the top of Part B next time." : "";
         } catch (e) {
           out.textContent = "This browser can't keep it, so write it at the top of your next paper.";
