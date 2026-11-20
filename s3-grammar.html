@@ -37,94 +37,260 @@
     <div><span class="form-mark">S.3</span><a href="s3-grammar.html" aria-current="page">Grammar</a><a href="s3-challenge.html">Weekly challenge</a></div>
   </nav>
 
-  <main class="column rows" id="main" data-rows="s3-grammar">
+  <main class="column rows" id="main" data-rows="s3-grammar" data-done-key="cly:s3-done" data-guide="S.3">
     <h1 class="title">S.3 Grammar · Units 1–4</h1>
+    <p class="topics-done" data-topics-done hidden></p>
     <noscript><p class="tip">These exercises need JavaScript. Turn it on in your browser to practise.</p></noscript>
 
     <h2 class="rows-group">Unit 1</h2>
-    <details class="row" id="indefinite-pronouns" name="rows">
+    <details class="row" id="indefinite-pronouns" name="rows" data-topic="indefinite">
       <summary>
         <span class="row-mark" aria-hidden="true">1</span>
-        <span class="row-head"><span class="row-title">Indefinite pronouns</span></span>
+        <span class="row-head"><span class="row-title">Indefinite pronouns</span><span class="row-sub">someone, anything, nobody</span></span>
       </summary>
       <div class="row-body">
-        <p>Twelve topics, each with the rules in plain words, a diagram and a quiz. <mark class="swipe">The quizzes test what sounds natural, not just what fits a formula,</mark> so read every option to the end. Consolidation exercises ask you to rewrite sentences yourself.</p>
-        <div class="part" id="indefinite-rules">
-          <div data-grammar="s3lesson" data-set="indefinite"></div>
-        </div>
-        <div class="part" id="indefinite-quiz">
-          <h3>Quiz</h3>
-          <p>Check how many the word means, then count the negatives. Wrong answers get a hint and another try.</p>
-          <div data-grammar="s3quiz" data-set="indefinite"></div>
+        <section class="opener" data-gates data-opener="s3-indefinite-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-indefinite-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-indefinite-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">I didn't see nobody at the bus stop.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">I didn't see anybody at the bus stop.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>Only one negative: &quot;didn't&quot; is already negative, so use &quot;anybody&quot;.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p>Twelve topics, each with the rules in plain words, a diagram and a quiz. <mark class="swipe">The quizzes test what sounds natural, not just what fits a formula,</mark> so read every option to the end. Consolidation exercises ask you to rewrite sentences yourself.</p>
+          <p class="goal"><b>One check:</b> Check the verb after every -one, -body and -thing word: it must be singular. Then count the negatives: there should be only one.</p>
+          <details class="why" id="indefinite-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="indefinite-rules">
+                        <div data-grammar="s3lesson" data-set="indefinite"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="indefinite-quiz">
+            <h3>Quiz</h3>
+            <p>Check how many the word means, then count the negatives. Wrong answers get a hint and another try.</p>
+            <div data-grammar="s3quiz" data-set="indefinite"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="indefinite" data-opener="s3-indefinite-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-indefinite-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-indefinite-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">Everyone in my class have a phone.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">Everyone in my class has a phone.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>&quot;Everyone&quot; takes a singular verb.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
 
-    <details class="row" id="noun-phrases" name="rows">
+    <details class="row" id="noun-phrases" name="rows" data-topic="noun">
       <summary>
         <span class="row-mark" aria-hidden="true">2</span>
-        <span class="row-head"><span class="row-title">Defining and non-defining noun phrases</span></span>
+        <span class="row-head"><span class="row-title">Defining and non-defining noun phrases</span><span class="row-sub">extra information about a noun</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="noun-rules">
-          <div data-grammar="s3lesson" data-set="noun"></div>
-        </div>
-        <div class="part" id="noun-quiz">
-          <h3>Quiz</h3>
-          <p>Cover the phrase with your finger each time: do you still know who or what is meant?</p>
-          <div data-grammar="s3quiz" data-set="noun"></div>
+        <section class="opener" data-gates data-opener="s3-noun-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-noun-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-noun-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">Sushi a famous Japanese dish is easy to find.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">Sushi, a famous Japanese dish, is easy to find.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>It is extra information, so it needs a comma on both sides.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> Cover the phrase with your finger. If you still know exactly who or what the sentence means, use commas. If not, use no commas.</p>
+          <details class="why" id="noun-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="noun-rules">
+                        <div data-grammar="s3lesson" data-set="noun"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="noun-quiz">
+            <h3>Quiz</h3>
+            <p>Cover the phrase with your finger each time: do you still know who or what is meant?</p>
+            <div data-grammar="s3quiz" data-set="noun"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="noun" data-opener="s3-noun-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-noun-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-noun-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">Former US President won many people's hearts.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">Former US President Barack Obama won many people's hearts.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>Which president? The name is needed here, so it can't be left out.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
 
-    <details class="row" id="bare-infinitives" name="rows">
+    <details class="row" id="bare-infinitives" name="rows" data-topic="bare">
       <summary>
         <span class="row-mark" aria-hidden="true">3</span>
-        <span class="row-head"><span class="row-title">Bare infinitives</span></span>
+        <span class="row-head"><span class="row-title">Bare infinitives</span><span class="row-sub">let me go, made me tidy (no “to”)</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="bare-rules">
-          <div data-grammar="s3lesson" data-set="bare"></div>
-        </div>
-        <div class="part" id="bare-quiz">
-          <h3>Quiz</h3>
-          <p>Find the word that switches off "to". The tense of the sentence doesn't change the verb after it.</p>
-          <div data-grammar="s3quiz" data-set="bare"></div>
+        <section class="opener" data-gates data-opener="s3-bare-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-bare-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-bare-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">Please let me to help you.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">Please let me help you.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>&quot;Let&quot; + someone + V1, with no &quot;to&quot;.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> Find can, must, should, had better, would rather, make or let. Then check the next verb (or the verb after the person): it must be plain V1.</p>
+          <details class="why" id="bare-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="bare-rules">
+                        <div data-grammar="s3lesson" data-set="bare"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="bare-quiz">
+            <h3>Quiz</h3>
+            <p>Find the word that switches off "to". The tense of the sentence doesn't change the verb after it.</p>
+            <div data-grammar="s3quiz" data-set="bare"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="bare" data-opener="s3-bare-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-bare-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-bare-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">I would rather stay at home than going out.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">I would rather stay at home than go out.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>Both verbs are V1: would rather + V1 + than + V1.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
 
     <h2 class="rows-group">Unit 2</h2>
-    <details class="row" id="so-so-that" name="rows">
+    <details class="row" id="so-so-that" name="rows" data-topic="so">
       <summary>
         <span class="row-mark" aria-hidden="true">4</span>
-        <span class="row-head"><span class="row-title">So, so that and so as to</span></span>
+        <span class="row-head"><span class="row-title">So, so that and so as to</span><span class="row-sub">saying why you do something</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="so-rules">
-          <div data-grammar="s3lesson" data-set="so"></div>
-        </div>
-        <div class="part" id="so-quiz">
-          <h3>Quiz</h3>
-          <p>Ask whether it really happened or was only the aim, then look at what follows the blank.</p>
-          <div data-grammar="s3quiz" data-set="so"></div>
+        <section class="opener" data-gates data-opener="s3-so-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-so-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-so-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">I moved closer so to hear the teacher.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">I moved closer so as to hear the teacher.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>Don't drop &quot;as&quot;: the phrase is &quot;so as to&quot;.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> Ask: did it happen, or was it someone's plan? Happened: so. Plan: look after the gap. A subject needs &quot;so that&quot;; a verb alone needs &quot;so as to&quot;.</p>
+          <details class="why" id="so-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="so-rules">
+                        <div data-grammar="s3lesson" data-set="so"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="so-quiz">
+            <h3>Quiz</h3>
+            <p>Ask whether it really happened or was only the aim, then look at what follows the blank.</p>
+            <div data-grammar="s3quiz" data-set="so"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="so" data-opener="s3-so-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-so-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-so-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">I whispered so as to not to wake the baby.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">I whispered so as not to wake the baby.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>&quot;Not&quot; goes before &quot;to&quot;, and &quot;to&quot; appears only once.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
 
-    <details class="row" id="must-have-to" name="rows">
+    <details class="row" id="must-have-to" name="rows" data-topic="must">
       <summary>
         <span class="row-mark" aria-hidden="true">5</span>
-        <span class="row-head"><span class="row-title">Must, have to and need to</span></span>
+        <span class="row-head"><span class="row-title">Must, have to and need to</span><span class="row-sub">rules and choices</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="must-rules">
-          <div data-grammar="s3lesson" data-set="must"></div>
-        </div>
-        <div class="part" id="must-quiz">
-          <h3>Quiz</h3>
-          <p>In negative sentences, ask: is it forbidden, or is it a free choice?</p>
-          <div data-grammar="s3quiz" data-set="must"></div>
+        <section class="opener" data-gates data-opener="s3-must-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-must-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-must-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">He must to focus on his work.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">He must focus on his work.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>After &quot;must&quot;, use V1 with no &quot;to&quot;.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> When you see &quot;must not&quot;, ask: is this really forbidden? If the person is simply free to choose, you need &quot;don't have to&quot; or &quot;don't need to&quot;.</p>
+          <details class="why" id="must-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="must-rules">
+                        <div data-grammar="s3lesson" data-set="must"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="must-quiz">
+            <h3>Quiz</h3>
+            <p>In negative sentences, ask: is it forbidden, or is it a free choice?</p>
+            <div data-grammar="s3quiz" data-set="must"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="must" data-opener="s3-must-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-must-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-must-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">You must not come tomorrow if you are busy.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">You don't have to come tomorrow if you are busy.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>It is the person's choice, not a ban, so use &quot;don't have to&quot;.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
@@ -153,61 +319,160 @@
     </details>
 
     <h2 class="rows-group">Unit 3</h2>
-    <details class="row" id="past-perfect" name="rows">
+    <details class="row" id="past-perfect" name="rows" data-topic="pastPerfect">
       <summary>
         <span class="row-mark" aria-hidden="true">7</span>
-        <span class="row-head"><span class="row-title">Past perfect</span></span>
+        <span class="row-head"><span class="row-title">Past perfect</span><span class="row-sub">the thing that happened first</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="pastperfect-rules">
-          <div data-grammar="s3lesson" data-set="pastPerfect"></div>
-        </div>
-        <div class="part" id="pastperfect-quiz">
-          <h3>Quiz</h3>
-          <p>Some options are grammatical but change the meaning. Wrong answers get a hint and another try.</p>
-          <div data-grammar="s3quiz" data-set="pastPerfect"></div>
+        <section class="opener" data-gates data-opener="s3-pastPerfect-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-pastPerfect-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-pastPerfect-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">The bus already left when we reached the stop.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">The bus had already left when we reached the stop.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>The bus left first, so it takes had + V3.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> Look for two past events and ask which came first. Only that one gets &quot;had&quot;. If there is only one past event, &quot;had&quot; is a mistake.</p>
+          <details class="why" id="pastPerfect-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="pastperfect-rules">
+                        <div data-grammar="s3lesson" data-set="pastPerfect"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="pastperfect-quiz">
+            <h3>Quiz</h3>
+            <p>Some options are grammatical but change the meaning. Wrong answers get a hint and another try.</p>
+            <div data-grammar="s3quiz" data-set="pastPerfect"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="pastPerfect" data-opener="s3-pastPerfect-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-pastPerfect-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-pastPerfect-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">I had gone to Ocean Park yesterday.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">I went to Ocean Park yesterday.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>There is no earlier past event, so a single finished action takes the past simple.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
 
-    <details class="row" id="present-participle" name="rows">
+    <details class="row" id="present-participle" name="rows" data-topic="present">
       <summary>
         <span class="row-mark" aria-hidden="true">8</span>
-        <span class="row-head"><span class="row-title">Present participle phrases</span></span>
+        <span class="row-head"><span class="row-title">Present participle phrases</span><span class="row-sub">Walking home, I saw…</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="present-rules">
-          <div data-grammar="s3lesson" data-set="present"></div>
-        </div>
-        <div class="part" id="present-quiz">
-          <h3>Quiz</h3>
-          <p>Watch for sentences where the wrong person (or thing) is doing the action.</p>
-          <div data-grammar="s3quiz" data-set="present"></div>
-        </div>
-        <div class="part" id="present-rewrite">
-          <h3>Rewrite practice</h3>
-          <div data-grammar="s3rewrite" data-set="presentA"></div>
+        <section class="opener" data-gates data-opener="s3-present-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-present-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-present-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">Don't knowing the answer, he kept quiet.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">Not knowing the answer, he kept quiet.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>Make a present participle phrase negative with &quot;not&quot;, never &quot;don't&quot;.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> After a present participle phrase, look at the first noun after the comma and ask: can this do the V-ing action? If not, the sentence is broken.</p>
+          <details class="why" id="present-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="present-rules">
+                        <div data-grammar="s3lesson" data-set="present"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="present-quiz">
+            <h3>Quiz</h3>
+            <p>Watch for sentences where the wrong person (or thing) is doing the action.</p>
+            <div data-grammar="s3quiz" data-set="present"></div>
+          </div>
+          <div class="part" id="present-rewrite">
+            <h3>Rewrite practice</h3>
+            <div data-grammar="s3rewrite" data-set="presentA"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="present" data-opener="s3-present-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-present-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-present-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">Looking out of the window, the mountains were beautiful.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">Looking out of the window, I saw how beautiful the mountains were.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>The mountains weren't looking out of the window. The person doing the looking must come after the comma.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
 
-    <details class="row" id="past-participle" name="rows">
+    <details class="row" id="past-participle" name="rows" data-topic="past">
       <summary>
         <span class="row-mark" aria-hidden="true">9</span>
-        <span class="row-head"><span class="row-title">Past participle phrases</span></span>
+        <span class="row-head"><span class="row-title">Past participle phrases</span><span class="row-sub">Excited about the trip, we…</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="past-rules">
-          <div data-grammar="s3lesson" data-set="past"></div>
-        </div>
-        <div class="part" id="past-quiz">
-          <h3>Quiz</h3>
-          <p>Ask each time: is the subject doing the action, or is it done to the subject?</p>
-          <div data-grammar="s3quiz" data-set="past"></div>
-        </div>
-        <div class="part" id="past-rewrite">
-          <h3>Rewrite practice</h3>
-          <div data-grammar="s3rewrite" data-set="pastB"></div>
+        <section class="opener" data-gates data-opener="s3-past-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-past-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-past-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">Exciting about the trip, the children couldn't sleep.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">Excited about the trip, the children couldn't sleep.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>The children felt excited. The person with the feeling takes -ed.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> When a sentence starts with V-ing or V3, check the subject after the comma. Is it doing the action (V-ing) or receiving it (V3)? Is it the right subject at all?</p>
+          <details class="why" id="past-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="past-rules">
+                        <div data-grammar="s3lesson" data-set="past"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="past-quiz">
+            <h3>Quiz</h3>
+            <p>Ask each time: is the subject doing the action, or is it done to the subject?</p>
+            <div data-grammar="s3quiz" data-set="past"></div>
+          </div>
+          <div class="part" id="past-rewrite">
+            <h3>Rewrite practice</h3>
+            <div data-grammar="s3rewrite" data-set="pastB"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="past" data-opener="s3-past-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-past-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-past-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">Being encouraged by his coach, so Tom entered the race.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">Encouraged by his coach, Tom entered the race.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>Drop &quot;so&quot;: the phrase already gives the reason. &quot;Being&quot; isn't needed either.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
@@ -228,36 +493,102 @@
     </details>
 
     <h2 class="rows-group">Unit 4</h2>
-    <details class="row" id="reported-statements" name="rows">
+    <details class="row" id="reported-statements" name="rows" data-topic="statements">
       <summary>
         <span class="row-mark" aria-hidden="true">11</span>
-        <span class="row-head"><span class="row-title">Reported statements</span></span>
+        <span class="row-head"><span class="row-title">Reported statements</span><span class="row-sub">telling what someone said</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="statements-rules">
-          <div data-grammar="s3lesson" data-set="statements"></div>
-        </div>
-        <div class="part" id="statements-quiz">
-          <h3>Quiz</h3>
-          <p>Read the situation first: when was it said, and is it still true? That decides what changes.</p>
-          <div data-grammar="s3quiz" data-set="statements"></div>
+        <section class="opener" data-gates data-opener="s3-statements-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-statements-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-statements-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">He said me that he was busy.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">He told me that he was busy.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>&quot;Say&quot; can't take a person straight after it. Use &quot;told me&quot; or &quot;said to me&quot;.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> After &quot;said&quot; or &quot;told&quot;, check three things: the tense, the pronoun and the time word. One of them is usually the trap.</p>
+          <details class="why" id="statements-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="statements-rules">
+                        <div data-grammar="s3lesson" data-set="statements"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="statements-quiz">
+            <h3>Quiz</h3>
+            <p>Read the situation first: when was it said, and is it still true? That decides what changes.</p>
+            <div data-grammar="s3quiz" data-set="statements"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="statements" data-opener="s3-statements-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-statements-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-statements-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">Mia said that ‘I am hungry’.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">Mia said that she was hungry.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>No quotation marks in reported speech, and &quot;I&quot; becomes &quot;she&quot;.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
 
-    <details class="row" id="reported-questions" name="rows">
+    <details class="row" id="reported-questions" name="rows" data-topic="questions">
       <summary>
         <span class="row-mark" aria-hidden="true">12</span>
-        <span class="row-head"><span class="row-title">Reported questions</span></span>
+        <span class="row-head"><span class="row-title">Reported questions</span><span class="row-sub">telling what someone asked</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="questions-rules">
-          <div data-grammar="s3lesson" data-set="questions"></div>
-        </div>
-        <div class="part" id="questions-quiz">
-          <h3>Quiz</h3>
-          <p>Check the word order and the full stop or question mark at the end. Both can be the trap.</p>
-          <div data-grammar="s3quiz" data-set="questions"></div>
+        <section class="opener" data-gates data-opener="s3-questions-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-questions-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-questions-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">She asked me where did I live.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">She asked me where I lived.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>Drop &quot;did&quot; and put the subject before the verb.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> After &quot;asked&quot;, &quot;wondered&quot; or &quot;Do you know&quot;, read what follows. If the verb comes before the subject, swap them.</p>
+          <details class="why" id="questions-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="questions-rules">
+                        <div data-grammar="s3lesson" data-set="questions"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="questions-quiz">
+            <h3>Quiz</h3>
+            <p>Check the word order and the full stop or question mark at the end. Both can be the trap.</p>
+            <div data-grammar="s3quiz" data-set="questions"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="questions" data-opener="s3-questions-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-questions-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-questions-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">Do you know where is the post office?</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">Do you know where the post office is?</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>Inside a bigger question, use statement order: subject, then verb.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
@@ -280,19 +611,52 @@
       </div>
     </details>
 
-    <details class="row" id="linking-words" name="rows">
+    <details class="row" id="linking-words" name="rows" data-topic="linking">
       <summary>
         <span class="row-mark" aria-hidden="true">14</span>
-        <span class="row-head"><span class="row-title">Linking words</span></span>
+        <span class="row-head"><span class="row-title">Linking words</span><span class="row-sub">although, because, in case</span></span>
       </summary>
       <div class="row-body">
-        <div class="part" id="linking-rules">
-          <div data-grammar="s3lesson" data-set="linking"></div>
-        </div>
-        <div class="part" id="linking-quiz">
-          <h3>Quiz</h3>
-          <p>Choose the job first, then check what follows the blank: a noun, a verb, or a whole clause.</p>
-          <div data-grammar="s3quiz" data-set="linking"></div>
+        <section class="opener" data-gates data-opener="s3-linking-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-linking-open-q">
+          <p class="opener-kicker">Before you read</p>
+          <h2 class="opener-q" id="s3-linking-open-q">Which sentence is correct?</h2>
+          <div class="opener-choices">
+            <button type="button" class="opener-choice" data-tag="Common mistake">Although I was tired, but I finished my homework.</button>
+            <button type="button" class="opener-choice" data-ok data-tag="Correct">Although I was tired, I finished my homework.</button>
+          </div>
+          <div class="opener-reveal" hidden aria-live="polite">
+            <p class="opener-verdict"></p>
+            <p>Use one contrast word. &quot;Although&quot; already links the two parts.</p>
+          </div>
+          <p class="opener-skip"><button type="button" class="btn-quiet" data-skip>I know this. Show me the quiz.</button></p>
+        </section>
+        <div class="topic-lesson" data-lesson hidden>
+          <p class="goal"><b>One check:</b> For every linking word, check two things: does its job match the ideas (add, contrast, cause …)? And does the right grammar follow it (a noun or a clause, a new sentence or the same one)?</p>
+          <details class="why" id="linking-rules-fold">
+            <summary>See the rules</summary>
+            <div>
+                  <div class="part" id="linking-rules">
+                        <div data-grammar="s3lesson" data-set="linking"></div>
+                      </div>
+            </div>
+          </details>
+          <div class="part" id="linking-quiz">
+            <h3>Quiz</h3>
+            <p>Choose the job first, then check what follows the blank: a noun, a verb, or a whole clause.</p>
+            <div data-grammar="s3quiz" data-set="linking"></div>
+          </div>
+          <section class="opener" data-step-done data-step-id="linking" data-opener="s3-linking-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s3-linking-close-q">
+            <p class="opener-kicker">Check yourself</p>
+            <h2 class="opener-q" id="s3-linking-close-q">Which sentence is correct?</h2>
+            <div class="opener-choices">
+              <button type="button" class="opener-choice" data-tag="Common mistake">I'll bring a jacket in case it will be cold.</button>
+              <button type="button" class="opener-choice" data-ok data-tag="Correct">I'll bring a jacket in case it is cold.</button>
+            </div>
+            <div class="opener-reveal" hidden aria-live="polite">
+              <p class="opener-verdict"></p>
+              <p>No &quot;will&quot; after &quot;in case&quot;, just like after &quot;if&quot;.</p>
+            </div>
+          </section>
         </div>
       </div>
     </details>
@@ -358,6 +722,8 @@
 <script src="assets/js/s3-grammar.js"></script>
 <script src="assets/js/sets.js"></script>
 <script src="assets/js/grammar.js"></script>
+<script src="assets/js/opener.js"></script>
+<script src="assets/js/topic-ticks.js"></script>
 <script src="assets/js/stickers.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>
