@@ -11,6 +11,8 @@ const GUIDES = ["part-a.html", "part-b.html", "text-types.html", "questions.html
 const loaded = Object.fromEntries(GUIDES.map((f) => [f, read(f)]));
 // text-types.html is a hub: its anchors live on the six text-types-<type>.html pages, so the hub and the pages are read as one
 loaded["text-types.html"] += fs.readdirSync(root).filter((f) => /^text-types-[a-z]+[.]html$/.test(f)).map(read).join(String.fromCharCode(10));
+// questions.html is a hub: each year is its own page, read here as the one long page it used to be
+loaded["questions.html"] = require("./questions-pages.js").all;
 // any other page of the site is read when it is asked for
 const pages = new Proxy(loaded, { get: (t, k) => (k in t ? t[k] : typeof k === "string" && /[.]html$/.test(k) && fs.existsSync(path.join(root, k)) ? read(k) : undefined) });
 // the hub forwards old links (part-b.html#crei) in a script in its head: first to a step page, then to where things moved

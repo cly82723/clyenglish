@@ -509,6 +509,9 @@
     for (var fold = el.closest("details"); fold; fold = fold.parentElement && fold.parentElement.closest("details")) {
       if (!fold.open) { fold.open = true; opened = true; }
     }
+    // a link to a past question that has a sample opens the sample with it
+    var sample = el.classList.contains("q") && el.querySelector(".q-sample");
+    if (sample && !sample.open) { sample.open = true; opened = true; }
     if (opened) requestAnimationFrame(function () { el.scrollIntoView({ block: "start" }); });
   }
   window.addEventListener("hashchange", openFoldFor);
