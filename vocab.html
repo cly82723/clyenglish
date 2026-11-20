@@ -4,19 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vocab · CLY English</title>
-<meta name="description" content="S.3 vocab revision for Units 1 and 2: a 15-blank cloze passage with the vocabulary list and guided hints.">
+<meta name="description" content="S.3 vocab for Units 1 and 2: flashcards, a fill-in-the-blank quiz and a short passage.">
 <script>document.documentElement.className = "js preload";</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="stylesheet" href="assets/css/motion.css">
+<link rel="stylesheet" href="assets/css/guide.css">
 <link rel="icon" href="images/brand/cly-icon-32.png" sizes="32x32">
 <link rel="icon" href="images/brand/cly-icon-16.png" sizes="16x16">
 <meta name="theme-color" content="#1f7a45">
+<script>(function(){var m={"s3":"vocab-passage.html"},id=location.hash.slice(1),t=id&&m[id];if(t)location.replace(t);})();</script>
 </head>
 <body data-cover="tree">
-<a class="skip" href="#main">Skip to the vocab revision</a>
+<a class="skip" href="#main">Skip to Vocab</a>
 
 <header class="cover">
   <a class="brand" href="index.html">
@@ -35,25 +37,27 @@
     <ol><li><a href="junior.html">Junior</a></li><li aria-current="page">Vocab</li></ol>
   </nav>
 
-  <main class="column" id="main">
+  <main class="column rows" id="main">
     <h1 class="title">S.3 Vocab</h1>
-    <noscript><p class="tip">These exercises need JavaScript. Turn it on in your browser to practise.</p></noscript>
-
-    <section id="s3">
-      <h2>S.3 · Units 1 &amp; 2</h2>
-      <p class="tagline">Tung Tung Vocab Quiz</p>
-      <div data-vocab="s3"></div>
-    </section>
-    <aside class="versions" aria-label="Wrong form and right form">
-      <p class="versions-title">Same word, right form</p>
-      <ul class="marks">
-        <li class="avoid"><span class="visually-hidden">Wrong: </span><s>She spoke with real confident.</s></li>
-        <li class="do"><span class="visually-hidden">Right: </span>She spoke with real confidence.</li>
-      </ul>
-      <p class="cly"><b>CLY:</b> The first letter is given, and some blanks need a different part of speech from the list. After "real", you need a noun.</p>
-    </aside>
+    <p class="lead">Units 1 and 2: 45 words, and 31 phrases for writing. Pick one thing.</p>
+    <nav class="steps" aria-label="S.3 Vocab">
+    <a class="row step-link" href="vocab-cards.html">
+      <span class="row-mark" aria-hidden="true">1</span>
+      <span class="row-head"><span class="row-kicker">Learn</span><span class="row-title">Flashcards: flip a card, then mark Got it or Again.</span></span>
+      <span class="step-done" hidden>Done</span>
+    </a>
+    <a class="row step-link" href="vocab-quiz.html">
+      <span class="row-mark" aria-hidden="true">2</span>
+      <span class="row-head"><span class="row-kicker">Test</span><span class="row-title">Quiz: ten fill-in-the-blank questions, with a hint if you slip.</span></span>
+      <span class="step-done" hidden>Done</span>
+    </a>
+    <a class="row step-link" href="vocab-passage.html">
+      <span class="row-mark" aria-hidden="true">3</span>
+      <span class="row-head"><span class="row-kicker">Read</span><span class="row-title">Passage: fill the blanks in a short text.</span></span>
+      <span class="step-done" hidden>Done</span>
+    </a>
+    </nav>
   </main>
-
 </div>
 
 <footer class="back-cover">
@@ -62,10 +66,6 @@
     <a href="index.html">Home</a>
   </nav>
 </footer>
-<script src="assets/js/practice-core.js"></script>
-<script src="assets/js/data/vocab-data.js"></script>
-<script src="assets/js/data/vocab-extra.js"></script>
-<script src="assets/js/vocab.js"></script>
 <script src="assets/js/stickers.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>

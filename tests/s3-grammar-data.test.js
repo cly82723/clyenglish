@@ -56,5 +56,5 @@ test("the page has no Challenge or Three versions left", () => {
 
 test("the Junior tab is current on the S.3 grammar page, and Junior links to vocab", () => {
   assert.ok(html.includes('<a href="junior.html" aria-current="page">Junior</a>'));
-  assert.ok(fs.readFileSync(path.join(root, "junior.html"), "utf8").includes('href="vocab.html#s3"'), "Junior does not link to vocab");
+  assert.ok(fs.readFileSync(path.join(root, "junior.html"), "utf8").includes('href="vocab.html"'), "Junior does not link to vocab");
 });
