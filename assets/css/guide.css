@@ -380,3 +380,14 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
 .share-table thead th { font-weight: 700; color: var(--sky); border-bottom: 1px solid var(--ink); }
 .share-table tbody th { text-align: left; font-weight: 700; padding-left: 0; }
 @media (max-width: 760px) { .share-table th, .share-table td { padding: 8px 3px; font-size: 0.875rem; } }
+
+/* ---------- S.3 grammar: a topic row names itself plainly, shows its progress, and opens on a question ---------- */
+
+.row-sub { font: 400 1rem/1.4 var(--font-body); color: var(--ink-soft); overflow-wrap: anywhere; }
+.row-done { font: 700 0.875rem/1.3 var(--font-display); color: var(--leaf-deep); }
+.row-done::before { content: "✓ "; }
+.row.is-done .row-mark { background: var(--chest); border-color: var(--leaf); color: var(--leaf-deep); }
+.topics-done { margin: 0 0 14px; font: 600 0.9375rem/1.3 var(--font-display); color: var(--ink-soft); }
+.topics-done[hidden] { display: none; }
+.topic-lesson[hidden] { display: none; }
+.topic-lesson > .why { margin: 4px 0 20px; }

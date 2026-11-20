@@ -15,24 +15,30 @@
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* storage blocked: the opener works, it just isn't remembered */ }
   }
 
-  var main = document.querySelector("main[data-step]");
-  var stepId = main ? main.getAttribute("data-step") : "";
+  // a step page names its step; a page of topic rows (S.3 grammar) only names where its ticks are kept
+  var main = document.querySelector("main[data-step], main[data-done-key]");
+  var stepId = main ? main.getAttribute("data-step") || "" : "";
   // Part B is the default guide; the Toolkit pages name themselves and keep their own ticks
   var GUIDE = (main && main.getAttribute("data-guide")) || "";
   var DONE_KEY = (main && main.getAttribute("data-done-key")) || "cly:partb-done";
-  var lesson = document.querySelector("[data-lesson]");
+  // the lesson an opener holds back: the one in the same row if the opener sits in a row, else the page's
+  function lessonFor(box) {
+    var scope = box.closest(".row-body");
+    return (scope && scope.querySelector("[data-lesson]")) || document.querySelector("[data-lesson]");
+  }
 
-  function unlock() {
+  function unlock(lesson) {
     if (!lesson || !lesson.hidden) return;
     lesson.hidden = false;
     // the highlighter swipes draw once they scroll into view; a hidden lesson never lets them start
     lesson.querySelectorAll("mark.swipe:not(.on)").forEach(function (m) { m.classList.add("on"); });
   }
 
-  function markDone() {
+  function markDone(box) {
+    var which = box.getAttribute("data-step-id") || stepId;   // a row names its own topic; a step page is its own step
     var done = load(DONE_KEY) || [];
-    if (stepId && done.indexOf(stepId) < 0) { done.push(stepId); save(DONE_KEY, done); }
-    document.dispatchEvent(new CustomEvent("cly:step-done", { detail: stepId }));
+    if (which && done.indexOf(which) < 0) { done.push(which); save(DONE_KEY, done); }
+    document.dispatchEvent(new CustomEvent("cly:step-done", { detail: which }));
   }
 
   function initOpener(box) {
@@ -43,6 +49,7 @@
     var skip = box.querySelector("[data-skip]");
     var holder = box.querySelector(".opener-choices");
     var gates = box.hasAttribute("data-gates");
+    var lesson = lessonFor(box);
     var saved = load(PREFIX + id);
 
     // either line can come first, so the stronger one is not always second
@@ -67,9 +74,9 @@
         : (box.getAttribute("data-wrong") || "An easy one to pick. The other is stronger, and here is why.");
       reveal.hidden = false;
       if (skip) skip.parentNode.hidden = true;
-      if (gates) unlock();
+      if (gates) unlock(lesson);
       if (announce) {
-        if (box.hasAttribute("data-step-done")) markDone();
+        if (box.hasAttribute("data-step-done")) markDone(box);
         document.dispatchEvent(new CustomEvent("cly:opener", { detail: { id: id, ok: right, suggest: box.getAttribute("data-suggest") } }));
       }
     }
@@ -84,11 +91,11 @@
       skip.addEventListener("click", function () {
         save(PREFIX + id, { skip: true });
         box.hidden = true;
-        unlock();
+        unlock(lesson);
       });
     }
 
-    if (saved && saved.skip) { box.hidden = true; unlock(); return; }
+    if (saved && saved.skip) { box.hidden = true; unlock(lesson); return; }
     if (saved && saved.pick) {
       var again = choices.filter(function (c) { return c.getAttribute("data-tag") === saved.pick; })[0];
       if (again) { show(again, !gates); return; }
@@ -96,7 +103,14 @@
     // a link into the lesson (part-b.html#crei sends a student here) should not meet a closed gate
     if (gates && lesson && location.hash.length > 1) {
       var target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-      if (target && lesson.contains(target)) { unlock(); target.scrollIntoView({ block: "start" }); }
+      if (target && lesson.contains(target)) { unlock(lesson); target.scrollIntoView({ block: "start" }); }
+    }
+    // a link inside the page that opens a row at something in this lesson (a quiz's "review the rules") opens the gate too
+    if (gates && lesson) {
+      document.addEventListener("cly:show", function (e) {
+        var el = e.detail && document.getElementById(e.detail);
+        if (el && lesson.contains(el)) unlock(lesson);
+      });
     }
   }
 
