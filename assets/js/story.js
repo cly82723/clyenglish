@@ -16,6 +16,7 @@
   var narrow = window.matchMedia("(max-width: 760px)");
 
   var POINTER_TURN = 5;        // degrees the notebook leans towards a mouse
+  var POINTER_EASE = 0.14;     // the share of the way to the pointer the lean covers each frame, so it follows and does not jump
   var POINTER_DRIFT = 26;      // pixels the nearest sticker shifts away from a mouse
   var SPIN_PER_PX = 0.03;      // degrees a sticker turns for each pixel it travels
   var TURN_MS = 700;           // how long the notebook takes to open or shut on a tap
@@ -144,7 +145,7 @@
   });
 
   var sceneStarts = [], marks = [], away = null, outOfBag = null;
-  var width = 0, height = 0, pointer = { x: 0, y: 0 }, queued = false, tint = "";
+  var width = 0, height = 0, pointer = { x: 0, y: 0 }, aim = { x: 0, y: 0 }, queued = false, tint = "";
 
   function clamp(t) { return Math.min(1, Math.max(0, t)); }
   function ease(t) { return t * t * (3 - 2 * t); }
@@ -199,6 +200,9 @@
 
   function draw() {
     queued = false;
+    // the lean eases towards where the pointer is; it keeps drawing until it has arrived
+    var dx = aim.x - pointer.x, dy = aim.y - pointer.y, easing = Math.abs(dx) > 0.002 || Math.abs(dy) > 0.002;
+    if (easing) { pointer.x += dx * POINTER_EASE; pointer.y += dy * POINTER_EASE; }
     var y = window.scrollY, at = pose(y), held = null;
     if (shown) held = fromBag ? outOfBag : (narrow.matches ? TAPPED_NARROW : TAPPED_WIDE);
     KEYS.forEach(function (k) {
@@ -240,6 +244,7 @@
       f.el.style.setProperty("--fr", (f.spin + travelled * SPIN_PER_PX * (f.spin < 0 ? -1 : 1)).toFixed(2));
       f.el.style.setProperty("--px", (-pointer.x * f.speed * POINTER_DRIFT).toFixed(1));
     });
+    if (easing) soon();
   }
   function soon() {
     if (queued) return;
@@ -260,9 +265,11 @@
 
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
     window.addEventListener("pointermove", function (e) {
-      pointer = { x: e.clientX / width * 2 - 1, y: e.clientY / height * 2 - 1 };
+      aim = { x: e.clientX / width * 2 - 1, y: e.clientY / height * 2 - 1 };
       soon();
     }, { passive: true });
+    // the pointer leaving the window lets the notebook settle back to facing the reader
+    document.documentElement.addEventListener("mouseleave", function () { aim = { x: 0, y: 0 }; soon(); });
     // pointing at a form shows its cover colour on the notebook, as if picking that book up
     Array.prototype.forEach.call(document.querySelectorAll(".directory li"), function (row) {
       // the form is read from the row's own mark: "S.3" is the s3 book

@@ -963,12 +963,13 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 
 /* Press feedback: every control gives a little under the finger, then springs back quickly */
 .tabs a, .btn, .btn-quiet, .reset, .chip, .ok-btn, .step-btn, .cell, .letter, .choice, .forms a, .directory a, .row-next a, .swap-choice {
-  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.16s var(--ease-out);
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.45s var(--spring);
 }
 .tabs a:active, .btn:active:not(:disabled), .btn-quiet:active:not(:disabled), .reset:active,
 .chip:active:not(:disabled), .ok-btn:active:not(:disabled), .step-btn:active:not(:disabled),
 .cell:active, .letter:active:not(:disabled), .forms a:active, .directory a:active { transform: scale(0.97); }
 .choice:active:not(:disabled), .row-next a:active, .swap-choice:active:not(:disabled) { transform: scale(0.98); } /* wide rows give less, or they look like they lurch */
+.tabs a:active, .btn:active, .btn-quiet:active, .reset:active, .chip:active, .ok-btn:active, .step-btn:active, .cell:active, .letter:active, .choice:active, .forms a:active, .directory a:active, .row-next a:active, .swap-choice:active { transition-duration: 70ms; transition-timing-function: ease-out; } /* in at once; out on a spring */
 @media (prefers-reduced-motion: reduce) {
   .tabs a:active, .btn:active, .btn-quiet:active, .reset:active, .chip:active, .ok-btn:active,
   .step-btn:active, .cell:active, .letter:active, .choice:active, .forms a:active, .directory a:active,
@@ -1349,7 +1350,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 
 /* every pressable thing gives a little under the finger */
 .levelup-steps [role="group"] button, .resume a, .index a, .pager a, .word, .spot button, .cond-ladder > li > button {
-  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.16s var(--ease-out);
+  transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.45s var(--spring);
 }
 .levelup-steps [role="group"] button:active, .resume a:active, .index a:active, .pager a:active,
 .word:active:not(:disabled) { transform: scale(0.97); }

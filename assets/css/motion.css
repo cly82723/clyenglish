@@ -6,6 +6,18 @@
   --lift: 0 6px 14px rgb(16 38 59 / 0.2);   /* the shadow of something held above the paper */
   --dur-turn: 0.34s;                        /* a page turning */
   --ease-turn: cubic-bezier(0.32, 0.72, 0, 1);   /* a sheet with some weight: quick to lift, slow to settle */
+  /* Springs, as Apple draws them: whatever a finger can touch settles on a spring, so it can be let go of and picked up
+     again from where it is. --spring is critically damped (no bounce) and is the default; --spring-bounce has damping 0.8
+     (about 1.5% overshoot) and is for things that carry momentum, like a sticker that has just been earned. Browsers
+     without linear() get the near-equivalent curves. Give each a duration of about 0.4 to 0.6s. */
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --spring-bounce: cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --spring: linear(0, .06, .186, .33, .466, .584, .682, .76, .821, .868, .903, .929, .949, .963, .973, .981, .986, .99, .993, .995, .997, .998, .998, .999, .999, .999, 1, 1, 1);
+    --spring-bounce: linear(0, .027, .095, .188, .291, .396, .498, .592, .676, .749, .81, .861, .903, .935, .961, .98, .993, 1.003, 1.009, 1.013, 1.015, 1.015, 1.015, 1.014, 1.012, 1.011, 1.009, 1.008, 1.006, 1.005, 1.004, 1.003, 1.002, 1.001, 1.001, 1.001, 1, 1, 1, 1, 1);
+  }
 }
 
 /* ---------- Page turns: the next page lies underneath; the old one turns away on its spine ---------- */
@@ -16,7 +28,8 @@
 ::view-transition-group(sheet) { animation-duration: var(--dur-turn); animation-timing-function: var(--ease-turn); }
 /* two solid pages, one over the other: no adding of colours, which is only right for a cross-fade */
 ::view-transition-old(sheet), ::view-transition-new(sheet) { mix-blend-mode: normal; }
-::view-transition-new(sheet) { animation: none; }
+::view-transition-new(sheet) { animation: page-under var(--dur-turn) var(--ease-turn) both; }
+@keyframes page-under { from { filter: brightness(0.92); } }
 ::view-transition-old(sheet) {
   z-index: 1;   /* the page being turned is on top of the one underneath */
   transform-origin: 0 var(--turn-old-y, 30vh);
@@ -29,7 +42,8 @@
 }
 
 /* going back: the page underneath stays still, and the earlier page swings back over it (motion.js marks it) */
-html[data-turn="back"]::view-transition-old(sheet) { z-index: 0; animation: none; }
+html[data-turn="back"]::view-transition-old(sheet) { z-index: 0; animation: page-under-back var(--dur-turn) var(--ease-turn) both; }
+@keyframes page-under-back { to { filter: brightness(0.92); } }
 html[data-turn="back"]::view-transition-new(sheet) {
   z-index: 1;
   transform-origin: 0 var(--turn-new-y, 30vh);
@@ -48,8 +62,8 @@ html[data-turn="back"]::view-transition-new(sheet) {
 
   /* ---------- Sections of one page turn the same way, hinged on the side the reader came from ---------- */
 
-  .js [data-tabs] .column > section.turn-next { animation: page-next 0.3s var(--ease-out); transform-origin: 0 240px; }
-  .js [data-tabs] .column > section.turn-prev { animation: page-prev 0.3s var(--ease-out); transform-origin: 100% 240px; }
+  .js [data-tabs] .column > section.turn-next { animation: page-next 0.45s var(--spring); transform-origin: 0 240px; }
+  .js [data-tabs] .column > section.turn-prev { animation: page-prev 0.45s var(--spring); transform-origin: 100% 240px; }
   @keyframes page-next { from { opacity: 0; transform: perspective(1600px) rotateY(6deg) translateX(14px); } }
   @keyframes page-prev { from { opacity: 0; transform: perspective(1600px) rotateY(-6deg) translateX(-14px); } }
 
@@ -57,24 +71,25 @@ html[data-turn="back"]::view-transition-new(sheet) {
 
   .tabs { perspective: 520px; }
   .tabs a { transform-origin: 50% 100%; }
-  @media (hover: hover) and (pointer: fine) { .tabs a:not([aria-current="page"]):hover { transform: rotateX(-9deg); } }
-  .tabs a:not([aria-current="page"]):active { transform: rotateX(-14deg) scale(0.98); }
+  @media (hover: hover) and (pointer: fine) { .tabs a:not([aria-current="page"]):hover { transform: rotateX(-4deg); } }
+  .tabs a:not([aria-current="page"]):active { transform: rotateX(-6deg) scale(0.98); }
 
   /* ---------- Held controls: lifted and tilted towards the finger (motion.js sets --tx and --ty, -1 to 1) ---------- */
 
   .held.held.held.held {
-    transform: perspective(520px) translateY(-2px) rotateX(calc(var(--ty, 0) * -7deg)) rotateY(calc(var(--tx, 0) * 7deg)) scale(0.985);
+    transform: perspective(520px) translateY(-2px) rotateX(calc(var(--ty, 0) * -3deg)) rotateY(calc(var(--tx, 0) * 3deg)) scale(0.97);
     box-shadow: var(--lift);
+    transition: transform 90ms ease-out, box-shadow 90ms ease-out;
   }
   /* wide rows tilt less, or they look like they lurch */
   :is(.choice, .pager a, .resume a).held.held.held.held {
-    transform: perspective(900px) translateY(-2px) rotateX(calc(var(--ty, 0) * -3deg)) rotateY(calc(var(--tx, 0) * 2deg)) scale(0.99);
+    transform: perspective(900px) translateY(-2px) rotateX(calc(var(--ty, 0) * -1.5deg)) rotateY(calc(var(--tx, 0) * 1deg)) scale(0.985);
   }
 
   /* ---------- Level ladder: the chosen level flips down like a card ---------- */
 
-  .js .ladder-panel.flip { animation: card-flip 0.38s var(--ease-out); transform-origin: 50% 0; }
-  @keyframes card-flip { from { opacity: 0; transform: perspective(1100px) rotateX(-72deg); } 45% { opacity: 1; } }
+  .js .ladder-panel.flip { animation: card-flip 0.5s var(--spring); transform-origin: 50% 0; }
+  @keyframes card-flip { from { opacity: 0; transform: perspective(1100px) translateY(-6px) rotateX(-14deg); } 45% { opacity: 1; } }
 
   /* ---------- A finished set is stamped ---------- */
 
@@ -132,7 +147,7 @@ html[data-turn="back"]::view-transition-new(sheet) {
   @media (hover: hover) and (pointer: fine) { .sticker.earned:hover::after { opacity: 1; } }
   .sticker.earned.held::after { opacity: 1; }
   .sticker.held.held.held.held {
-    transform: perspective(300px) translateY(-5px) rotateX(calc(var(--ty, 0) * -16deg)) rotateY(calc(var(--tx, 0) * 16deg)) scale(1.1);
+    transform: perspective(300px) translateY(-5px) rotateX(calc(var(--ty, 0) * -9deg)) rotateY(calc(var(--tx, 0) * 9deg)) scale(1.08);
     box-shadow: 0 10px 18px rgb(16 38 59 / 0.26);
   }
 }
@@ -147,8 +162,8 @@ html[data-turn="back"]::view-transition-new(sheet) {
   box-shadow: 0 8px 22px rgb(16 38 59 / 0.22);
   font-family: var(--font-display);
   /* hidden by opacity, not visibility, so a screen reader hears what is put in it */
-  opacity: 0; pointer-events: none; transform: translateY(12px) rotate(2deg);
-  transition: opacity 0.25s var(--ease-colour), transform 0.3s var(--ease-out);
+  opacity: 0; pointer-events: none; transform: translateY(14px) scale(0.96);
+  transition: opacity 0.25s var(--ease-colour), transform 0.5s var(--spring);
 }
 .sticker-toast.show { opacity: 1; pointer-events: auto; transform: none; }
 .sticker-toast .sticker-art { flex: none; width: 52px; }
@@ -156,8 +171,8 @@ html[data-turn="back"]::view-transition-new(sheet) {
 .sticker-toast strong { font-weight: 800; }
 .sticker-toast a { font-weight: 600; }
 @media (prefers-reduced-motion: no-preference) {
-  .sticker-toast.show .sticker-art { animation: peel-in 0.5s var(--ease-out); }
-  @keyframes peel-in { from { opacity: 0; transform: perspective(300px) rotateY(-70deg) rotate(-12deg) scale(0.7); } }
+  .sticker-toast.show .sticker-art { animation: peel-in 0.65s var(--spring-bounce); }
+  @keyframes peel-in { from { opacity: 0; transform: perspective(300px) rotateY(-35deg) rotate(-6deg) scale(0.75); } }
 }
 @media (prefers-reduced-motion: reduce) {
   .sticker-toast, .sticker-toast.show { transform: none; transition: opacity 0.15s ease-out; }
@@ -166,7 +181,7 @@ html[data-turn="back"]::view-transition-new(sheet) {
 /* ---------- A badge zoomed in: the picture and its words, large, in a card over the dimmed page ---------- */
 
 .sticker-zoom { padding: 0; border: 0; background: none; color: var(--ink); max-width: none; max-height: none; overflow: visible; }
-.sticker-zoom::backdrop { background: rgb(16 38 59 / 0.62); }
+.sticker-zoom::backdrop { background: rgb(16 38 59 / 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .sticker-zoom-card {
   position: relative; box-sizing: border-box; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 32px); max-height: calc(100svh - 32px); overflow: auto;
   display: grid; justify-items: center; gap: 12px; padding: 28px 20px 24px; text-align: center;
@@ -185,14 +200,45 @@ html[data-turn="back"]::view-transition-new(sheet) {
 .sticker-zoom-art.empty .sticker-art::after { content: "?"; font: 800 4rem/1 var(--font-display); color: var(--ring); }
 .sticker-zoom h3 { margin: 0; font-size: var(--step-2); line-height: 1.15; }
 .sticker-zoom p { margin: 0; max-width: 34ch; font-size: 1.0625rem; line-height: 1.5; }
-@keyframes sticker-zoom-in { from { opacity: 0; transform: scale(0.86); } }
+@keyframes sticker-zoom-in { from { opacity: 0; transform: scale(0.92); } }
 @keyframes sticker-zoom-fade { from { opacity: 0; } }
 /* the card arrives with its picture and words together, and then stands perfectly still; with reduced motion it only fades */
 @media (prefers-reduced-motion: no-preference) {
-  .sticker-zoom[open] .sticker-zoom-card { animation: sticker-zoom-in 0.24s var(--ease-out); }
+  .sticker-zoom[open] .sticker-zoom-card { animation: sticker-zoom-in 0.4s var(--spring); }
   .sticker-zoom[open]::backdrop { animation: sticker-zoom-fade 0.2s ease-out; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sticker-zoom[open] .sticker-zoom-card, .sticker-zoom[open]::backdrop { animation: sticker-zoom-fade 0.15s ease-out; }
 }
 @media print { .sticker-zoom { display: none; } }
+
+/* ---------- Materials, and the three accessibility signals that go with them ---------- */
+
+/* The corner note is a thin material over whatever is under it, as Apple draws a notification. */
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .sticker-toast {
+    background: rgb(255 255 255 / 0.8);
+    -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+    border-color: rgb(29 42 58 / 0.22);
+  }
+}
+/* reduce transparency: the same surfaces, solid and with no blur */
+@media (prefers-reduced-transparency: reduce) {
+  .cover-home, .sticker-toast { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sticker-zoom::backdrop { background: rgb(16 38 59 / 0.7); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+/* more contrast: the edge is always drawn, and solid */
+@media (prefers-contrast: more) {
+  .cover-home { background: var(--paper); border-bottom-color: var(--ink); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sticker-toast { background: var(--paper); border-color: var(--ink); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/* ---------- The concept-check openers: a press gives, an answer arrives, a lesson is revealed ---------- */
+
+.opener-choice { transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), transform 0.45s var(--spring); }
+.opener-choice:active:not(:disabled) { transform: scale(0.985); transition-duration: 70ms; transition-timing-function: ease-out; }
+@media (prefers-reduced-motion: reduce) { .opener-choice:active:not(:disabled) { transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .opener-reveal:not([hidden]) { animation: note-in 0.45s var(--spring); }
+  .step-lesson:not([hidden]) { animation: note-in 0.55s var(--spring); }
+}
