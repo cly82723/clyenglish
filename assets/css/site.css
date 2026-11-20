@@ -1210,6 +1210,48 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 .closing p { margin: 0; color: var(--ink-soft); max-width: 60ch; }
 .closing a { font-weight: 700; white-space: nowrap; }
 
+/* ---------- The menu: three lines at the top left, and every hub in a list that pops up (site.js) ---------- */
+.menu-wrap { position: relative; align-self: center; margin-bottom: 18px; z-index: 30; }
+.cover-home .menu-wrap { margin-bottom: 8px; }
+.menu-btn {
+  display: grid; place-items: center; width: 48px; height: 48px; padding: 0; cursor: pointer;
+  color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(16 38 59 / 0.2); -webkit-tap-highlight-color: transparent;
+  transition: transform 0.45s var(--spring), background-color var(--dur-fast) var(--ease-colour);
+}
+.menu-btn:active { transform: scale(0.95); transition-duration: 70ms; }
+@media (hover: hover) { .menu-btn:hover { background: var(--chest); } }
+.menu-lines, .menu-lines::before, .menu-lines::after { width: 22px; height: 2px; background: currentColor; border-radius: 2px; }
+.menu-lines { position: relative; transition: background-color 0.15s ease-out; }
+.menu-lines::before, .menu-lines::after { content: ""; position: absolute; left: 0; transition: transform 0.35s var(--spring); }
+.menu-lines::before { transform: translateY(-7px); }
+.menu-lines::after { transform: translateY(7px); }
+.is-open .menu-lines { background: transparent; }
+.is-open .menu-lines::before { transform: rotate(45deg); }
+.is-open .menu-lines::after { transform: rotate(-45deg); }
+.site-menu {
+  position: absolute; left: 0; top: calc(100% + 6px);
+  width: min(340px, calc(100vw - 2 * var(--gutter))); max-height: calc(100vh - 140px); overflow-y: auto;
+  padding: 8px 12px 12px; background: var(--paper); color: var(--ink);
+  border: 1px solid var(--ink); border-radius: 16px; box-shadow: 0 14px 34px rgb(16 38 59 / 0.28);
+  transform-origin: 24px 0;
+}
+.site-menu[hidden] { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .site-menu:not([hidden]) { animation: menu-pop 0.4s var(--spring); }
+  @keyframes menu-pop { from { opacity: 0; transform: translateY(-6px) scale(0.96); } }
+}
+.site-menu ul { list-style: none; margin: 0; padding: 0; }
+.site-menu a {
+  display: flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 10px;
+  font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
+}
+@media (hover: hover) { .site-menu a:hover { background: var(--chest); } }
+.site-menu a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+.menu-group { margin: 10px 0 0; }
+.menu-head { margin: 0; padding: 6px 10px 2px; font: 700 0.875rem/1.3 var(--font-display); color: var(--sky); }
+.playing .menu-wrap { display: none; }
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {

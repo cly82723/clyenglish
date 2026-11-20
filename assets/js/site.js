@@ -497,6 +497,94 @@
   document.querySelectorAll(".checklist[data-store]").forEach(initChecklist);
   swipe(document);
 
+  /* ---------- The menu: three lines at the top left, and every hub in a list that pops up ---------- */
+  // Pointing at the icon opens it, leaving closes it. A tap or a click opens it and keeps it open until the next tap,
+  // so it also works with a finger or the keyboard. Escape, or a tap anywhere else, closes it.
+  var MENU = [
+    ["Junior", [["S.3 Grammar", "s3-grammar.html"], ["S.3 Vocab", "vocab.html"], ["S.3 Weekly challenge", "s3-challenge.html"]]],
+    ["Senior · Paper 2 Writing", [["Part A", "part-a.html"], ["Part B", "part-b.html"], ["Toolkit", "toolkit.html"], ["Text types", "text-types.html"], ["Past questions", "questions.html"]]],
+    ["Senior · S.4", [["S.4 Grammar", "grammar.html"], ["S.4 Weekly challenge", "challenge.html"]]],
+    ["Senior · Before the exam", [["Cut-offs", "cutoffs.html"], ["Final reminders", "final.html"]]]
+  ];
+  function initSiteMenu() {
+    var cover = document.querySelector("header.cover");
+    var brand = cover && cover.querySelector(".brand");
+    if (!brand) return;
+    var up = brand.getAttribute("href").replace("index.html", "");   // pages in a folder reach the rest one level up
+    var here = location.pathname.split("/").pop() || "index.html";
+    var wrap = document.createElement("div");
+    wrap.className = "menu-wrap";
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "menu-btn";
+    btn.setAttribute("aria-label", "Menu");
+    btn.setAttribute("aria-expanded", "false");
+    btn.setAttribute("aria-controls", "site-menu");
+    btn.innerHTML = '<span class="menu-lines" aria-hidden="true"></span>';
+    var panel = document.createElement("nav");
+    panel.id = "site-menu";
+    panel.className = "site-menu";
+    panel.setAttribute("aria-label", "Every part of the site");
+    panel.hidden = true;
+    function link(text, href) {
+      var a = document.createElement("a");
+      a.href = up + href;
+      a.textContent = text;
+      if (href === here) a.setAttribute("aria-current", "page");
+      return a;
+    }
+    panel.appendChild(link("Home", "index.html"));
+    MENU.forEach(function (group) {
+      var section = document.createElement("div");
+      section.className = "menu-group";
+      var head = document.createElement("p");
+      head.className = "menu-head";
+      head.textContent = group[0];
+      var list = document.createElement("ul");
+      group[1].forEach(function (item) {
+        var li = document.createElement("li");
+        li.appendChild(link(item[0], item[1]));
+        list.appendChild(li);
+      });
+      section.appendChild(head);
+      section.appendChild(list);
+      panel.appendChild(section);
+    });
+    wrap.appendChild(btn);
+    wrap.appendChild(panel);
+    cover.insertBefore(wrap, cover.firstChild);
+
+    var pinned = false, timer = null;
+    function setOpen(on) {
+      panel.hidden = !on;
+      btn.setAttribute("aria-expanded", String(on));
+      wrap.classList.toggle("is-open", on);
+      if (!on) pinned = false;
+    }
+    btn.addEventListener("click", function () {
+      if (panel.hidden) { setOpen(true); pinned = true; }
+      else if (!pinned) pinned = true;   // it was open from pointing: keep it open
+      else setOpen(false);
+    });
+    wrap.addEventListener("pointerenter", function (e) {
+      if (e.pointerType !== "mouse") return;
+      clearTimeout(timer);
+      if (panel.hidden) setOpen(true);
+    });
+    wrap.addEventListener("pointerleave", function (e) {
+      if (e.pointerType !== "mouse" || pinned) return;
+      timer = setTimeout(function () { setOpen(false); }, 250);
+    });
+    document.addEventListener("pointerdown", function (e) { if (!panel.hidden && !wrap.contains(e.target)) setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !panel.hidden) { setOpen(false); btn.focus(); }
+    });
+    wrap.addEventListener("focusout", function (e) {
+      if (!panel.hidden && e.relatedTarget && !wrap.contains(e.relatedTarget)) setOpen(false);
+    });
+  }
+  initSiteMenu();
+
   // A link to something inside a closed fold (text-types-letter.html#whole) opens the fold and goes there. A page of
   // rows does this itself (initRows); a page of one topic has no rows, so this is what opens it.
   function openFoldFor() {
