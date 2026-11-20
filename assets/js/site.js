@@ -315,8 +315,6 @@
       var text = done + " of " + boxes.length + " " + (list.getAttribute("data-count") || "done this week");
       if (out.textContent && out.textContent !== text) { out.classList.remove("bump"); void out.offsetWidth; out.classList.add("bump"); }
       out.textContent = text;
-      // every box ticked: stickers.js gives a badge for the weekly self-study list
-      if (boxes.length && done === boxes.length) document.dispatchEvent(new CustomEvent("cly:checklist", { detail: list.getAttribute("data-store") }));
     }
     function store() { try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) { /* storage blocked: still works for this visit */ } }
     var reset = document.querySelector("[data-reset='" + list.getAttribute("data-store") + "']");
