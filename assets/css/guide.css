@@ -406,3 +406,53 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
 
 .lesson-fold { margin: 12px 0; max-width: none; }
 .lesson-fold > div > h3:first-child { margin-top: 4px; }
+
+/* ---------- Vocab flashcards and quiz (vocab-practice.js) ---------- */
+.deck-list { list-style: none; margin: 20px 0 0; padding: 0; border-top: 1px solid var(--ink); }
+.deck-btn {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 58px; padding: 12px 4px;
+  background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer; text-align: left; color: var(--ink);
+  font: 600 1.0625rem/1.3 var(--font-display); -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) { .deck-btn:hover { background: var(--chest); } }
+.deck-meta { flex: none; font: 600 0.875rem/1.3 var(--font-display); color: var(--ink-soft); }
+.fc-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 20px 0 12px; font: 600 0.9375rem/1.3 var(--font-display); color: var(--ink-soft); }
+.fc-card { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; perspective: 1000px; text-align: left; -webkit-tap-highlight-color: transparent; }
+.fc-inner { display: grid; transform-style: preserve-3d; transition: transform 0.6s var(--spring); }
+.fc-card.is-flipped .fc-inner { transform: rotateY(180deg); }
+.fc-face {
+  grid-area: 1 / 1; min-height: 280px; padding: 22px 20px; background: var(--paper); color: var(--ink);
+  border: 1px solid var(--ink); border-radius: 16px; box-shadow: 0 8px 22px rgb(16 38 59 / 0.14);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.fc-front { display: grid; align-content: center; justify-items: center; text-align: center; gap: 6px; }
+.fc-back { transform: rotateY(180deg); }
+.fc-word { margin: 0; font: 800 var(--step-3)/1.15 var(--font-display); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.fc-pos { margin: 0; font: 600 1rem/1.3 var(--font-display); color: var(--ink-soft); }
+.fc-hint { margin: 14px 0 0; font: 600 0.875rem/1.3 var(--font-display); color: var(--sky); }
+.fc-meaning { margin: 0 0 12px; font: 700 1.125rem/1.4 var(--font-display); }
+.fc-line { margin: 0 0 8px; }
+.fc-note { margin: 8px 0 0; font: 700 0.9375rem/1.4 var(--font-display); color: var(--ink-soft); }
+.fc-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 0; }
+.fc-actions .btn, .fc-actions .btn-quiet { flex: 1 1 140px; min-height: 48px; justify-content: center; text-align: center; }
+.fc-left { margin: 12px 0 0; font: 600 0.875rem/1.3 var(--font-display); color: var(--ink-soft); }
+.fc-done h2, .q-done h2 { margin: 24px 0 8px; font-size: var(--step-2); }
+.q-sentence { margin: 8px 0 18px; font: 500 var(--step-2)/1.55 var(--font-display); }
+.q-blank { display: inline-block; min-width: 5em; padding: 0 6px; border-bottom: 3px solid var(--sky); text-align: center; font-weight: 800; }
+.q-blank.is-filled { border-bottom-color: var(--leaf); color: var(--leaf-deep); }
+.q-options { display: grid; gap: 10px; margin: 0 0 14px; }
+.q-opt {
+  min-height: 52px; padding: 10px 14px; border: 1px solid var(--rule-strong); border-radius: 12px; background: var(--paper); color: var(--ink);
+  font: 600 1rem/1.3 var(--font-display); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-fast) var(--ease-colour), transform 0.45s var(--spring);
+}
+.q-opt:active:not(:disabled) { transform: scale(0.98); transition-duration: 70ms; }
+@media (hover: hover) { .q-opt:hover:not(:disabled) { background: var(--chest); } }
+.q-opt.is-right { background: var(--chest); border-color: var(--leaf); }
+.q-opt.is-wrong { opacity: 0.55; text-decoration: line-through; }
+.q-feedback { min-height: 3em; }
+.q-ok { margin: 0 0 6px; font: 800 1.0625rem/1.3 var(--font-display); color: var(--leaf-deep); }
+.q-hint, .q-note { margin: 0 0 8px; }
+.q-stars { margin: 4px 0 8px; font-size: 2rem; letter-spacing: 0.1em; color: var(--leaf-deep); }
+@media (prefers-reduced-motion: reduce) { .fc-inner { transition: none; } .q-opt { transition: none; } }
+html[data-lite] .fc-inner { transition-duration: 0.2s; }
