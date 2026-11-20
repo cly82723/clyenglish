@@ -357,3 +357,26 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
 /* without scripts the lesson and the answers simply show */
 .no-js [data-lesson][hidden], .no-js .opener-reveal[hidden] { display: block; }
 .no-js .opener-skip { display: none; }
+
+/* ---------- Topic tags on past questions, a second example on each sentence pattern, and the official level shares ---------- */
+
+.q-themes { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.q-theme {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 0 11px;
+  font: 600 0.8125rem/1 var(--font-display); color: var(--ink-soft); text-decoration: none;
+  background: var(--chest); border: 1px solid var(--rule-strong); border-radius: 999px;
+}
+@media (hover: hover) { .q-theme:hover { border-color: var(--ink); color: var(--ink); } }
+.themes-list { list-style: none; margin: 12px 0; padding: 0; }
+.themes-list li { padding: 10px 0; border-top: 1px solid var(--rule); }
+.themes-list li:last-child { border-bottom: 1px solid var(--rule); }
+
+.pattern-ex2 { margin-top: 6px !important; }
+.pattern-ex2 b { margin-right: 0.35em; font: 700 0.875rem/1.3 var(--font-display); color: var(--sky); }
+
+.share-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.share-table caption { text-align: left; padding: 0 0 8px; font: 600 0.9375rem/1.35 var(--font-display); color: var(--ink-soft); }
+.share-table th, .share-table td { padding: 8px 6px; text-align: right; border-bottom: 1px solid var(--rule); font-size: 0.9375rem; }
+.share-table thead th { font-weight: 700; color: var(--sky); border-bottom: 1px solid var(--ink); }
+.share-table tbody th { text-align: left; font-weight: 700; padding-left: 0; }
+@media (max-width: 760px) { .share-table th, .share-table td { padding: 8px 3px; font-size: 0.875rem; } }
