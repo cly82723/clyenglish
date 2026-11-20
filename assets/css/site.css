@@ -1308,20 +1308,22 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 /* ---------- Phone: less chrome above the first line of the guide ---------- */
 
 @media (max-width: 760px) {
-  .cover { padding-top: 12px; }
+  .cover { padding-top: 12px; row-gap: 8px; }   /* the brand and the tabs sit closer */
   .brand { gap: 12px; }
   .brand img { width: 48px; height: 48px; }
   .brand-name { font-size: 1.35rem; }
   .brand-sub { font-size: 0.875rem; margin-top: 2px; }
 
   /* the form is already named on the cover tab, so the strip is just its pages: up to three to a row, wrapping, none hidden */
-  .forms { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px var(--gutter); }
+  .forms { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px var(--gutter); }
   .forms div { display: contents; }
   .forms .form-mark { display: none; }
   .forms a {
     flex: 1 1 30%; justify-content: center; text-align: center; min-height: 44px; padding: 4px 6px;
     font-size: 0.875rem; line-height: 1.15; border-radius: 12px;
   }
+  /* four to a row where they fit (the longest word, "reminders", needs about 66px): seven links are two rows, not three */
+  @media (min-width: 360px) { .forms a { flex-basis: 22%; padding: 4px 4px; } }
 
   /* the sections wrap onto as many rows as they need, so none is cut off at the screen edge */
   .index { position: static; padding: 12px 0 10px; }
