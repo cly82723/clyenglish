@@ -8,7 +8,11 @@ const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const idsIn = (html) => new Set((html.match(/ id="([^"]+)"/g) || []).map((s) => s.slice(5, -1)));
 const GUIDES = ["part-a.html", "part-b.html", "text-types.html", "questions.html", "toolkit.html", "final.html", "cutoffs.html"];
-const pages = Object.fromEntries(GUIDES.map((f) => [f, read(f)]));
+const loaded = Object.fromEntries(GUIDES.map((f) => [f, read(f)]));
+// text-types.html is a hub: its anchors live on the six text-types-<type>.html pages, so the hub and the pages are read as one
+loaded["text-types.html"] += fs.readdirSync(root).filter((f) => /^text-types-[a-z]+[.]html$/.test(f)).map(read).join(String.fromCharCode(10));
+// any other page of the site is read when it is asked for
+const pages = new Proxy(loaded, { get: (t, k) => (k in t ? t[k] : typeof k === "string" && /[.]html$/.test(k) && fs.existsSync(path.join(root, k)) ? read(k) : undefined) });
 // the hub forwards old links (part-b.html#crei) in a script in its head: first to a step page, then to where things moved
 const hubScript = pages["part-b.html"].match(/var m=(\{.*?\}),o=(\{.*?\}),id=location/);
 const toStep = JSON.parse(hubScript[1]);
@@ -173,7 +177,7 @@ test("each text type has a Before you hand in checklist, and Part B's step pages
     assert.ok(boxes.length >= 7, type + " has too few boxes");
     for (const common of ["verbs", "words", "slips"]) assert.ok(boxes.includes("check-" + type + "-" + common), type + " is missing the " + common + " check");
     assert.ok(html.includes('id="handin-' + type + '"'), type + " has no anchor for its checklist");
-    assert.ok(pages["part-b-finish.html"].includes('text-types.html#handin-' + type), "Step 5 does not link to the " + type + " checklist");
+    assert.ok(pages["part-b-finish.html"].includes('text-types-' + type + '.html#handin-' + type), "Step 5 does not link to the " + type + " checklist");
   }
   for (const f of STEP_PAGES) assert.ok(!/class="checklist"/.test(pages[f]), f + " still has a tick-list");
 });

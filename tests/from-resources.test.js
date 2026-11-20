@@ -5,7 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const read = (f) => fs.readFileSync(path.join(__dirname, "..", f), "utf8").replace(/\r\n/g, "\n");
-const questions = read("questions.html"), text = read("text-types.html"), cutoffs = read("cutoffs.html"), words = read("toolkit-words.html");
+const questions = read("questions.html"), text = [read("text-types.html")].concat(fs.readdirSync(path.join(__dirname, "..")).filter((f) => /^text-types-[a-z]+[.]html$/.test(f)).map(read)).join(String.fromCharCode(10)), cutoffs = read("cutoffs.html"), words = read("toolkit-words.html");
 
 test("past questions: every topic tag points at a real Toolkit topic, and the summary counts what is tagged", () => {
   const ids = new Set([...words.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]));

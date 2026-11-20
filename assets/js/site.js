@@ -499,6 +499,21 @@
   document.querySelectorAll(".checklist[data-store]").forEach(initChecklist);
   swipe(document);
 
+  // A link to something inside a closed fold (text-types-letter.html#whole) opens the fold and goes there. A page of
+  // rows does this itself (initRows); a page of one topic has no rows, so this is what opens it.
+  function openFoldFor() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id && document.getElementById(id);
+    if (!el || document.querySelector("[data-rows]")) return;
+    var opened = false;
+    for (var fold = el.closest("details"); fold; fold = fold.parentElement && fold.parentElement.closest("details")) {
+      if (!fold.open) { fold.open = true; opened = true; }
+    }
+    if (opened) requestAnimationFrame(function () { el.scrollIntoView({ block: "start" }); });
+  }
+  window.addEventListener("hashchange", openFoldFor);
+  openFoldFor();
+
   // transitions wait until the page has settled, so tabs the script marks as open do not fade in on load
   requestAnimationFrame(function () { requestAnimationFrame(function () { document.documentElement.classList.remove("preload"); }); });
 })();
