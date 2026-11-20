@@ -242,3 +242,17 @@ html[data-turn="back"]::view-transition-new(sheet) {
   .opener-reveal:not([hidden]) { animation: note-in 0.45s var(--spring); }
   .step-lesson:not([hidden]) { animation: note-in 0.55s var(--spring); }
 }
+
+/* ---------- Low-end Android: the same pages, with the costly parts off ---------- */
+
+/* site.js sets data-lite on phones short of memory or CPU, or with Data Saver on. The page turn becomes a short
+   cross-fade (no 3D, no brightness filter), and nothing is blurred behind or kept on its own layer. */
+@keyframes lite-out { to { opacity: 0; } }
+@keyframes lite-in { from { opacity: 0; } }
+html[data-lite]::view-transition-old(sheet) { animation: lite-out 0.2s ease-out both; z-index: 1; }
+html[data-lite]::view-transition-new(sheet) { animation: lite-in 0.2s ease-out both; z-index: 0; }
+html[data-lite][data-turn="back"]::view-transition-old(sheet) { animation: lite-out 0.2s ease-out both; z-index: 1; }
+html[data-lite][data-turn="back"]::view-transition-new(sheet) { animation: lite-in 0.2s ease-out both; z-index: 0; }
+html[data-lite] .cover-home, html[data-lite] .sticker-toast { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-lite] .sticker-zoom::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-lite] .book, html[data-lite] .floater { will-change: auto; }

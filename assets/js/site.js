@@ -4,6 +4,20 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* ---------- Lighter on a phone that is short of memory or CPU, or has Data Saver on ---------- */
+  // lite:start
+  // The page turn, the blurred bars and the layers kept for the drifting stickers are the costly parts. On Android
+  // phones short of memory (Chrome reports it), with Data Saver on, or with few cores and a touch screen, motion.css
+  // swaps the turn for a plain cross-fade and drops the blur. The pages and every control are the same.
+  function lowEnd(nav, coarse) {
+    var c = nav.connection;
+    if (c && c.saveData) return true;
+    if (nav.deviceMemory && nav.deviceMemory <= 2) return true;
+    return !!(coarse && nav.hardwareConcurrency && nav.hardwareConcurrency <= 4);
+  }
+  // lite:end
+  if (lowEnd(navigator, window.matchMedia("(pointer: coarse)").matches)) document.documentElement.setAttribute("data-lite", "");
+
   /* ---------- Scroll edge: a bar that content scrolls under shows its edge only once content is under it ---------- */
   var edgeOn = false;
   function edge() {
