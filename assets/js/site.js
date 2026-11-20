@@ -110,7 +110,7 @@
       return a;
     }
 
-    // an id names a section, or a part inside one (grammar.html#matrix opens Tenses at the Tense Matrix)
+    // an id names a section, or a part inside one (s4-tenses.html#matrix opens Tenses at the Tense Matrix)
     function sectionOf(id) {
       var el = id && document.getElementById(id);
       return el ? sections.filter(function (s) { return s === el || s.contains(el); })[0] : null;
