@@ -32,7 +32,7 @@ test("S.3 grammar: all eleven topics have an opener and a closing question", () 
     assert.strictEqual(more.length, 0, key + " has more than two openers");
     assert.ok(/data-gates/.test(open.attrs) && !/data-step-done/.test(open.attrs), key + ": the first opener must hold the lesson back");
     assert.ok(/data-step-done/.test(close.attrs) && close.attrs.includes('data-step-id="' + key + '"'), key + ": the closing question must tick this topic");
-    assert.ok(row.indexOf(open.id) < row.indexOf('class="topic-lesson"') && row.indexOf('class="topic-lesson"') < row.indexOf(close.id), key + ": order is opener, lesson, closing question");
+    assert.ok(row.indexOf(open.id) < row.indexOf('class="topic-lesson ') && row.indexOf('class="topic-lesson ') < row.indexOf(close.id), key + ": order is opener, lesson, closing question");
   }
 });
 
