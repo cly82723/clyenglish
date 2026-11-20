@@ -391,3 +391,8 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
 .topics-done[hidden] { display: none; }
 .topic-lesson[hidden] { display: none; }
 .topic-lesson > .why { margin: 4px 0 20px; }
+
+/* ---------- A lesson's picture and "when to use it" sit behind a tap ---------- */
+
+.lesson-fold { margin: 12px 0; max-width: none; }
+.lesson-fold > div > h3:first-child { margin-top: 4px; }

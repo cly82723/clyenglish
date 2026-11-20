@@ -559,27 +559,22 @@
       })))));
     if (lesson.spelling) root.appendChild(h("div", null, h("p", { class: "field-label" }, "Spelling the -ing form"), h("ul", null, lesson.spelling.map(function (sp) { return h("li", null, sp); }))));
 
-    if (lesson.visual) {
-      root.appendChild(h("h3", null, lesson.visualTitle));
-      root.appendChild(h("div", null, VISUALS[lesson.visual]()));
-    }
+    // A lesson is short by default: the form, the common mistakes and the one tip. The picture and the longer
+    // "when to use it" (with its comparison) are one tap away, so a weaker student is not met by five screens.
+    var picture = [];
+    if (lesson.visual) picture.push(h("h3", null, lesson.visualTitle), h("div", null, VISUALS[lesson.visual]()));
+    if (lesson.extra) picture.push(h("h3", null, lesson.extraTitle), h("div", null, VISUALS[lesson.extra]()));
+    if (picture.length) root.appendChild(h("details", { class: "why lesson-fold" }, h("summary", null, "See a picture of it"), h("div", null, picture)));
 
-    root.appendChild(h("h3", null, "When to use it"));
-    root.appendChild(h("ol", { class: "lesson-functions" }, lesson.functions.map(function (f) {
+    var uses = [h("ol", { class: "lesson-functions" }, lesson.functions.map(function (f) {
       return h("li", null, h("strong", null, f.title), h("p", null, f.text), h("ul", null, f.examples.map(function (ex) { return h("li", null, bold(ex)); })));
-    })));
-
-    if (lesson.extra) {
-      root.appendChild(h("h3", null, lesson.extraTitle));
-      root.appendChild(h("div", null, VISUALS[lesson.extra]()));
-    }
+    }))];
     if (lesson.compare) {
-      root.appendChild(h("h3", null, lesson.compare.title));
-      root.appendChild(h("p", null, lesson.compare.text));
-      root.appendChild(h("div", { class: "compare" }, lesson.compare.rows.map(function (r) {
+      uses.push(h("h3", null, lesson.compare.title), h("p", null, lesson.compare.text), h("div", { class: "compare" }, lesson.compare.rows.map(function (r) {
         return h("div", null, h("p", { class: "field-label" }, r[0]), h("p", null, bold(r[1])), h("p", { class: "note-line" }, r[2]));
       })));
     }
+    root.appendChild(h("details", { class: "why lesson-fold" }, h("summary", null, "When to use it"), h("div", null, uses)));
 
     root.appendChild(h("h3", null, "Common mistakes: spot the error"));
     root.appendChild(h("ul", { class: "spot" }, lesson.mistakes.map(function (m) {
