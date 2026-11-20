@@ -120,7 +120,7 @@
   if (stepId) {
     var kicker = document.querySelector(".row-kicker");
     var page = location.pathname.split("/").pop() || "";
-    var name = kicker ? kicker.textContent : "";
+    var name = main.getAttribute("data-resume") || (kicker ? kicker.textContent : "");   // a topic page names itself, its kicker is only the unit
     var label = GUIDE ? (name.indexOf(GUIDE) === 0 ? name : GUIDE + " › " + name) : "Part B › " + name;
     try { localStorage.setItem("cly:last", JSON.stringify({ href: page, label: label })); } catch (e) { /* home simply shows no "Continue" */ }
     // the "Step by step" badge counts Part B's steps only

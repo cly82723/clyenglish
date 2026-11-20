@@ -323,7 +323,7 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
 .step-back a::before { content: "\2190\00a0"; }
 .step-page > .row-kicker { margin: 0 0 4px; }
 .step-page > .title { margin-top: 0; }
-@media (min-width: 761px) { .step-lesson.row-body { padding-left: 0; } }
+@media (min-width: 761px) { .step-lesson.row-body, .topic-lesson.row-body { padding-left: 0; } }
 
 /* ---------- The opener: one "which is stronger?" question ---------- */
 .opener { margin: 20px 0 28px; max-width: 68ch; padding: 16px; border: 1.5px solid var(--ink); border-radius: 14px; background: var(--paper); }

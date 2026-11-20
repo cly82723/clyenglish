@@ -10,7 +10,7 @@ const motionCss = read("assets", "css", "motion.css");
 const motionJs = read("assets", "js", "motion.js");
 
 // The hub rows wait (hidden) only once motion.js is watching them, so a page without the script never hides anything.
-const HUBS = ["part-a.html", "part-b.html", "toolkit.html", "s3-grammar.html"];
+const HUBS = ["junior.html", "senior.html", "part-a.html", "part-b.html", "toolkit.html", "s3-grammar.html"];
 
 test("hub rows arrive one after another, only where motion is welcome", () => {
   const block = motionCss.slice(motionCss.indexOf("Hub rows arrive"));
@@ -25,7 +25,6 @@ test("motion.js watches the hub rows, skips reduced motion, and never leaves a r
   const code = motionJs.slice(motionJs.indexOf("Hub rows arrive"));
   assert.ok(code.length > 100, "no 'Hub rows arrive' section in motion.js");
   assert.ok(/\.steps \.step-link/.test(code), "Part A, Part B and Toolkit rows are not watched");
-  assert.ok(/details\.row\[data-topic\]/.test(code), "S.3 topic rows are not watched");
   assert.ok(/prefers-reduced-motion: reduce/.test(code), "reduced motion is not checked");
   assert.ok(/setTimeout/.test(code), "no safety net if the observer never fires");
 });

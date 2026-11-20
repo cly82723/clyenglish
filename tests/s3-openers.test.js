@@ -6,7 +6,9 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const root = path.join(__dirname, "..");
-const page = fs.readFileSync(path.join(root, "s3-grammar.html"), "utf8").replace(/\r\n/g, "\n");
+const S3P = require("./s3-pages.js");
+const pages = Object.fromEntries(S3P.files.map((f) => [f, S3P.read(f).split(String.fromCharCode(13, 10)).join(String.fromCharCode(10))]));
+const page = Object.values(pages).join(String.fromCharCode(10));
 const ctx = { window: {} };
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(root, "assets", "js", "data", "s3-grammar-data.js"), "utf8"), ctx);
@@ -16,9 +18,9 @@ const unescape = (s) => s.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(
 
 // every topic row, keyed by its data-topic
 const rows = {};
-for (const m of page.matchAll(/<details class="row" id="([a-z-]+)" name="rows" data-topic="([A-Za-z]+)">/g)) {
-  const end = page.indexOf(String.fromCharCode(10) + "    </details>", m.index);
-  rows[m[2]] = page.slice(m.index, end);
+for (const html of Object.values(pages)) {
+  const m = html.match(/<main [^>]*data-step="([A-Za-z]+)"[^>]*>/);
+  if (m) rows[m[1]] = html.slice(m.index, html.indexOf("</main>", m.index));
 }
 const buttons = (section) => [...section.matchAll(/<button type="button" class="opener-choice"( data-ok)? data-tag="([^"]*)">([^<]*)<[/]button>/g)].map((b) => ({ ok: !!b[1], tag: b[2], text: unescape(b[3]) }));
 const openers = (row) => [...row.matchAll(/<section class="opener"[^>]*data-opener="([^"]+)"[^>]*>([^]*?)<[/]section>/g)].map((s) => ({ id: s[1], attrs: s[0].slice(0, s[0].indexOf(">")), html: s[2] }));
@@ -30,7 +32,7 @@ test("S.3 grammar: all eleven topics have an opener and a closing question", () 
     assert.strictEqual(more.length, 0, key + " has more than two openers");
     assert.ok(/data-gates/.test(open.attrs) && !/data-step-done/.test(open.attrs), key + ": the first opener must hold the lesson back");
     assert.ok(/data-step-done/.test(close.attrs) && close.attrs.includes('data-step-id="' + key + '"'), key + ": the closing question must tick this topic");
-    assert.ok(row.indexOf(open.id) < row.indexOf('class="topic-lesson"') && row.indexOf('class="topic-lesson"') < row.indexOf(close.id), key + ": order is opener, lesson, closing question");
+    assert.ok(row.indexOf(open.id) < row.indexOf('class="topic-lesson ') && row.indexOf('class="topic-lesson ') < row.indexOf(close.id), key + ": order is opener, lesson, closing question");
   }
 });
 
@@ -61,14 +63,17 @@ test("the rules are behind a tap and the quiz is not, and every old anchor still
     assert.ok(!fold.includes("s3quiz"), key + ": the quiz is hidden in the fold");
     assert.ok(row.includes('id="' + lessons[key].practice.id + '"') , key + ": the quiz anchor is gone");
     assert.ok(row.includes("-rules\""), key + ": the rules anchor is gone");
-    assert.ok(/<span class="row-sub">[^<]{5,}<[/]span>/.test(row), key + ": no plain name under the title");
+    assert.ok(/<p class="lead">[^<]{5,}<[/]p>/.test(row), key + ": no plain name under the title");
+    assert.ok(new RegExp('data-step-link="' + key + '"[^]*?class="row-sub">[^<]{5,}<').test(pages["s3-grammar.html"]), key + ": the hub row has no plain name");
   }
 });
 
 test("the page keeps its ticks on the device and loads the scripts that draw them", () => {
-  assert.ok(page.includes('data-done-key="cly:s3-done"'));
-  assert.ok(page.includes("data-topics-done"));
-  assert.ok(page.includes('<script src="assets/js/opener.js"></script>') && page.includes('<script src="assets/js/topic-ticks.js"></script>'));
+  assert.ok(pages["s3-grammar.html"].includes("data-topics-done") && pages["s3-grammar.html"].includes('<script src="assets/js/topic-ticks.js"></script>'));
+  for (const [file, html] of Object.entries(pages)) {
+    if (!/<main [^>]*data-step=/.test(html)) continue;
+    assert.ok(html.includes('data-done-key="cly:s3-done"') && html.includes('<script src="assets/js/opener.js"></script>'), file + " does not keep its tick");
+  }
   const ids = [...page.matchAll(/data-opener="([^"]+)"/g)].map((m) => m[1]);
   assert.strictEqual(new Set(ids).size, ids.length, "an opener id is repeated");
   assert.strictEqual(ids.length, 22);

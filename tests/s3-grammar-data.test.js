@@ -1,4 +1,4 @@
-// Checks the S.3 grammar content is self-consistent and every link it makes lands on s3-grammar.html.
+// Checks the S.3 grammar content is self-consistent and every link it makes lands on a page of the S.3 section.
 // Run with: node --test tests/
 const test = require("node:test");
 const assert = require("node:assert");
@@ -11,7 +11,8 @@ const window = {};
 vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/data/grammar-data.js"), "utf8") + "\n" +
   fs.readFileSync(path.join(root, "assets/js/data/s3-grammar-data.js"), "utf8"), { window });
 const G = window.CLY_GRAMMAR, S3 = window.CLY_S3_GRAMMAR;
-const html = fs.readFileSync(path.join(root, "s3-grammar.html"), "utf8");
+const S3P = require("./s3-pages.js");
+const html = S3P.all;
 const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
 const sets = new Set([...html.matchAll(/data-set="([^"]+)"/g)].map(m => m[1]));
 
@@ -36,7 +37,7 @@ test("quiz questions have four different options and a valid answer, hint and ex
 });
 
 test("nothing on the S.3 page teaches or tests 'unless'", () => {
-  ["s3-grammar.html", "assets/js/s3-grammar.js", "assets/js/data/s3-grammar-data.js", "assets/js/data/s3-consolidation-data.js"].forEach(f =>
+  [...S3P.files, "assets/js/s3-grammar.js", "assets/js/data/s3-grammar-data.js", "assets/js/data/s3-consolidation-data.js"].forEach(f =>
     assert.ok(!/\bunless\b/i.test(fs.readFileSync(path.join(root, f), "utf8")), f));
 });
 

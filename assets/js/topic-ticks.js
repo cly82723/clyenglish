@@ -1,36 +1,20 @@
-/* CLY English: S.3 grammar. A topic row gets a tick once its closing question is answered, and the top of the page
-   counts them. Kept on this device only (opener.js writes cly:s3-done); no sign-in, no points. */
+/* CLY English: S.3 grammar hub. Each topic's tick is drawn by partb-hub.js from cly:s3-done (opener.js writes it when a
+   topic's closing question is answered); this counts them at the top of the page. Kept on this device only; no sign-in,
+   no points. */
 (function () {
   "use strict";
   var KEY = "cly:s3-done";
-  var rows = Array.prototype.slice.call(document.querySelectorAll("details.row[data-topic]"));
+  var rows = Array.prototype.slice.call(document.querySelectorAll("[data-step-link]"));
   var count = document.querySelector("[data-topics-done]");
+  if (!count || !rows.length) return;
 
-  function done() {
-    try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; }
-  }
   function draw() {
-    var d = done(), n = 0;
-    rows.forEach(function (row) {
-      var finished = d.indexOf(row.getAttribute("data-topic")) >= 0;
-      if (finished) n++;
-      row.classList.toggle("is-done", finished);
-      var head = row.querySelector(".row-head"), note = head.querySelector(".row-done");
-      if (finished && !note) {
-        note = document.createElement("span");
-        note.className = "row-done";
-        note.textContent = "Done";
-        head.appendChild(note);
-      } else if (!finished && note) {
-        note.remove();
-      }
-    });
-    if (count) {
-      count.textContent = n + " of " + rows.length + " topics done";
-      count.hidden = false;
-    }
+    var done = [];
+    try { done = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { done = []; }
+    var n = rows.filter(function (row) { return done.indexOf(row.getAttribute("data-step-link")) >= 0; }).length;
+    count.textContent = n + " of " + rows.length + " topics done";
+    count.hidden = false;
   }
-  document.addEventListener("cly:step-done", draw);
   window.addEventListener("pageshow", draw);
   draw();
 })();

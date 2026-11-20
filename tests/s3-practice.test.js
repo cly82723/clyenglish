@@ -12,7 +12,7 @@ const window = {};
 vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/word-box.js"), "utf8") + "\n" +
   fs.readFileSync(path.join(root, "assets/js/data/s3-practice-data.js"), "utf8"), { window });
 const W = window.CLY_WORD_BOX, sets = window.CLY_S3_PRACTICE;
-const html = fs.readFileSync(path.join(root, "s3-grammar.html"), "utf8");
+const html = require("./s3-pages.js").all;
 const asCloze = set => Object.assign({ format: "cloze", title: set.title }, set);
 
 test("every listed answer is right, in the page's marking and the web app's", () => {
@@ -49,6 +49,6 @@ test("each set follows the league's rules", () => {
 
 test("nothing is in the league's indefinite pronoun group, and the page links to the practice", () => {
   assert.ok(W.RANGES["Indefinite pronouns"].words.includes("nothing"));
-  assert.ok(/id="practice-cloze"/.test(html) && /id="tenses"/.test(html) && /data-grammar="s3practice"/.test(html));
+  assert.ok(fs.existsSync(path.join(root, "s3-practice-cloze.html")) && fs.existsSync(path.join(root, "s3-tenses.html")) && /data-grammar="s3practice"/.test(html));
   ["assets/js/word-box.js", "assets/js/data/s3-practice-data.js"].forEach(f => assert.ok(html.includes(f), f));
 });
