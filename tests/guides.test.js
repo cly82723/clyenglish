@@ -17,6 +17,9 @@ const STEP_PAGES = ["part-b-choose.html", "part-b-content.html", "part-b-organis
 for (const f of STEP_PAGES) pages[f] = read(f);
 // the Toolkit hub forwards old links (toolkit.html#linking, #vocab-education) the same way
 const toolkitMap = JSON.parse(pages["toolkit.html"].match(/var m=(\{.*?\}),id=location/)[1]);
+const partAMap = JSON.parse(pages["part-a.html"].match(/var m=(\{.*?\}),id=location/)[1]);
+const PART_A_SKILLS = ["part-a-read.html", "part-a-formats.html", "part-a-plan.html", "part-a-opening.html"];
+for (const f of PART_A_SKILLS) pages[f] = read(f);
 const TOOLKIT_SKILLS = ["toolkit-openings.html", "toolkit-linking.html", "toolkit-vocabulary.html", "toolkit-variety.html"];
 for (const f of [...TOOLKIT_SKILLS, "toolkit-words.html"]) pages[f] = read(f);
 
@@ -133,12 +136,27 @@ test("the Toolkit is a hub of five pages, and every old Toolkit link goes on to 
   }
 });
 
+test("Part A is a hub of four skill pages, each with an opener and a closing question, and old links go on to where their content is", () => {
+  const links = [...pages["part-a.html"].matchAll(/<a class="row step-link" id="go-([^"]+)" href="([^"]+)"/g)];
+  assert.deepStrictEqual(links.map((m) => m[2]), PART_A_SKILLS);
+  for (const file of PART_A_SKILLS) {
+    assert.ok(/<section class="opener" data-gates/.test(pages[file]), file + " starts without a concept-check");
+    assert.ok(/<section class="opener" data-step-done/.test(pages[file]), file + " has no closing question");
+  }
+  for (const [id, target] of Object.entries(partAMap)) {
+    const [file, hash] = target.split("#");
+    assert.ok(pages[file], id + " goes to an unknown page " + file);
+    if (hash) assert.ok(idsIn(pages[file]).has(hash), id + " goes to " + target + ", which is not there");
+  }
+  assert.ok(partAMap.formats && partAMap.check && partAMap.ladder, "an old Part A row has no forward");
+});
+
 test("no link on the site points at a part of a guide that is not there", () => {
   const files = ["index.html", "self-study.html", "grammar.html", "s3-grammar.html", "challenge.html", "s3-challenge.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"];
   for (const file of files) {
     for (const m of read(file).matchAll(/(part-a|part-b|text-types|questions|cutoffs|toolkit|final)\.html#([A-Za-z0-9-]+)/g)) {
       const target = m[1] + ".html";
-      assert.ok(idsIn(pages[target]).has(m[2]) || (target === "part-b.html" && (moved[m[2]] || toStep[m[2]])) || (target === "toolkit.html" && toolkitMap[m[2]]), file + " links to " + m[0] + ", which is not there");
+      assert.ok(idsIn(pages[target]).has(m[2]) || (target === "part-b.html" && (moved[m[2]] || toStep[m[2]])) || (target === "toolkit.html" && toolkitMap[m[2]]) || (target === "part-a.html" && partAMap[m[2]]), file + " links to " + m[0] + ", which is not there");
     }
   }
 });
