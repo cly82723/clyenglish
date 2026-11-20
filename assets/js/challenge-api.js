@@ -10,7 +10,7 @@
     form: "S.4",
     webApp: "https://script.google.com/macros/s/AKfycbyISXddli7FK0eppikCORtBaRSd4LWmBWVu3bUakmInmqZ52-Gf7AMS9WSCX88-Q9Lv/exec",
     tokenKey: "cly:league-token",
-    practiceHref: "grammar.html#practice",
+    practiceHref: "s4-practice.html",
     practiceNote: "While you wait, practise the same kind of paper with hints and instant marking.",
     boxLabel: "Verb box",
     boxHelp: "Tap a verb to cross it off once you've used it. Lost the box? Tap “Box” at the top.",
