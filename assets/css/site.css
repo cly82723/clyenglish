@@ -962,17 +962,17 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 }
 
 /* Press feedback: every control gives a little under the finger, then springs back quickly */
-.tabs a, .btn, .btn-quiet, .reset, .chip, .ok-btn, .step-btn, .cell, .letter, .choice, .forms a, .directory a, .row-next a, .swap-choice {
+.tabs a, .btn, .btn-quiet, .reset, .chip, .ok-btn, .step-btn, .cell, .letter, .choice, .directory a, .row-next a, .swap-choice {
   transition: background-color var(--dur-fast) var(--ease-colour), border-color var(--dur-fast) var(--ease-colour), color var(--dur-fast) var(--ease-colour), transform 0.45s var(--spring);
 }
 .tabs a:active, .btn:active:not(:disabled), .btn-quiet:active:not(:disabled), .reset:active,
 .chip:active:not(:disabled), .ok-btn:active:not(:disabled), .step-btn:active:not(:disabled),
-.cell:active, .letter:active:not(:disabled), .forms a:active, .directory a:active { transform: scale(0.97); }
+.cell:active, .letter:active:not(:disabled), .directory a:active { transform: scale(0.97); }
 .choice:active:not(:disabled), .row-next a:active, .swap-choice:active:not(:disabled) { transform: scale(0.98); } /* wide rows give less, or they look like they lurch */
-.tabs a:active, .btn:active, .btn-quiet:active, .reset:active, .chip:active, .ok-btn:active, .step-btn:active, .cell:active, .letter:active, .choice:active, .forms a:active, .directory a:active, .row-next a:active, .swap-choice:active { transition-duration: 70ms; transition-timing-function: ease-out; } /* in at once; out on a spring */
+.tabs a:active, .btn:active, .btn-quiet:active, .reset:active, .chip:active, .ok-btn:active, .step-btn:active, .cell:active, .letter:active, .choice:active, .directory a:active, .row-next a:active, .swap-choice:active { transition-duration: 70ms; transition-timing-function: ease-out; } /* in at once; out on a spring */
 @media (prefers-reduced-motion: reduce) {
   .tabs a:active, .btn:active, .btn-quiet:active, .reset:active, .chip:active, .ok-btn:active,
-  .step-btn:active, .cell:active, .letter:active, .choice:active, .forms a:active, .directory a:active,
+  .step-btn:active, .cell:active, .letter:active, .choice:active, .directory a:active,
   .row-next a:active, .swap-choice:active { transform: none; }
 }
 
@@ -1038,22 +1038,18 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 /* a page with no contents column (vocab: its forms are the cover tabs) */
 .sheet.solo { grid-template-columns: minmax(0, 1fr); max-width: 1040px; }
 
-/* Every form has this strip: the pages of the form whose cover tab is open. S.5 & S.6 share one tab, so their strip names both. */
-.forms {
+/* The breadcrumb under the cover tabs: where this page sits, one tap from each level above it. */
+.crumbs {
   grid-column: 1 / -1;
-  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 32px;
-  padding: 14px var(--gutter);
+  padding: 10px var(--gutter);
   background: var(--chest); border-bottom: 1px solid var(--ink);
+  font: 600 0.9375rem/1.3 var(--font-display);
 }
-.forms div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.forms .form-mark { margin-right: 6px; }
-.forms a {
-  display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px;
-  font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
-  background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 999px;
-}
-@media (hover: hover) { .forms a:hover { border-color: var(--ink); } }
-.forms a[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin: 0; padding: 0; list-style: none; }
+.crumbs li + li::before { content: "›"; margin-right: 8px; color: var(--ink-soft); }
+.crumbs a { display: inline-flex; align-items: center; min-height: 32px; color: var(--sky); text-decoration: none; }
+@media (hover: hover) { .crumbs a:hover { text-decoration: underline; text-underline-offset: 0.2em; } }
+.crumbs [aria-current="page"] { color: var(--ink); }
 
 /* ---------- Two versions: the weak and the strong line under the practice, with CLY's one-line note ---------- */
 
@@ -1162,7 +1158,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 .directory > h2 { font-size: var(--step-3); margin: 0 0 18px; }
 .directory ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
 .directory li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
-.directory .form-mark { width: 3.6em; margin-right: 6px; }
+.directory .form-mark { width: 5em; margin-right: 6px; }
 .directory li a {
   display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
   font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
@@ -1242,8 +1238,6 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   }
 
   .sheet { display: block; box-shadow: none; }
-  .forms { gap: 10px 20px; padding: 12px var(--gutter); }
-  .forms a { padding: 0 14px; }
   .index {
     border-right: 0; border-bottom: 1px solid var(--rule);
     padding: 14px 0 12px;
@@ -1316,16 +1310,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
   .brand-name { font-size: 1.35rem; }
   .brand-sub { font-size: 0.875rem; margin-top: 2px; }
 
-  /* the form is already named on the cover tab, so the strip is just its pages: up to three to a row, wrapping, none hidden */
-  .forms { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px var(--gutter); }
-  .forms div { display: contents; }
-  .forms .form-mark { display: none; }
-  .forms a {
-    flex: 1 1 30%; justify-content: center; text-align: center; min-height: 44px; padding: 4px 6px;
-    font-size: 0.875rem; line-height: 1.15; border-radius: 12px;
-  }
-  /* four to a row where they fit (the longest word, "reminders", needs about 66px): seven links are two rows, not three */
-  @media (min-width: 360px) { .forms a { flex-basis: 22%; padding: 4px 4px; } }
+  .crumbs { padding: 8px var(--gutter); }
 
   /* the sections wrap onto as many rows as they need, so none is cut off at the screen edge */
   .index { position: static; padding: 12px 0 10px; }
@@ -1344,7 +1329,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 /* ---------- Motion details ---------- */
 
 /* tabs the script marks as open on load take their colour at once, not in a fade */
-.preload .tabs a, .preload .forms a { transition: none; }
+.preload .tabs a { transition: none; }
 
 /* the climb: each step is seen often in one sitting, so it rises quickly and the highlighter draws briskly */
 .levelup mark.swipe { transition-duration: 0.4s; }
@@ -1852,12 +1837,3 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 /* the home page has no brand beside its tabs: the sheet below carries the name */
 .cover-home { max-width: 1040px; justify-content: flex-end; }
 .cover-home + .hub { margin-top: 0; }
-/* Self-study belongs to no form, so it sits under the list of forms */
-.directory-any { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 12px 0; border-bottom: 1px solid var(--rule); }
-.directory-any .form-mark { width: 3.6em; margin-right: 6px; }
-.directory-any a {
-  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
-  font: 600 1rem/1.2 var(--font-display); color: var(--ink); text-decoration: none;
-  background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 999px;
-}
-@media (hover: hover) { .directory-any a:hover { background: var(--chest); border-color: var(--ink); } }

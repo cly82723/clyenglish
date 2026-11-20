@@ -9,18 +9,18 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const html = read("index.html");
 const directory = html.slice(html.indexOf('<nav class="directory"'), html.indexOf("</nav>", html.indexOf('<nav class="directory"')));
 
-test("the home directory is one plain list of S.3 to S.6, with no track headings", () => {
-  const forms = [...directory.matchAll(/class="form-mark">(S\.\d)</g)].map((m) => m[1]);
-  assert.deepStrictEqual(forms, ["S.3", "S.4", "S.5", "S.6"]);
+test("the home directory is two doors, Junior and Senior, with no track headings", () => {
+  const forms = [...directory.matchAll(/class="form-mark">([A-Za-z.0-9]+)</g)].map((m) => m[1]);
+  assert.deepStrictEqual(forms, ["Junior", "Senior"]);
   assert.ok(!/<h3|class="tracks"/.test(directory), "track headings or columns are still there");
+  assert.ok(directory.includes('href="junior.html"') && directory.includes('href="senior.html"'));
 });
 
-test("every directory link says which form it belongs to, for screen readers", () => {
-  for (const row of directory.match(/<li>.*?<\/li>/g)) {
-    const form = row.match(/class="form-mark">(S\.\d)</)[1];
-    for (const link of row.match(/<a [^>]*>[^<]*<\/a>/g)) {
-      const text = link.match(/>([^<]*)</)[1];
-      assert.ok(link.includes('aria-label="' + form + " " + text + '"'), "no form in: " + link);
+test("every directory link names its level in its label, for screen readers", () => {
+  for (const row of directory.match(/<li>.*?<[/]li>/g)) {
+    const level = row.match(/class="form-mark">([A-Za-z]+)</)[1];
+    for (const link of row.match(/<a [^>]*>[^<]*<[/]a>/g)) {
+      assert.ok(link.includes('aria-label="' + level + " secondary"), "no level in: " + link);
     }
   }
 });
