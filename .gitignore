@@ -1,3 +1,22 @@
 ﻿.claude/
 .impeccable/
 images/image_1792159441498114.png
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
+
+# AI tool installs and their lock file: not part of the site
+.agents/
+.codex/
+.taste-skill/
+skills-lock.json
+
+# Teaching material kept for reference: large, and not the site's own
+grammar reference/
+
+# Large pictures the site does not use
+images/07905b16e08767c9cc4719f0266b004b.jpg
+images/20250903210150_3b3ded43c00a4ef1e03bc247a437e7eb.jpg
+images/599c2b2c96296dd3aa4b147e20b53520.jpg
+images/bc19a80616467b494dca539a33625d9c.jpg
+images/s88.png
+images/brand/cly_fox_refined_logo_v11.png
