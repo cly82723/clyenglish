@@ -7,7 +7,6 @@
   "use strict";
 
   var PREFIX = "cly:opener:";
-  var DONE_KEY = "cly:partb-done";
 
   function load(key) {
     try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
@@ -18,6 +17,9 @@
 
   var main = document.querySelector("main[data-step]");
   var stepId = main ? main.getAttribute("data-step") : "";
+  // Part B is the default guide; the Toolkit pages name themselves and keep their own ticks
+  var GUIDE = (main && main.getAttribute("data-guide")) || "";
+  var DONE_KEY = (main && main.getAttribute("data-done-key")) || "cly:partb-done";
   var lesson = document.querySelector("[data-lesson]");
 
   function unlock() {
@@ -101,9 +103,14 @@
   if (stepId) {
     var kicker = document.querySelector(".row-kicker");
     var page = location.pathname.split("/").pop() || "";
-    try { localStorage.setItem("cly:last", JSON.stringify({ href: page, label: "Part B › " + (kicker ? kicker.textContent : "") })); } catch (e) { /* home simply shows no "Continue" */ }
-    // stickers.js loads after this file, so the event waits until every script on the page has run
-    var announce = function () { document.dispatchEvent(new CustomEvent("cly:read", { detail: { page: "part-b.html", id: stepId } })); };
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", announce); else announce();
+    var name = kicker ? kicker.textContent : "";
+    var label = GUIDE ? (name.indexOf(GUIDE) === 0 ? name : GUIDE + " › " + name) : "Part B › " + name;
+    try { localStorage.setItem("cly:last", JSON.stringify({ href: page, label: label })); } catch (e) { /* home simply shows no "Continue" */ }
+    // the "Step by step" badge counts Part B's steps only
+    if (!GUIDE) {
+      // stickers.js loads after this file, so the event waits until every script on the page has run
+      var announce = function () { document.dispatchEvent(new CustomEvent("cly:read", { detail: { page: "part-b.html", id: stepId } })); };
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", announce); else announce();
+    }
   }
 })();
