@@ -460,7 +460,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .summary div { padding: 14px 18px 14px 0; }
 .summary div + div { padding-left: 18px; border-left: 1px solid var(--rule); }
 .summary dt { font: 700 var(--step--1)/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sky); margin-bottom: 6px; }
-.summary dd { margin: 0; font-weight: 700; }
+.summary dd { margin: 0; font-weight: 600; }
 
 /* prev / next */
 .pager {
@@ -1005,6 +1005,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   .stack tr { padding: 12px 16px; border-bottom: 1px solid var(--rule); }
   .stack tbody tr:last-child { border-bottom: 0; }
   .stack th, .stack td { padding: 2px 0; border: 0; }
+  .stack th { font-weight: 600; font-size: 0.9375rem; color: var(--ink-soft); }
   .stack td + td { margin-top: 4px; }
   .passage { padding: 16px; line-height: 2.4; }
   .blank input { width: 8.5em; }
@@ -1441,16 +1442,16 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .words p, .patterns-list p { margin: 0; }
 .word-head { font-family: var(--font-display); }
 .word-head b { font-size: var(--step-1); margin-right: 8px; }
-.word-head span { color: var(--ink-soft); font-weight: 600; }
+.word-head span { color: var(--ink-soft); font-weight: 400; }
 .word-ex, .pattern-ex { margin-top: 4px !important; }
-.word-ex strong { background: var(--chest); padding: 0 3px; border-radius: 4px; }
-.word-up { margin-top: 8px !important; font-family: var(--font-display); font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.word-ex strong { background: var(--chest); padding: 0 3px; border-radius: 4px; font-weight: 600; }
+.word-up { margin-top: 8px !important; font-family: var(--font-display); font-weight: 400; color: var(--ink-soft); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .word-up .lv { height: 26px; min-width: 26px; font-size: 0.875rem; }
 .word-up s { text-decoration-color: var(--avoid); text-decoration-thickness: 2px; color: var(--ink-soft); }
 .word-up .to { color: var(--ink-soft); }
 .from-real {
   display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px;
-  font: 600 0.875rem/1.5 var(--font-display); color: var(--ink) !important; background: var(--highlight);
+  font: 600 0.8125rem/1.5 var(--font-display); color: var(--ink-soft) !important; background: none; border: 1px solid var(--edge);
 }
 .pattern { font: 700 var(--step-1)/1.35 var(--font-display); }
 .pattern-note { margin-top: 4px !important; color: var(--ink-soft); font-size: 1rem; }
