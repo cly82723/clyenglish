@@ -56,12 +56,15 @@
         var tag = document.createElement("span");
         tag.className = "opener-tag";
         var name = c.getAttribute("data-tag");
-        tag.textContent = name + (c.hasAttribute("data-ok") && !/stronger|bigger/i.test(name) ? " · stronger" : "");
+        tag.textContent = name + (c.hasAttribute("data-ok") && !/stronger|bigger|correct/i.test(name) ? " · stronger" : "");
         c.insertBefore(tag, c.firstChild);
         c.classList.toggle("is-stronger", c.hasAttribute("data-ok"));
         c.classList.toggle("is-pick", c === pick);
       });
-      verdict.textContent = right ? "Yes, that is the stronger one." : "An easy one to pick. The other is stronger, and here is why.";
+      // a section can use its own words: Final lap's pairs are right and wrong, not stronger and weaker
+      verdict.textContent = right
+        ? (box.getAttribute("data-right") || "Yes, that is the stronger one.")
+        : (box.getAttribute("data-wrong") || "An easy one to pick. The other is stronger, and here is why.");
       reveal.hidden = false;
       if (skip) skip.parentNode.hidden = true;
       if (gates) unlock();

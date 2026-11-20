@@ -151,6 +151,14 @@ test("Part A is a hub of four skill pages, each with an opener and a closing que
   assert.ok(partAMap.formats && partAMap.check && partAMap.ladder, "an old Part A row has no forward");
 });
 
+test("Final lap is still one page of rows, with a concept-check at the top and a closing check at the foot", () => {
+  const html = read("final.html");
+  assert.strictEqual((html.match(/<details class="row"/g) || []).length, 5);
+  const first = html.indexOf('data-opener="final-open"'), rows = html.indexOf('<details class="row"'), last = html.indexOf('data-opener="final-close"');
+  assert.ok(first > 0 && first < rows && last > html.lastIndexOf('<details class="row"'), "openers are not at the top and the foot");
+  assert.ok(html.includes('<script src="assets/js/opener.js"></script>'));
+});
+
 test("no link on the site points at a part of a guide that is not there", () => {
   const files = ["index.html", "self-study.html", "grammar.html", "s3-grammar.html", "challenge.html", "s3-challenge.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"];
   for (const file of files) {
