@@ -63,7 +63,7 @@
 @media print {
   @page { margin: 14mm; }
   body { background: #fff; font-size: 11pt; }
-  body::before, .cover, .crumbs, .index, .pager, .back-cover, .draft-note, .print-btn, .sticker-toast, .essentials .more, .skip { display: none !important; }
+  body::before, .cover, .menu-wrap, .crumbs, .index, .pager, .back-cover, .draft-note, .print-btn, .sticker-toast, .essentials .more, .skip { display: none !important; }
   .sheet { display: block; max-width: none; box-shadow: none; min-height: 0; }
   .column { padding: 0; }
   .essentials > li { padding: 9px 0; break-inside: avoid; }
