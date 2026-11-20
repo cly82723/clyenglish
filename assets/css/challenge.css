@@ -265,15 +265,15 @@ tr.you > td { background: var(--chest); }
 
 @media (prefers-reduced-motion: no-preference) {
   .paper-back.turning::before { animation: paper-away 0.26s var(--ease-out) 0.12s forwards; }
-  @keyframes paper-away { to { transform: perspective(1400px) rotateY(88deg); } }
+  @keyframes paper-away { to { transform: perspective(1400px) rotateY(64deg); } }
   /* the face arrives in a quarter of a second: the league's clock is already running, so the turn stays short */
   .paper.turned-in { animation: paper-face 0.26s var(--ease-out); }
-  @keyframes paper-face { from { transform: perspective(1400px) rotateY(-80deg); } }
+  @keyframes paper-face { from { transform: perspective(1400px) rotateY(-58deg); } }
   .paper-back.handing::before { animation: paper-hand 0.28s var(--ease-out) forwards; }
-  @keyframes paper-hand { to { opacity: 0; transform: perspective(1400px) rotateX(64deg) translateY(-70px) scale(0.9); } }
+  @keyframes paper-hand { to { opacity: 0; transform: perspective(1400px) rotateX(30deg) translateY(-70px) scale(0.9); } }
   /* the marked sheet is turned face up (0.52s: challenge.js waits that long before the mark counts up) */
   .handed-in.returned { animation: paper-flip 0.52s var(--ease-out); transform-origin: 0 40%; }
-  @keyframes paper-flip { from { opacity: 0.2; transform: perspective(1400px) rotateY(-88deg); } 40% { opacity: 1; } }
+  @keyframes paper-flip { from { opacity: 0.2; transform: perspective(1400px) rotateY(-62deg); } 40% { opacity: 1; } }
   .returned .big-score::after { animation: pen 0.35s var(--ease-out) 1.3s both; }
 
   /* ----- Arriving as they are scrolled to (motion.js adds .waits, then .arrives; --wait staggers neighbours) -----
@@ -281,15 +281,15 @@ tr.you > td { background: var(--chest); }
 
   /* the rules are dealt onto the page, one card after another */
   .how .skeleton > li.waits { opacity: 0; }
-  .how .skeleton > li.arrives { animation: card-deal 0.34s var(--ease-out) var(--wait, 0ms) backwards; transform-origin: 50% 0; }
+  .how .skeleton > li.arrives { animation: card-deal 0.5s var(--spring) var(--wait, 0ms) backwards; transform-origin: 50% 0; }
   .how .skeleton > li.arrives:nth-child(even) { animation-name: card-deal-right; }
-  @keyframes card-deal { from { opacity: 0; transform: perspective(900px) translate(-20px, -44px) rotateX(-56deg) rotate(-5deg); } 55% { opacity: 1; } }
-  @keyframes card-deal-right { from { opacity: 0; transform: perspective(900px) translate(20px, -44px) rotateX(-56deg) rotate(5deg); } 55% { opacity: 1; } }
+  @keyframes card-deal { from { opacity: 0; transform: perspective(900px) translate(-20px, -44px) rotateX(-20deg) rotate(-5deg); } 55% { opacity: 1; } }
+  @keyframes card-deal-right { from { opacity: 0; transform: perspective(900px) translate(20px, -44px) rotateX(-20deg) rotate(5deg); } 55% { opacity: 1; } }
 
   /* the stamp card lies tilted back like a card on a desk, lifts to face the reader, and its stamps press in in turn */
-  .stamp-card.waits { opacity: 0.45; transform: perspective(800px) rotateX(44deg) scale(0.94); transform-origin: 50% 100%; }
-  .stamp-card.arrives { animation: card-lift 0.34s var(--ease-out) backwards; transform-origin: 50% 100%; }
-  @keyframes card-lift { from { opacity: 0.45; transform: perspective(800px) rotateX(44deg) scale(0.94); } }
+  .stamp-card.waits { opacity: 0.45; transform: perspective(800px) rotateX(16deg) scale(0.94); transform-origin: 50% 100%; }
+  .stamp-card.arrives { animation: card-lift 0.5s var(--spring) backwards; transform-origin: 50% 100%; }
+  @keyframes card-lift { from { opacity: 0.45; transform: perspective(800px) rotateX(16deg) scale(0.94); } }
   .stamp-card.waits .stamps li.inked { opacity: 0; }
   .stamp-card.arrives .stamps li.inked { animation: stamp 0.36s var(--ease-out) calc(0.24s + var(--n, 0) * 70ms) backwards; }
   .stamps li:nth-child(2) { --n: 1; } .stamps li:nth-child(3) { --n: 2; } .stamps li:nth-child(4) { --n: 3; }
@@ -298,11 +298,11 @@ tr.you > td { background: var(--chest); }
 
   /* the podium: third, second, then first rise as steps; your own row lifts into place; every other row is still */
   .board-panel table.waits tr:is(.step, .you) { opacity: 0; }
-  .board-panel table.arrives tr.step { animation: step-rise 0.46s var(--ease-out) backwards; transform-origin: 50% 100%; }
+  .board-panel table.arrives tr.step { animation: step-rise 0.6s var(--spring) backwards; transform-origin: 50% 100%; }
   .board-panel table.arrives tr.step-2 { animation-delay: 130ms; }
   .board-panel table.arrives tr.step-1 { animation-delay: 260ms; }
-  @keyframes step-rise { from { opacity: 0; transform: perspective(700px) translateY(24px) rotateX(-52deg); } 60% { opacity: 1; } }
-  .board-panel table.arrives tr.you:not(.step) { animation: you-lift 0.4s var(--ease-out) 0.4s backwards; }
+  @keyframes step-rise { from { opacity: 0; transform: perspective(700px) translateY(24px) rotateX(-18deg); } 60% { opacity: 1; } }
+  .board-panel table.arrives tr.you:not(.step) { animation: you-lift 0.5s var(--spring) 0.4s backwards; }
   @keyframes you-lift { from { opacity: 0; transform: translateY(12px); } }
 
   /* the countdown: a tile whose number changed turns over */
@@ -311,7 +311,7 @@ tr.you > td { background: var(--chest); }
 
   /* pressed, the stamp card and a podium step tilt only a little: they are wide */
   :is(.stamp-card, tr.step).held.held.held.held {
-    transform: perspective(900px) translateY(-2px) rotateX(calc(var(--ty, 0) * -4deg)) rotateY(calc(var(--tx, 0) * 2.5deg)) scale(0.99);
+    transform: perspective(900px) translateY(-2px) rotateX(calc(var(--ty, 0) * -2deg)) rotateY(calc(var(--tx, 0) * 1.2deg)) scale(0.985);
   }
   /* a closed week's answers are marked one after another */
   .review-sheet.marking .answer::after { animation: pen 0.3s var(--ease-out) var(--mark-wait, 0ms) both; }

@@ -4,6 +4,17 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* ---------- Scroll edge: a bar that content scrolls under shows its edge only once content is under it ---------- */
+  var edgeOn = false;
+  function edge() {
+    var on = window.scrollY > 2;
+    if (on === edgeOn) return;
+    edgeOn = on;
+    document.documentElement.classList.toggle("is-scrolled", on);
+  }
+  window.addEventListener("scroll", edge, { passive: true });
+  edge();
+
   /* ---------- Highlighter swipe: draws once when it enters view ---------- */
   function swipe(root) {
     var marks = (root || document).querySelectorAll("mark.swipe:not(.on)");

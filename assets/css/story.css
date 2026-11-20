@@ -9,9 +9,12 @@
   position: sticky; top: 0; z-index: 10; max-width: none;
   flex-wrap: nowrap; justify-content: space-between; align-items: flex-end;
   padding: 10px var(--gutter) 0;
-  background: rgb(255 255 255 / 0.9); border-bottom: 1px solid var(--ink);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  background: rgb(255 255 255 / 0.72); border-bottom: 1px solid transparent;
+  -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+  transition: border-color 0.25s var(--ease-colour);
 }
+/* the scroll edge: a hairline appears only when the page has moved under the bar (site.js sets .is-scrolled) */
+html.is-scrolled .cover-home { border-bottom-color: rgb(29 42 58 / 0.16); }
 .cover-home .brand { gap: 10px; padding-bottom: 8px; }
 .cover-home .brand img { width: 44px; height: 44px; box-shadow: none; }
 .cover-home .brand-name { font-size: 1.25rem; }
@@ -81,7 +84,8 @@
 /* packed away: it cannot be tapped through the bag */
 .book.away { pointer-events: none; }
 /* opening and shutting on a tap takes a moment; following the scroll does not */
-.book.turning, .book.turning .book-front { transition: transform 0.65s var(--ease-out), opacity 0.3s var(--ease-colour); }
+.book.turning, .book.turning .book-front { transition: transform 0.8s var(--spring), opacity 0.3s var(--ease-colour); }
+@media (prefers-reduced-motion: no-preference) { .book, .floater { will-change: transform; } }
 /* the same skill in plain text, with its link, beside the headline */
 .skill-peek { margin: 22px 0 0; }
 .badges-new { margin: 14px 0 0; font: 600 1rem/1.4 var(--font-display); }
