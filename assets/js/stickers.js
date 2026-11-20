@@ -319,6 +319,8 @@
   }
   function isPage(name) { return new RegExp("(^|/)" + name + "(\\.html)?$").test(location.pathname); }
   // the rows of the guide on this page, which a student opens one at a time
+  // the five Part B steps, each its own page (part-b-choose.html and so on); the hub links to them in this order
+  var PART_B_STEPS = ["choose", "method", "crei", "language", "check"];
   function rowIds() {
     return Array.prototype.map.call(document.querySelectorAll("main details.row[id]"), function (row) { return row.id; });
   }
@@ -451,13 +453,16 @@
   });
   document.addEventListener("cly:read", function (e) {
     if (!e.detail) return;
-    // Part B is five steps and the final reminders a short list: each badge is every row opened at least once
+    // Part B is five steps, each its own page, and the final reminders a short list of rows: each badge is every
+    // step or row opened at least once
+    if (PART_B_STEPS.indexOf(e.detail.id) >= 0 && /(^|\/)part-b(-[a-z]+)?(\.html)?$/.test(location.pathname)) {
+      update({ steps: addOnce(state.steps, e.detail.id) });
+      if (allRead(state.steps, PART_B_STEPS)) give(["step-by-step"]);
+      return;
+    }
     var rows = rowIds();
     if (rows.indexOf(e.detail.id) < 0) return;
-    if (isPage("part-b")) {
-      update({ steps: addOnce(state.steps, e.detail.id) });
-      if (allRead(state.steps, rows)) give(["step-by-step"]);
-    } else if (isPage("final")) {
+    if (isPage("final")) {
       update({ final: addOnce(state.final, e.detail.id) });
       if (allRead(state.final, rows)) give(["final-lap"]);
     }

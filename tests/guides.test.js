@@ -9,18 +9,37 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const idsIn = (html) => new Set((html.match(/ id="([^"]+)"/g) || []).map((s) => s.slice(5, -1)));
 const GUIDES = ["part-a.html", "part-b.html", "text-types.html", "questions.html", "toolkit.html", "final.html", "cutoffs.html"];
 const pages = Object.fromEntries(GUIDES.map((f) => [f, read(f)]));
-const moved = JSON.parse(pages["part-b.html"].match(/window\.CLY_MOVED = (\{.*?\});/)[1]);
+// the hub forwards old links (part-b.html#crei) in a script in its head: first to a step page, then to where things moved
+const hubScript = pages["part-b.html"].match(/var m=(\{.*?\}),o=(\{.*?\}),id=location/);
+const toStep = JSON.parse(hubScript[1]);
+const moved = JSON.parse(hubScript[2]);
+const STEP_PAGES = ["part-b-choose.html", "part-b-content.html", "part-b-organisation.html", "part-b-language.html", "part-b-finish.html"];
+for (const f of STEP_PAGES) pages[f] = read(f);
 
 test("every S.5 and S.6 guide is one list of rows, with no side contents list", () => {
   for (const file of GUIDES) {
-    assert.ok(/<details class="row[ "]/.test(pages[file]), file + " has no rows");
+    assert.ok(/<(details|a) class="row[ "]/.test(pages[file]), file + " has no rows");
     assert.ok(!/<nav class="index"/.test(pages[file]), file + " still has a side list");
   }
 });
 
-test("Part B is five steps, in order", () => {
-  const rows = [...pages["part-b.html"].matchAll(/<details class="row" id="([^"]+)"/g)].map((m) => m[1]);
-  assert.deepStrictEqual(rows, ["choose", "method", "crei", "language", "check"]);
+test("Part B is a hub of five step pages, in order, each page one skill with its opener", () => {
+  const links = [...pages["part-b.html"].matchAll(/<a class="row step-link" id="go-([^"]+)" href="([^"]+)"/g)];
+  assert.deepStrictEqual(links.map((m) => m[1]), ["choose", "method", "crei", "language", "check"]);
+  assert.deepStrictEqual(links.map((m) => m[2]), STEP_PAGES);
+  for (const [, id, file] of links) {
+    assert.ok(pages[file].includes('data-step="' + id + '"'), file + " does not say which step it is");
+    assert.ok(/<section class="opener" data-gates/.test(pages[file]), file + " starts without a concept-check");
+    assert.ok(/<div class="step-lesson row-body" data-lesson hidden>/.test(pages[file]), file + " has no lesson to unlock");
+  }
+});
+
+test("every old Part B link goes on to a step page, and the anchor it names is there", () => {
+  for (const [id, target] of Object.entries(toStep)) {
+    const [file, hash] = target.split("#");
+    assert.ok(STEP_PAGES.includes(file), id + " goes to " + file);
+    if (hash) assert.ok(idsIn(pages[file]).has(hash), id + " goes to " + target + ", which is not there");
+  }
 });
 
 test("the strip is the same seven links on every S.5 and S.6 guide", () => {
@@ -100,7 +119,7 @@ test("no link on the site points at a part of a guide that is not there", () => 
   for (const file of files) {
     for (const m of read(file).matchAll(/(part-a|part-b|text-types|questions|cutoffs|toolkit|final)\.html#([A-Za-z0-9-]+)/g)) {
       const target = m[1] + ".html";
-      assert.ok(idsIn(pages[target]).has(m[2]) || (target === "part-b.html" && moved[m[2]]), file + " links to " + m[0] + ", which is not there");
+      assert.ok(idsIn(pages[target]).has(m[2]) || (target === "part-b.html" && (moved[m[2]] || toStep[m[2]])), file + " links to " + m[0] + ", which is not there");
     }
   }
 });
