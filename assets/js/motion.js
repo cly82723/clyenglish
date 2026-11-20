@@ -116,6 +116,40 @@
     look();
   }
 
+  /* ---------- Hub rows arrive: the steps of Part A, Part B, the Toolkit and S.3 list in one after another ---------- */
+
+  // A row waits (motion.css: .waits) only once it is being watched, so without this code nothing is ever hidden.
+  var HUB_ROWS = ".steps .step-link, main details.row[data-topic]";
+  var hubRows = document.querySelectorAll(HUB_ROWS);
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (hubRows.length && !calm && "IntersectionObserver" in window) {
+    var ROW_GAP_MS = 70;        // between rows that come into view together
+    var SAFETY_MS = 2500;       // if the observer never reports, show everything rather than leave a row hidden
+    var observed = false;       // set once the observer has reported anything at all
+    var nudged = false;         // only the first unfinished step gets its number nudged
+    var rowsSeen = new IntersectionObserver(function (entries) {
+      var landed = 0;
+      observed = true;
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var row = entry.target;
+        rowsSeen.unobserve(row);
+        row.style.setProperty("--wait", landed++ * ROW_GAP_MS + "ms");
+        row.classList.remove("waits");
+        row.classList.add("arrives");
+        if (!nudged && row.classList.contains("step-link") && !row.classList.contains("is-done")) {
+          nudged = true;
+          row.classList.add("is-next");
+        }
+      });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    Array.prototype.forEach.call(hubRows, function (row) { row.classList.add("waits"); rowsSeen.observe(row); });
+    setTimeout(function () {
+      if (observed) return;   // working: rows lower down arrive as they are scrolled to
+      Array.prototype.forEach.call(document.querySelectorAll(HUB_ROWS + ".waits"), function (row) { row.classList.remove("waits"); });
+    }, SAFETY_MS);
+  }
+
   /* ---------- A sticker catches the light where the pointer is ---------- */
 
   document.addEventListener("pointermove", function (e) {

@@ -256,3 +256,18 @@ html[data-lite][data-turn="back"]::view-transition-new(sheet) { animation: lite-
 html[data-lite] .cover-home, html[data-lite] .sticker-toast { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-lite] .sticker-zoom::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-lite] .book, html[data-lite] .floater { will-change: auto; }
+
+/* ---------- Hub rows arrive: Part A, Part B, Toolkit and S.3 list their steps one after another ----------
+   motion.js adds .waits once it is watching a row, then .arrives as it scrolls into view (--wait staggers
+   neighbours). Plays once and lets go (fill backwards), so the row lies flat and can be pressed.
+   Not in lite mode or with reduced motion: there the rows are simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-lite]) .steps .step-link.waits,
+  html:not([data-lite]) main details.row[data-topic].waits { opacity: 0; }
+  html:not([data-lite]) .steps .step-link.arrives,
+  html:not([data-lite]) main details.row[data-topic].arrives { animation: row-arrive 0.55s var(--spring) var(--wait, 0ms) backwards; }
+  @keyframes row-arrive { from { opacity: 0; transform: translateY(18px) scale(0.985); } 50% { opacity: 1; } }
+  /* the first unfinished step: its number gives one small nudge once the rows have settled */
+  html:not([data-lite]) .step-link.is-next .row-mark { animation: mark-nudge 0.7s var(--spring-bounce) calc(var(--wait, 0ms) + 0.55s) backwards; }
+  @keyframes mark-nudge { 40% { transform: scale(1.16); } }
+}
