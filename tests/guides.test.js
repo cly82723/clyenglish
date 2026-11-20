@@ -159,6 +159,22 @@ test("Final lap is still one page of rows, with a concept-check at the top and a
   assert.ok(html.includes('<script src="assets/js/opener.js"></script>'));
 });
 
+test("each text type has a Before you hand in checklist, and Part B's step pages have no tick-lists of their own", () => {
+  const html = pages["text-types.html"];
+  for (const type of ["article", "letter", "speech", "proposal", "report", "story"]) {
+    const at = html.indexOf('<ul class="checklist" data-store="check-' + type + '"');
+    const list = at < 0 ? null : [html.slice(at, html.indexOf("</ul>", at))];
+    assert.ok(list, type + " has no checklist");
+    const boxes = [...list[0].matchAll(/<input type="checkbox" id="(check-[a-z]+-[a-z]+)"/g)].map((m) => m[1]);
+    assert.strictEqual(new Set(boxes).size, boxes.length, type + " has a repeated box id");
+    assert.ok(boxes.length >= 7, type + " has too few boxes");
+    for (const common of ["verbs", "words", "slips"]) assert.ok(boxes.includes("check-" + type + "-" + common), type + " is missing the " + common + " check");
+    assert.ok(html.includes('id="handin-' + type + '"'), type + " has no anchor for its checklist");
+    assert.ok(pages["part-b-finish.html"].includes('text-types.html#handin-' + type), "Step 5 does not link to the " + type + " checklist");
+  }
+  for (const f of STEP_PAGES) assert.ok(!/class="checklist"/.test(pages[f]), f + " still has a tick-list");
+});
+
 test("no link on the site points at a part of a guide that is not there", () => {
   const files = ["index.html", "self-study.html", "grammar.html", "s3-grammar.html", "challenge.html", "s3-challenge.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"];
   for (const file of files) {
