@@ -117,7 +117,7 @@ test("the nine CLY samples sit under their questions, and the old samples page f
 });
 
 test("no page links to the old samples page", () => {
-  for (const file of ["index.html", "self-study.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"]) {
+  for (const file of ["index.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"]) {
     assert.ok(!read(file).includes("samples.html"), file + " still links to samples.html");
   }
 });
@@ -185,7 +185,7 @@ test("each text type has a Before you hand in checklist, and Part B's step pages
 });
 
 test("no link on the site points at a part of a guide that is not there", () => {
-  const files = ["index.html", "self-study.html", "grammar.html", "s3-grammar.html", "challenge.html", "s3-challenge.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"];
+  const files = ["index.html", "grammar.html", "s3-grammar.html", "challenge.html", "s3-challenge.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"];
   for (const file of files) {
     for (const m of read(file).matchAll(/(?<![-A-Za-z])(part-a|part-b|text-types|questions|cutoffs|toolkit|final)\.html#([A-Za-z0-9-]+)/g)) {
       const target = m[1] + ".html";
@@ -212,4 +212,10 @@ test("the fox no longer gives a word of the day", () => {
   delete require.cache[require.resolve(path.join(root, "assets", "js", "data", "tips.js"))];
   require(path.join(root, "assets", "js", "data", "tips.js"));
   assert.deepStrictEqual(Object.keys(window.CLY_TIPS).sort(), ["grammar", "writing"]);
+});
+
+test("Self-study is gone: no page, no link, no entry in the page-turn order", () => {
+  assert.ok(!fs.existsSync(path.join(root, "self-study.html")));
+  const files = fs.readdirSync(root).filter((f) => f.endsWith(".html")).concat(["assets/js/motion.js", "assets/js/site.js", "assets/js/data/tips.js", "assets/js/data/words.js"]);
+  for (const file of files) assert.ok(!/self-study/i.test(read(file)), file + " still mentions self-study");
 });

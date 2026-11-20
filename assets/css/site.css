@@ -487,7 +487,7 @@ td s { text-decoration-color: var(--avoid); color: var(--ink-soft); }
 .domains h3 { margin-top: 0; font-size: var(--step-2); }
 .domains p { color: var(--ink-soft); }
 
-/* self-study checklist */
+/* a tick-list (Before you hand in, the night before) */
 .checklist { list-style: none; padding: 0; margin: 18px 0 26px; }
 .checklist li { border-bottom: 1px solid var(--rule); }
 .checklist label { display: flex; gap: 14px; align-items: flex-start; padding: 12px 4px; cursor: pointer; }
