@@ -23,7 +23,7 @@
   });
 
   // The site's reading order: the cover tabs, then each form's strip. Moving to an earlier page turns back.
-  var ORDER = ["index.html", "s3-grammar.html", "s3-challenge.html", "grammar.html", "challenge.html",
+  var ORDER = ["index.html", "junior.html", "s3-grammar.html", "vocab.html", "s3-challenge.html", "senior.html", "grammar.html", "challenge.html",
     "part-a.html", "part-a-read.html", "part-a-formats.html", "part-a-plan.html", "part-a-opening.html", "part-b.html", "part-b-choose.html", "part-b-content.html", "part-b-organisation.html", "part-b-language.html", "part-b-finish.html", "text-types.html", "questions.html", "toolkit.html", "toolkit-openings.html", "toolkit-linking.html", "toolkit-vocabulary.html", "toolkit-variety.html", "toolkit-words.html", "final.html", "cutoffs.html",
     "self-study.html"];
   function pageOf(url) {

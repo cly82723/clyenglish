@@ -318,4 +318,4 @@ tr.you > td { background: var(--chest); }
 }
 
 /* While the clock runs, the strip of other pages steps aside with the title: the paper is all there is. */
-.playing .forms { display: none; }
+.playing .crumbs { display: none; }

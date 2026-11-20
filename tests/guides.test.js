@@ -49,10 +49,13 @@ test("every old Part B link goes on to a step page, and the anchor it names is t
   }
 });
 
-test("the strip is the same seven links on every S.5 and S.6 guide", () => {
-  const strip = (html) => [...html.match(/<nav class="forms"[\s\S]*?<\/nav>/)[0].matchAll(/<a href="([^"]+)"/g)].map((m) => m[1]);
+test("every S.5 and S.6 guide has a breadcrumb that starts at Senior and ends on the page itself", () => {
   for (const file of GUIDES) {
-    assert.deepStrictEqual(strip(pages[file]), ["part-a.html", "part-b.html", "text-types.html", "questions.html", "toolkit.html", "final.html", "cutoffs.html"], file);
+    const trail = pages[file].match(/<nav class="crumbs"[^]*?<[/]nav>/);
+    assert.ok(trail, file + " has no breadcrumb");
+    const links = [...trail[0].matchAll(/<a href="([^"]+)"/g)].map((m) => m[1]);
+    assert.strictEqual(links[0], "senior.html", file + " does not start at Senior");
+    assert.ok(/<li aria-current="page">[^<]+<[/]li>/.test(trail[0]), file + " does not name itself");
   }
 });
 
