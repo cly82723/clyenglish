@@ -12,7 +12,7 @@ const window = {};
 vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/rewrite-check.js"), "utf8") + "\n" +
   fs.readFileSync(path.join(root, "assets/js/data/s3-consolidation-data.js"), "utf8"), { window });
 const C = window.CLY_S3_CONSOLIDATION, R = window.CLY_REWRITE_CHECK;
-const html = fs.readFileSync(path.join(root, "s3-grammar.html"), "utf8");
+const html = require("./s3-pages.js").all;
 // every set, named "key" or "key #2" when an exercise has several
 const SETS = Object.entries(C).flatMap(([k, v]) => [].concat(v).map((s, i) => [k + (Array.isArray(v) ? " #" + (i + 1) : ""), s]));
 const item = (set, n) => [].concat(C[set.split("#")[0]])[set.includes("#") ? Number(set.split("#")[1]) - 1 : 0].items[n];

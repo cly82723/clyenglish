@@ -48,9 +48,23 @@
     var link = document.querySelector(".index a[href='#" + id + "']");
     if (link) { link.click(); return; }
     var sheet = document.querySelector("[data-tabs]") || document.querySelector("[data-rows]");
-    if (!sheet) return;
+    if (!sheet) { reveal(id); return; }
     var a = h("a", { href: "#" + id, hidden: true });
     sheet.appendChild(a); a.click(); sheet.removeChild(a);
+  }
+
+  // A page of one topic has no list of rows to open: show what holds the thing, or go to the page that has it.
+  // CLY_ELSEWHERE (set by a page) names, for an id that lives on another page, that page.
+  function reveal(id) {
+    var el = document.getElementById(id);
+    if (!el) {
+      var elsewhere = (window.CLY_ELSEWHERE || {})[id];
+      if (elsewhere) location.href = elsewhere;
+      return;
+    }
+    for (var fold = el.closest("details"); fold; fold = fold.parentElement && fold.parentElement.closest("details")) fold.open = true;
+    document.dispatchEvent(new CustomEvent("cly:show", { detail: id }));
+    requestAnimationFrame(function () { scrollTo(el); });
   }
 
   function scrollTo(el) {

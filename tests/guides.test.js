@@ -181,7 +181,7 @@ test("each text type has a Before you hand in checklist, and Part B's step pages
 test("no link on the site points at a part of a guide that is not there", () => {
   const files = ["index.html", "self-study.html", "grammar.html", "s3-grammar.html", "challenge.html", "s3-challenge.html", ...GUIDES, "assets/js/data/tips.js", "assets/js/data/words.js"];
   for (const file of files) {
-    for (const m of read(file).matchAll(/(part-a|part-b|text-types|questions|cutoffs|toolkit|final)\.html#([A-Za-z0-9-]+)/g)) {
+    for (const m of read(file).matchAll(/(?<![-A-Za-z])(part-a|part-b|text-types|questions|cutoffs|toolkit|final)\.html#([A-Za-z0-9-]+)/g)) {
       const target = m[1] + ".html";
       assert.ok(idsIn(pages[target]).has(m[2]) || (target === "part-b.html" && (moved[m[2]] || toStep[m[2]])) || (target === "toolkit.html" && toolkitMap[m[2]]) || (target === "part-a.html" && partAMap[m[2]]), file + " links to " + m[0] + ", which is not there");
     }
