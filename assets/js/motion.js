@@ -24,7 +24,7 @@
 
   // The site's reading order: the cover tabs, then each form's strip. Moving to an earlier page turns back.
   var ORDER = ["index.html", "s3-grammar.html", "s3-challenge.html", "grammar.html", "challenge.html",
-    "part-a.html", "part-b.html", "part-b-choose.html", "part-b-content.html", "part-b-organisation.html", "part-b-language.html", "part-b-finish.html", "text-types.html", "questions.html", "toolkit.html", "final.html", "cutoffs.html",
+    "part-a.html", "part-b.html", "part-b-choose.html", "part-b-content.html", "part-b-organisation.html", "part-b-language.html", "part-b-finish.html", "text-types.html", "questions.html", "toolkit.html", "toolkit-openings.html", "toolkit-linking.html", "toolkit-vocabulary.html", "toolkit-variety.html", "toolkit-words.html", "final.html", "cutoffs.html",
     "self-study.html"];
   function pageOf(url) {
     try { return new URL(url, location.href).pathname.split("/").pop() || "index.html"; } catch (err) { return ""; }

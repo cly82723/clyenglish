@@ -9,7 +9,8 @@
 
   /* ---------- Route: a tick on every finished step ---------- */
   function markDone() {
-    var done = load("cly:partb-done") || [];
+    var nav = document.querySelector(".steps");
+    var done = load((nav && nav.getAttribute("data-done-key")) || "cly:partb-done") || [];
     document.querySelectorAll("[data-step-link]").forEach(function (a) {
       var finished = done.indexOf(a.getAttribute("data-step-link")) >= 0;
       a.classList.toggle("is-done", finished);
