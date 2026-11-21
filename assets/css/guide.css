@@ -478,7 +478,7 @@ html[data-lite] .fc-inner { transition-duration: 0.2s; }
 .tryit-opt.is-right { background: var(--chest); border-color: var(--leaf); }
 .tryit-opt.is-wrong { opacity: 0.55; text-decoration: line-through; }
 .tryit-hint { margin: 8px 0 0; font: 700 0.9375rem/1.4 var(--font-display); color: var(--ink-soft); }
-.tryit-why { margin: 8px 0 0; padding-left: 12px; border-left: 3px solid var(--leaf); }
+.tryit-why { margin: 8px 0 0; padding: 8px 12px; border-radius: var(--r-square, 8px); background: var(--chest); }
 .tryit-score { margin: 4px 0 0; font: 700 0.9375rem/1.4 var(--font-display); color: var(--leaf-deep); }
 .tapescript { margin: 12px 0 8px; padding: 12px 14px; border: 1px solid var(--rule-strong); border-radius: 12px; background: var(--chest); }
 .tapescript p { margin: 0 0 8px; }
