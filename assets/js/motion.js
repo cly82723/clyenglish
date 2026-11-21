@@ -16,8 +16,17 @@
     var sheet = document.querySelector(".sheet");
     return sheet ? Math.round(window.innerHeight / 2 - sheet.getBoundingClientRect().top) : null;
   }
+  // The page turn is for moving between the cover tabs (Home, Junior, Senior) and the pages under them. Links
+  // inside a hub, and between lessons, change at once: students make those moves dozens of times a session.
+  var TAB_PAGES = ["index.html", "junior.html", "senior.html"];
+  function touchesCoverTab(activation) {
+    if (!activation || !activation.from || !activation.entry) return true;
+    var from = pageOf(activation.from.url), to = pageOf(activation.entry.url);
+    return TAB_PAGES.indexOf(from) >= 0 || TAB_PAGES.indexOf(to) >= 0;
+  }
   window.addEventListener("pageswap", function (e) {
     if (!e.viewTransition) return;
+    if (!touchesCoverTab(e.activation)) { e.viewTransition.skipTransition(); return; }
     var y = hingeOf();
     try { if (y !== null) sessionStorage.setItem(HINGE_KEY, String(y)); } catch (err) { /* no hinge: the 30vh default */ }
   });
@@ -123,6 +132,7 @@
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (hubRows.length && !calm && "IntersectionObserver" in window) {
     var ROW_GAP_MS = 45;        // between rows that come into view together
+    var ROW_SPREAD_MS = 250;    // the last row of a long hub never waits longer than this
     var SAFETY_MS = 2500;       // if the observer never reports, show everything rather than leave a row hidden
     var observed = false;       // set once the observer has reported anything at all
     var nudged = false;         // only the first unfinished step gets its number nudged
@@ -133,7 +143,7 @@
         if (!entry.isIntersecting) return;
         var row = entry.target;
         rowsSeen.unobserve(row);
-        row.style.setProperty("--wait", landed++ * ROW_GAP_MS + "ms");
+        row.style.setProperty("--wait", Math.min(landed++ * ROW_GAP_MS, ROW_SPREAD_MS) + "ms");
         row.classList.remove("waits");
         row.classList.add("arrives");
         if (!nudged && row.classList.contains("step-link") && !row.classList.contains("is-done")) {

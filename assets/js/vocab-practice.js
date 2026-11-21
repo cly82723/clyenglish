@@ -138,8 +138,18 @@
 
     function start(deck) {
       var round = shuffle(deck.cards).slice(0, ROUND);
-      var at = 0, score = 0, missed = [];
+      var at = 0, score = 0, missed = [], marks = [];
       ask();
+
+      // ten small marks under the count: filled = right first time, ringed = right after a hint, outlined = this one
+      function strip() {
+        var firsts = marks.filter(function (m) { return m === "first"; }).length;
+        var bar = h("p", { class: "q-strip", role: "img", "aria-label": "Question " + (at + 1) + " of " + round.length + ", " + firsts + " right first time" });
+        round.forEach(function (_, i) {
+          bar.appendChild(h("span", { class: "q-step" + (marks[i] ? " is-" + marks[i] : "") + (i === at ? " is-now" : "") }));
+        });
+        return bar;
+      }
 
       function leave() { picker(root, "quiz", start); }
 
@@ -155,6 +165,7 @@
           b.addEventListener("click", function () {
             if (text === card.blank) {
               if (!tries) score++; else missed.push(card.word);
+              marks[at] = tries ? "hint" : "first";
               blank.textContent = card.blank;
               blank.classList.add("is-filled");
               b.classList.add("is-right");
@@ -179,6 +190,7 @@
         root.appendChild(h("p", { class: "fc-bar" },
           h("button", { type: "button", class: "btn-quiet", onclick: leave }, "All decks"),
           h("span", null, "Question " + (at + 1) + " of " + round.length)));
+        root.appendChild(strip());
         root.appendChild(h("p", { class: "q-sentence" }, parts.before, blank, parts.after));
         root.appendChild(list);
         root.appendChild(feedback);

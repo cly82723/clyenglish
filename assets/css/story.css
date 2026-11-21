@@ -231,7 +231,7 @@ html.is-scrolled .cover-home { border-bottom-color: rgb(29 42 58 / 0.16); }
   .book { --bw: clamp(112px, 34vw, 150px); left: 64%; top: 26%; }
   /* the first screen ends early enough for "Pick your form" to show at its foot */
   .scene { min-height: 0; padding: 12px var(--gutter); }
-  .scene-title { min-height: 78vh; min-height: 78svh; align-content: end; padding-bottom: 20px; }
+  .scene-title { min-height: 68vh; min-height: 68svh; align-content: end; padding-bottom: 20px; }
   .scene-title h1 { font-size: clamp(2.8rem, 15vw, 4rem); }
   .scene .page { width: 100%; padding: 22px 16px 26px; }
   .scene:last-child { padding-bottom: 96px; }   /* room for the bag below the last sheet */
