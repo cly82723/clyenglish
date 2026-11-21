@@ -40,6 +40,18 @@
     <p class="row-kicker">Text types</p>
     <h1 class="title">Letter to the editor</h1>
     <p class="lead">You're writing to a newspaper to argue a point in public. The editor is your addressee, but your real audience is every reader of that newspaper.</p>
+    <section class="opener" data-opener="text-types-letter-open" aria-labelledby="text-types-letter-open-q">
+      <p class="opener-kicker">Before you read</p>
+      <h2 class="opener-q" id="text-types-letter-open-q">Which opening fits a letter to a newspaper?</h2>
+      <div class="opener-choices">
+        <button type="button" class="opener-choice" data-tag="Weaker">Hi everyone!</button>
+        <button type="button" class="opener-choice" data-ok data-tag="Stronger">Dear Editor,</button>
+      </div>
+      <div class="opener-reveal" hidden aria-live="polite">
+        <p class="opener-verdict"></p>
+        <p>You write to the editor, so start &quot;Dear Editor,&quot;.</p>
+      </div>
+    </section>
     <div class="topic-lesson row-body">
       <dl class="summary">
         <div><dt>Reader</dt><dd>The public, through the editor</dd></div>
@@ -142,6 +154,18 @@
         <li><a href="past-questions/2016-part-b.html#y2016-q2">Past paper sample: 2016 Q2</a></li>
       </ul>
 
+      <section class="opener" data-opener="text-types-letter-close" aria-labelledby="text-types-letter-close-q">
+        <p class="opener-kicker">Check yourself</p>
+        <h2 class="opener-q" id="text-types-letter-close-q">Which sign-off goes with &quot;Dear Editor&quot;?</h2>
+        <div class="opener-choices">
+          <button type="button" class="opener-choice" data-tag="Weaker">Yours sincerely,</button>
+          <button type="button" class="opener-choice" data-ok data-tag="Stronger">Yours faithfully,</button>
+        </div>
+        <div class="opener-reveal" hidden aria-live="polite">
+          <p class="opener-verdict"></p>
+          <p>You do not know the name, so it is &quot;faithfully&quot;.</p>
+        </div>
+      </section>
       <p class="row-next"><a href="text-types-speech.html">Next: Speech</a></p>
     </div>
   </main>
@@ -154,6 +178,7 @@
   </nav>
 </footer>
 <script src="assets/js/stickers.js"></script>
+<script src="assets/js/opener.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>
 </body>

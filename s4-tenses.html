@@ -39,6 +39,18 @@
   <main class="column rows step-page" id="main">
     <p class="row-kicker">S.4 Grammar</p>
     <h1 class="title">Tenses</h1>
+    <section class="opener" data-opener="s4-tenses-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s4-tenses-open-q">
+      <p class="opener-kicker">Before you read</p>
+      <h2 class="opener-q" id="s4-tenses-open-q">Which sentence is correct?</h2>
+      <div class="opener-choices">
+        <button type="button" class="opener-choice" data-tag="Common mistake">By the time we arrived, the film already started.</button>
+        <button type="button" class="opener-choice" data-ok data-tag="Correct">By the time we arrived, the film had already started.</button>
+      </div>
+      <div class="opener-reveal" hidden aria-live="polite">
+        <p class="opener-verdict"></p>
+        <p>Two past events: the earlier one takes &quot;had&quot; plus V3.</p>
+      </div>
+    </section>
     <div class="topic-lesson row-body">
       <div class="part" id="matrix">
         <h3>The Tense Matrix</h3>
@@ -56,6 +68,18 @@
         <p>Pick a verb from the bank and type it in the right tense. Each verb is used once at most, and the tenses come in any order.</p>
         <div data-grammar="tensecloze"></div>
       </div>
+      <section class="opener" data-opener="s4-tenses-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s4-tenses-close-q">
+        <p class="opener-kicker">Check yourself</p>
+        <h2 class="opener-q" id="s4-tenses-close-q">Which sentence is correct?</h2>
+        <div class="opener-choices">
+          <button type="button" class="opener-choice" data-tag="Common mistake">I live here since 2022.</button>
+          <button type="button" class="opener-choice" data-ok data-tag="Correct">I have lived here since 2022.</button>
+        </div>
+        <div class="opener-reveal" hidden aria-live="polite">
+          <p class="opener-verdict"></p>
+          <p>&quot;Since&quot; points at a start in the past and runs to now, so use the present perfect.</p>
+        </div>
+      </section>
       <p class="row-next"><a href="s4-passive.html">Next: The passive voice</a></p>
     </div>
   </main>
@@ -78,6 +102,7 @@
 <script src="assets/js/sets.js"></script>
 <script src="assets/js/grammar.js"></script>
 <script src="assets/js/stickers.js"></script>
+<script src="assets/js/opener.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>
 </body>
