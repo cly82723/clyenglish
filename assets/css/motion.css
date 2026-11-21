@@ -263,7 +263,7 @@ html[data-lite] .book, html[data-lite] .floater { will-change: auto; }
    Not in lite mode or with reduced motion: there the rows are simply there. */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-lite]) .steps .step-link.waits { opacity: 0; }
-  html:not([data-lite]) .steps .step-link.arrives { animation: row-arrive 0.55s var(--spring) var(--wait, 0ms) backwards; }
+  html:not([data-lite]) .steps .step-link.arrives { animation: row-arrive 0.4s var(--spring) var(--wait, 0ms) backwards; }
   @keyframes row-arrive { from { opacity: 0; transform: translateY(18px) scale(0.985); } 50% { opacity: 1; } }
   /* the first unfinished step: its number gives one small nudge once the rows have settled */
   html:not([data-lite]) .step-link.is-next .row-mark { animation: mark-nudge 0.7s var(--spring-bounce) calc(var(--wait, 0ms) + 0.55s) backwards; }

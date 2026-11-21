@@ -586,6 +586,28 @@
   }
   initSiteMenu();
 
+  /* A long exercise page (the S.4 topics, the S.3 consolidation pages) shows its parts one at a time: each part folds
+     under its own title and the first is open. Without script, every part is simply there. */
+  function foldParts() {
+    var lesson = document.querySelector("main.step-page > .topic-lesson:not([data-lesson])");
+    if (!lesson) return;
+    var parts = Array.prototype.filter.call(lesson.children, function (el) { return el.classList.contains("part") && el.querySelector(":scope > h3"); });
+    if (parts.length < 2) return;
+    parts.forEach(function (part, i) {
+      var title = part.querySelector(":scope > h3");
+      var fold = document.createElement("details");
+      fold.className = "why lesson-fold part-fold";
+      fold.open = i === 0;
+      var summary = document.createElement("summary");
+      summary.textContent = title.textContent;
+      title.classList.add("visually-hidden");
+      lesson.insertBefore(fold, part);
+      fold.appendChild(summary);
+      fold.appendChild(part);
+    });
+  }
+  foldParts();
+
   // A link to something inside a closed fold (text-types-letter.html#whole) opens the fold and goes there. A page of
   // rows does this itself (initRows); a page of one topic has no rows, so this is what opens it.
   function openFoldFor() {

@@ -1238,7 +1238,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 }
 .site-menu[hidden] { display: none; }
 @media (prefers-reduced-motion: no-preference) {
-  .site-menu:not([hidden]) { animation: menu-pop 0.4s var(--spring); }
+  .site-menu:not([hidden]) { animation: menu-pop 0.25s var(--spring); }
   @keyframes menu-pop { from { opacity: 0; transform: translateY(-6px) scale(0.96); } }
 }
 .site-menu ul { list-style: none; margin: 0; padding: 0; }
@@ -1689,7 +1689,7 @@ body:has(.hub) .back-cover { max-width: 1040px; }
 .bubble-eg .rung u { text-decoration-color: var(--ring); }
 .bubble-eg .rung.up u { text-decoration-color: var(--sky); }
 /* the built-in tip waits a moment for today's; if the script never runs, it shows anyway */
-.js .tip-day .bubble-body:not(.drawn) { animation: fade-in 0.2s 1s both; }
+.js .tip-day .bubble-body:not(.drawn) { animation: fade-in 0.2s 0.35s both; }
 
 /* ---------- Proofreading: the key folds away after the first visit ---------- */
 .proof-help > summary { cursor: pointer; margin: 0; list-style-position: inside; }
@@ -1879,3 +1879,9 @@ s.dg-tile.dg-helper { text-decoration-thickness: 2px; opacity: 0.8; }
 /* the home page has no brand beside its tabs: the sheet below carries the name */
 .cover-home { max-width: 1040px; justify-content: flex-end; }
 .cover-home + .hub { margin-top: 0; }
+
+/* every pressable row and card gives a little under the finger, then springs back (wide rows give less) */
+.step-link, .deck-btn, .site-menu a { transition: background-color var(--dur-fast) var(--ease-colour), transform 0.45s var(--spring); }
+.step-link:active, .deck-btn:active { transform: scale(0.985); transition-duration: 70ms; }
+.site-menu a:active { transform: scale(0.98); transition-duration: 70ms; }
+@media (prefers-reduced-motion: reduce) { .step-link, .deck-btn, .site-menu a { transition: none; } .step-link:active, .deck-btn:active, .site-menu a:active { transform: none; } }
