@@ -40,6 +40,18 @@
     <p class="row-kicker">Text types</p>
     <h1 class="title">Article</h1>
     <p class="lead">An article is written for readers of a magazine, newsletter or website.</p>
+    <section class="opener" data-opener="text-types-article-open" aria-labelledby="text-types-article-open-q">
+      <p class="opener-kicker">Before you read</p>
+      <h2 class="opener-q" id="text-types-article-open-q">Which opening suits a magazine article on stress?</h2>
+      <div class="opener-choices">
+        <button type="button" class="opener-choice" data-tag="Weaker">Dear Editor, I am writing about stress.</button>
+        <button type="button" class="opener-choice" data-ok data-tag="Stronger">Every exam season, the library fills up before the sun does.</button>
+      </div>
+      <div class="opener-reveal" hidden aria-live="polite">
+        <p class="opener-verdict"></p>
+        <p>An article hooks readers with a picture. &quot;Dear Editor&quot; starts a letter.</p>
+      </div>
+    </section>
     <div class="topic-lesson row-body">
       <dl class="summary">
         <div><dt>Reader</dt><dd>Magazine or newsletter readers</dd></div>
@@ -108,6 +120,18 @@
         <li><a href="past-questions/2015-part-b.html#y2015-q4">Past paper sample: 2015 Q4</a></li>
       </ul>
 
+      <section class="opener" data-opener="text-types-article-close" aria-labelledby="text-types-article-close-q">
+        <p class="opener-kicker">Check yourself</p>
+        <h2 class="opener-q" id="text-types-article-close-q">Which ending gives the reader something to do?</h2>
+        <div class="opener-choices">
+          <button type="button" class="opener-choice" data-tag="Weaker">In conclusion, stress is bad.</button>
+          <button type="button" class="opener-choice" data-ok data-tag="Stronger">Next time the work piles up, close the book for ten minutes and walk.</button>
+        </div>
+        <div class="opener-reveal" hidden aria-live="polite">
+          <p class="opener-verdict"></p>
+          <p>End on one small thing the reader can try, not on a summary.</p>
+        </div>
+      </section>
       <p class="row-next"><a href="text-types-letter.html">Next: Letter to the editor</a></p>
     </div>
   </main>
@@ -120,6 +144,7 @@
   </nav>
 </footer>
 <script src="assets/js/stickers.js"></script>
+<script src="assets/js/opener.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>
 </body>

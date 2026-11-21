@@ -1,6 +1,6 @@
-# S.4 grammar and Text types opener drafts (for CLY's review, not built)
+# S.4 grammar and Text types opener drafts (approved and built)
 
-Same shape as the S.3 and Part B openers (see s3-openers-plan.md and part-b-opener-drafts.md): one question before the lesson ("Before you read"), one after ("Check yourself"), two choices each, a one-line reveal. A wrong tap costs nothing. A and B are shuffled on screen; the better one is marked ✔ here. Every sentence below is [NEW] and written for these drafts, so please check the wording and the examples. The "I know this. Show me the page." skip link stays on every opener.
+Built 2026-11-22 on the ten pages. The openers do not hold the lesson back (no data-gates), so the pages keep their layout and a student can read on without answering. Same shape as the S.3 and Part B openers (see s3-openers-plan.md and part-b-opener-drafts.md): one question before the lesson ("Before you read"), one after ("Check yourself"), two choices each, a one-line reveal. A wrong tap costs nothing. A and B are shuffled on screen; the better one is marked ✔ here. Every sentence below is [NEW] and written for these drafts, so please check the wording and the examples. The "I know this. Show me the page." skip link stays on every opener.
 
 ## S.4 grammar
 

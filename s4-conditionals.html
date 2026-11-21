@@ -39,6 +39,18 @@
   <main class="column rows step-page" id="main">
     <p class="row-kicker">S.4 Grammar</p>
     <h1 class="title">Conditionals</h1>
+    <section class="opener" data-opener="s4-conditionals-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s4-conditionals-open-q">
+      <p class="opener-kicker">Before you read</p>
+      <h2 class="opener-q" id="s4-conditionals-open-q">Which sentence is correct?</h2>
+      <div class="opener-choices">
+        <button type="button" class="opener-choice" data-tag="Common mistake">If it will rain tomorrow, we will stay home.</button>
+        <button type="button" class="opener-choice" data-ok data-tag="Correct">If it rains tomorrow, we will stay home.</button>
+      </div>
+      <div class="opener-reveal" hidden aria-live="polite">
+        <p class="opener-verdict"></p>
+        <p>Not after &quot;if&quot;: the &quot;if&quot; part stays in the present.</p>
+      </div>
+    </section>
     <div class="topic-lesson row-body">
       <div class="part" id="condmatrix">
         <h3>The Conditionals Matrix</h3>
@@ -55,6 +67,18 @@
         <p><strong>Part A:</strong> match each sentence to its meaning. <strong>Part B:</strong> type the verbs in the right form.</p>
         <div data-grammar="condmatch"></div>
       </div>
+      <section class="opener" data-opener="s4-conditionals-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s4-conditionals-close-q">
+        <p class="opener-kicker">Check yourself</p>
+        <h2 class="opener-q" id="s4-conditionals-close-q">Which sentence is correct?</h2>
+        <div class="opener-choices">
+          <button type="button" class="opener-choice" data-tag="Common mistake">If I would be you, I would apologise.</button>
+          <button type="button" class="opener-choice" data-ok data-tag="Correct">If I were you, I would apologise.</button>
+        </div>
+        <div class="opener-reveal" hidden aria-live="polite">
+          <p class="opener-verdict"></p>
+          <p>The &quot;if&quot; part of an unreal situation uses &quot;were&quot;. &quot;Would&quot; belongs in the other part.</p>
+        </div>
+      </section>
       <p class="row-next"><a href="s4-practice.html">Next: Practice</a></p>
     </div>
   </main>
@@ -77,6 +101,7 @@
 <script src="assets/js/sets.js"></script>
 <script src="assets/js/grammar.js"></script>
 <script src="assets/js/stickers.js"></script>
+<script src="assets/js/opener.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>
 </body>

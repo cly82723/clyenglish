@@ -39,8 +39,32 @@
   <main class="column rows step-page" id="main">
     <p class="row-kicker">S.4 Grammar</p>
     <h1 class="title">The passive voice</h1>
+    <section class="opener" data-opener="s4-passive-open" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s4-passive-open-q">
+      <p class="opener-kicker">Before you read</p>
+      <h2 class="opener-q" id="s4-passive-open-q">Which sentence is correct?</h2>
+      <div class="opener-choices">
+        <button type="button" class="opener-choice" data-tag="Common mistake">The window broke by the storm.</button>
+        <button type="button" class="opener-choice" data-ok data-tag="Correct">The window was broken by the storm.</button>
+      </div>
+      <div class="opener-reveal" hidden aria-live="polite">
+        <p class="opener-verdict"></p>
+        <p>The passive is &quot;be&quot; plus V3. &quot;Broke&quot; is the past tense, not V3.</p>
+      </div>
+    </section>
     <div class="topic-lesson row-body">
       <div data-grammar="passive"></div>
+      <section class="opener" data-opener="s4-passive-close" data-right="Yes, that one is correct." data-wrong="An easy one to pick. The other is the correct one, and here is why." aria-labelledby="s4-passive-close-q">
+        <p class="opener-kicker">Check yourself</p>
+        <h2 class="opener-q" id="s4-passive-close-q">Which sentence is correct?</h2>
+        <div class="opener-choices">
+          <button type="button" class="opener-choice" data-tag="Common mistake">The results will announce next week.</button>
+          <button type="button" class="opener-choice" data-ok data-tag="Correct">The results will be announced next week.</button>
+        </div>
+        <div class="opener-reveal" hidden aria-live="polite">
+          <p class="opener-verdict"></p>
+          <p>After &quot;will&quot;, keep &quot;be&quot; and add V3.</p>
+        </div>
+      </section>
       <p class="row-next"><a href="s4-gerunds-infinitives.html">Next: Gerunds &amp; infinitives</a></p>
     </div>
   </main>
@@ -63,6 +87,7 @@
 <script src="assets/js/sets.js"></script>
 <script src="assets/js/grammar.js"></script>
 <script src="assets/js/stickers.js"></script>
+<script src="assets/js/opener.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/site.js"></script>
 </body>
