@@ -456,3 +456,26 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
 .q-stars { margin: 4px 0 8px; font-size: 2rem; letter-spacing: 0.1em; color: var(--leaf-deep); }
 @media (prefers-reduced-motion: reduce) { .fc-inner { transition: none; } .q-opt { transition: none; } }
 html[data-lite] .fc-inner { transition-duration: 0.2s; }
+
+/* ---------- Paper 3: try-its, tapescript extracts and credits (tryit.js) ---------- */
+.credit { margin: 14px 0 0; font: 500 0.8125rem/1.4 var(--font-display); color: var(--ink-soft); }
+.tryit { margin: 28px 0 0; }
+.tryit-q { margin: 0 0 22px; }
+.tryit-prompt { margin: 0 0 10px; font-weight: 700; }
+.tryit-options { display: grid; gap: 8px; }
+.tryit-opt {
+  min-height: 48px; padding: 10px 14px; border: 1px solid var(--rule-strong); border-radius: 12px; background: var(--paper); color: var(--ink);
+  font: 600 1rem/1.35 var(--font-display); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-fast) var(--ease-colour), transform 0.45s var(--spring);
+}
+.tryit-opt:active:not(:disabled) { transform: scale(0.98); transition-duration: 70ms; }
+@media (hover: hover) { .tryit-opt:hover:not(:disabled) { background: var(--chest); } }
+.tryit-opt.is-right { background: var(--chest); border-color: var(--leaf); }
+.tryit-opt.is-wrong { opacity: 0.55; text-decoration: line-through; }
+.tryit-hint { margin: 8px 0 0; font: 700 0.9375rem/1.4 var(--font-display); color: var(--ink-soft); }
+.tryit-why { margin: 8px 0 0; padding-left: 12px; border-left: 3px solid var(--leaf); }
+.tryit-score { margin: 4px 0 0; font: 700 0.9375rem/1.4 var(--font-display); color: var(--leaf-deep); }
+.tapescript { margin: 12px 0 8px; padding: 12px 14px; border: 1px solid var(--rule-strong); border-radius: 12px; background: var(--chest); }
+.tapescript p { margin: 0 0 8px; }
+.tapescript p:last-child { margin-bottom: 0; }
+@media (prefers-reduced-motion: reduce) { .tryit-opt { transition: none; } }
