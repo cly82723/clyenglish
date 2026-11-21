@@ -56,7 +56,7 @@
 
   /* ---------- Pressed controls lift and tilt towards the finger, then land flat ---------- */
 
-  var TILTS = ".choice, .chip, .btn, .btn-quiet, .cell, .letter, .set-mark, .sticker, .directory a, .resume a, .forms a, .pager a, .word-cell, .levelup-steps button, .stamp-card, tr.step";
+  var TILTS = ".choice, .chip, .btn, .btn-quiet, .cell, .letter, .set-mark, .sticker, .directory a, .resume a, .pager a, .word-cell, .levelup-steps button, .stamp-card, tr.step";
   var held = null;
   function release() {
     if (!held) return;
@@ -122,7 +122,7 @@
   var hubRows = document.querySelectorAll(HUB_ROWS);
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (hubRows.length && !calm && "IntersectionObserver" in window) {
-    var ROW_GAP_MS = 70;        // between rows that come into view together
+    var ROW_GAP_MS = 45;        // between rows that come into view together
     var SAFETY_MS = 2500;       // if the observer never reports, show everything rather than leave a row hidden
     var observed = false;       // set once the observer has reported anything at all
     var nudged = false;         // only the first unfinished step gets its number nudged
