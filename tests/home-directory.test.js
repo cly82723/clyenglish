@@ -9,11 +9,11 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const html = read("index.html");
 const directory = html.slice(html.indexOf('<nav class="directory"'), html.indexOf("</nav>", html.indexOf('<nav class="directory"')));
 
-test("the home directory is two doors, Junior and Senior, with no track headings", () => {
+test("the home directory has a Junior row and a Senior row holding every feature, with no track headings", () => {
   const forms = [...directory.matchAll(/class="form-mark">([A-Za-z.0-9]+)</g)].map((m) => m[1]);
   assert.deepStrictEqual(forms, ["Junior", "Senior"]);
   assert.ok(!/<h3|class="tracks"/.test(directory), "track headings or columns are still there");
-  assert.ok(directory.includes('href="junior.html"') && directory.includes('href="senior.html"'));
+  for (const h of ["s3-grammar.html", "vocab.html", "s3-challenge.html", "paper-2.html", "paper-3.html", "grammar.html", "challenge.html"]) assert.ok(directory.includes('href="' + h + '"'), h + " is not on the home directory");
 });
 
 test("every directory link names its level in its label, for screen readers", () => {
