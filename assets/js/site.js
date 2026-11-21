@@ -503,6 +503,7 @@
   var MENU = [
     ["Junior", [["S.3 Grammar", "s3-grammar.html"], ["S.3 Vocab", "vocab.html"], ["S.3 Weekly challenge", "s3-challenge.html"]]],
     ["Senior · Paper 2 Writing", [["Part A", "part-a.html"], ["Part B", "part-b.html"], ["Toolkit", "toolkit.html"], ["Text types", "text-types.html"], ["Past questions", "questions.html"]]],
+    ["Senior · Paper 3", [["Part B2 Integrated Skills", "paper-3.html"]]],
     ["Senior · S.4", [["S.4 Grammar", "grammar.html"], ["S.4 Weekly challenge", "challenge.html"]]],
     ["Senior · Before the exam", [["Cut-offs", "cutoffs.html"], ["Final reminders", "final.html"]]]
   ];

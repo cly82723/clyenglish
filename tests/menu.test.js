@@ -20,7 +20,7 @@ test("the pop-up menu lists every hub, and every link in it is a real page", () 
   const code = read("assets/js/site.js");
   const menu = code.slice(code.indexOf("var MENU = ["), code.indexOf("function initSiteMenu"));
   const links = [...menu.matchAll(/"([a-z0-9-]+[.]html)"/g)].map((m) => m[1]);
-  assert.deepStrictEqual(links.slice().sort(), ["challenge.html", "cutoffs.html", "final.html", "grammar.html", "part-a.html", "part-b.html", "questions.html", "s3-challenge.html", "s3-grammar.html", "text-types.html", "toolkit.html", "vocab.html"]);
+  assert.deepStrictEqual(links.slice().sort(), ["challenge.html", "cutoffs.html", "final.html", "grammar.html", "paper-3.html", "part-a.html", "part-b.html", "questions.html", "s3-challenge.html", "s3-grammar.html", "text-types.html", "toolkit.html", "vocab.html"]);
   for (const f of links) assert.ok(fs.existsSync(path.join(root, f)), f + " does not exist");
   assert.ok(!fs.existsSync(path.join(root, "menu.html")), "the old menu page is still there");
 });

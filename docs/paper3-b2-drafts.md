@@ -1,4 +1,5 @@
 # Paper 3 Part B2 pages (proposal for CLY's review, not built)
+n> **Built** on 2026-11-21 as `paper-3.html` and five `paper-3-b2-*.html` pages (PR "Paper 3 Part B2"). The pages follow this plan, using the 2024 Data File, tapescript and marking scheme as the main worked example and 2022 as the second. Where they differ, the built pages are the source of truth.
 
 Five one-skill pages under a Paper 3 hub, in the order a student works. Same pattern as Part B: a concept-check opener (a wrong tap costs nothing), "By the end you can", an example, a try-it, a closing question, one Next row.
 
