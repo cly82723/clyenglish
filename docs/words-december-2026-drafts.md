@@ -17,7 +17,7 @@ The topics rotate in short runs, as November's did, and every topic maps to a To
 | 9 | mitigate + the effects of / the impact of | More trees could make the city less hot. | Planting more trees can mitigate the effects of extreme heat in crowded districts. | Environment | Report, proposal |
 | 10 | adopt + a healthier lifestyle | Cheap fresh food would help families eat better. | Cheaper fresh food would help low-income families adopt a healthier lifestyle. | Health | Article, speech |
 | 11 | risk + burnout | Students who study too much get very tired. | Students who study until midnight every day risk burnout before the exam even arrives. | Health | Article, speech |
-| 12 | reduce / break + the stigma + attached to + mental illness | People are afraid to talk about mental health. | Open talks in schools could reduce the stigma attached to mental illness. | Health | Speech, letter to the editor |
+| 12 | reduce / break + the stigma + attached to + mental health problems | People are afraid to talk about mental health. | Open talks in schools could reduce the stigma attached to mental health problems. | Health | Speech, letter to the editor |
 | 13 | peer pressure + to + do something | Teenagers copy their friends. | Peer pressure pushes teenagers to buy brands they cannot really afford. | Youth and society | Article, essay |
 | 14 | broaden + one's horizons | Trips abroad teach students new things. | Exchange trips broaden students' horizons far more than any textbook can. | Youth and society | Speech, proposal |
 | 15 | a sense of purpose | Volunteering makes young people feel useful. | Volunteering gives many young people a sense of purpose outside the classroom. | Youth and society | Speech, article |
@@ -40,10 +40,7 @@ The topics rotate in short runs, as November's did, and every topic maps to a To
 
 ## Things to check
 
-- **Sham Shui Po (day 30):** November already uses it twice; swap if you want other districts.
-- **Day 26:** the shorter timetable claim is a plausible proposal, not a fact, and reads as one.
-- **Day 22:** the ageing population statement is general and true of Hong Kong; I did not add figures.
-- **Day 12** names mental illness directly. Say if you prefer "mental health problems" for S3 readers.
-- **November's entries 30 and 31** are still unchecked drafts too.
+- **Settled:** day 30 keeps Sham Shui Po (examples may repeat). Day 12 now says "mental health problems". Days 22 and 26 stay: day 22 is a general statement with no figures, and day 26 is worded as a proposal ("could"), so neither claims a fact.
+- **Still open:** November's entries 30 and 31 are unchecked drafts. They are "shoulder + responsibility / a burden" and "preserve + heritage / a tradition".
 
 Once you have approved or corrected the list, I add it as the `"2026-12"` block in `assets/js/data/words.js` and the site picks it up on 1 December.
