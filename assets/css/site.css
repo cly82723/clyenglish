@@ -1020,7 +1020,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   .ok-btn { margin: 0 0 6px; }
   .detail-head { flex-wrap: wrap; }
   .reality-axis button { font-size: 0.875rem; }
-  .compare > div + div, .pairs > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule); }
+  .compare > div + div, .pairs > div + div { padding-left: 0; border-left: none; border-top: 1px solid var(--rule); }
 }
 
 /* ---------- Back cover ---------- */
@@ -1267,7 +1267,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
 @media (max-width: 900px) {
   .domains { grid-template-columns: minmax(0, 1fr); }
   .domains > div { padding-right: 0; }
-  .domains > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule); padding-top: 14px; }
+  .domains > div + div { padding-left: 0; border-left: none; border-top: 1px solid var(--rule); padding-top: 14px; }
 }
 
 @media (max-width: 760px) {
@@ -1299,7 +1299,7 @@ mark.main-verb { text-decoration: underline; text-decoration-thickness: 2px; tex
   .index a { white-space: nowrap; border: 1px solid var(--rule-strong); padding: 8px 12px; font-size: 1rem; }
   .column { padding: 28px var(--gutter) 40px; }
   .label dt, .label dd { padding: 8px 12px; }
-  .summary div + div { padding-left: 0; border-left: 0; }
+  .summary div + div { padding-left: 0; border-left: none; }
   .summary { grid-template-columns: 1fr 1fr; }
   .summary div { padding-right: 12px; }
   .ladder-axis { padding: 16px 8px 4px; }
