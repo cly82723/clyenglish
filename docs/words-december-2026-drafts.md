@@ -1,4 +1,4 @@
-# Words of the day: December 2026 drafts (for CLY to check, not on the site)
+# Words of the day: December 2026 (approved by CLY, now in words.js)
 
 All 31 are new drafts by Claude. Nothing is in `assets/js/data/words.js` yet. Each word is a collocation or a phrase that carries meaning, not a single everyday word, because that is what lifts the Language mark in Paper 2: precise word partnerships a Level 3 student would not reach for. None repeats a November word, and I avoided the stock phrases students already overuse ("in today's society", "it goes without saying").
 
