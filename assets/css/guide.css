@@ -480,6 +480,14 @@ html[data-lite] .fc-inner { transition-duration: 0.2s; }
 .tryit-hint { margin: 8px 0 0; font: 700 0.9375rem/1.4 var(--font-display); color: var(--ink-soft); }
 .tryit-why { margin: 8px 0 0; padding: 8px 12px; border-radius: var(--r-square, 8px); background: var(--chest); }
 .tryit-score { margin: 4px 0 0; font: 700 0.9375rem/1.4 var(--font-display); color: var(--leaf-deep); }
+.tapescript + p audio, .recording audio { display: block; width: 100%; max-width: 560px; }
+.recording { margin: 20px 0 28px; }
+.recording-title { margin: 0 0 10px; }
+.chapters { list-style: none; margin: 12px 0 0; padding: 0; max-width: 560px; border-top: 1px solid var(--ink); }
+.chapters li { border-bottom: 1px solid var(--rule); }
+.chapter { display: flex; align-items: baseline; gap: 14px; width: 100%; min-height: 44px; padding: 10px 4px; border: 0; background: transparent; color: var(--ink); font: 600 1rem/1.35 var(--font-display); text-align: left; cursor: pointer; }
+.chapter-time { flex: none; min-width: 3.2em; color: var(--sky); font-variant-numeric: tabular-nums; }
+@media (hover: hover) { .chapter:hover { background: var(--chest); } }
 .tapescript { margin: 12px 0 8px; padding: 12px 14px; border: 1px solid var(--rule-strong); border-radius: 12px; background: var(--chest); }
 .tapescript p { margin: 0 0 8px; }
 .tapescript p:last-child { margin-bottom: 0; }

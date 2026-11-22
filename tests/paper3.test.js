@@ -58,10 +58,28 @@ test("the 2024 official points are listed in full: 8, 9 and 9", () => {
   }
 });
 
-test("Senior links to Paper 3, and the practice passages are marked for the Hear it button", () => {
+test("Senior links to Paper 3, and the practice passages play the real recording", () => {
   assert.ok(read("senior.html").includes('href="paper-3.html"'));
   const notes = read("paper-3-b2-notes.html");
-  assert.strictEqual((notes.match(/data-speak="#ts-[abc]"/g) || []).length, 3);
-  assert.ok(notes.includes('id="ts-a"') && notes.includes("data-say"));
-  assert.ok(read("assets/js/tryit.js").includes("SpeechSynthesisUtterance"));
+  for (const clip of ["2024-b2-review-board", "2024-b2-lifetime-membership", "2024-b2-white-sand-beaches"]) {
+    assert.ok(notes.includes('src="assets/audio/' + clip + '.mp3"'), clip + " is not on the page");
+  }
+  assert.ok(notes.includes('id="ts-a"') && notes.includes('id="ts-c"'));
+  assert.ok(!notes.includes("data-speak") && !read("assets/js/tryit.js").includes("SpeechSynthesis"), "the text-to-speech button should be gone");
+});
+
+test("both full Part B2 recordings are on the notes page with timestamps that stay inside the recording", () => {
+  const notes = read("paper-3-b2-notes.html");
+  const LENGTH = { "rec-2024-audio": 525.5, "rec-2022-audio": 482.8 };
+  for (const [id, length] of Object.entries(LENGTH)) {
+    assert.ok(notes.includes('id="' + id + '"'), id + " is missing");
+    const times = [...notes.matchAll(new RegExp('data-audio="' + id + '" data-t="([0-9.]+)"', "g"))].map((m) => parseFloat(m[1]));
+    assert.ok(times.length >= 6, id + " has too few timestamps");
+    assert.deepStrictEqual(times, [...times].sort((a, b) => a - b), id + " timestamps are not in order");
+    assert.ok(times.every((t) => t >= 0 && t < length - 5), id + " has a timestamp outside the recording");
+  }
+  for (const file of ["2022-b2", "2024-b2", "2024-b2-review-board", "2024-b2-lifetime-membership", "2024-b2-white-sand-beaches"]) {
+    assert.ok(fs.existsSync(path.join(root, "assets", "audio", file + ".mp3")), file + ".mp3 is not in assets/audio");
+  }
+  assert.ok(/Recordings: HKDSE English Language 2022 and 2024 Paper 3/.test(notes) && /Hong Kong Examinations and Assessment Authority/.test(notes), "the recordings are not credited to the HKEAA");
 });
