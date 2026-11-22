@@ -166,6 +166,6 @@ The step-by-step page. Two halves: before and after the recording.
 
 ## Questions for CLY
 
-1. **The recordings.** The two MP3s are 56 MB (2022) and 82 MB (2024) and hold the whole paper. I cannot listen to audio here, so I can't cut out the Part B2 section or transcribe it. For Page 3 I propose to use the 2024 tapescript text with a browser-voice "Hear it" button and not host the recordings. Alternative: you cut the B2 section (a few minutes) and I host that clip, so students hear the real recording. Which?
+1. **The recordings (done 2026-11-22).** The B2 sections of both recordings are trimmed to about 8 minutes each in `assets/audio`, with three short practice clips from 2024 and timestamp buttons on `paper-3-b2-notes.html`. The old browser-voice "Hear it" button is gone. The timestamps were found by machine transcription and pause detection, so check them by ear.
 2. **Credit wording:** is the proposed line right?
 3. **Content-point lists:** showing the official list of points after the student's attempt is how I read "approved, but credit". Fine?

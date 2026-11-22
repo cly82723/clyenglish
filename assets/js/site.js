@@ -591,10 +591,10 @@
   function foldParts() {
     var lesson = document.querySelector("main.step-page > .topic-lesson:not([data-lesson])");
     if (!lesson) return;
-    var parts = Array.prototype.filter.call(lesson.children, function (el) { return el.classList.contains("part") && el.querySelector(":scope > h3"); });
+    var parts = Array.prototype.filter.call(lesson.children, function (el) { return el.classList.contains("part") && el.querySelector(":scope > h3, :scope > h2.h-as-3"); });
     if (parts.length < 2) return;
     parts.forEach(function (part, i) {
-      var title = part.querySelector(":scope > h3");
+      var title = part.querySelector(":scope > h3, :scope > h2.h-as-3");
       var fold = document.createElement("details");
       fold.className = "why lesson-fold part-fold";
       fold.open = i === 0;

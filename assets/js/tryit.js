@@ -1,5 +1,5 @@
-/* CLY English: small multiple-choice try-its for the Paper 3 pages, and a Hear it button that reads a passage
-   aloud with the built-in voice of the browser (no audio files, nothing is sent anywhere). */
+/* CLY English: small multiple-choice try-its for the Paper 3 pages, and timestamp buttons that jump a Part B2
+   recording (assets/audio) to the part a student picks. */
 (function () {
   "use strict";
 
@@ -42,22 +42,21 @@
     say();
   });
 
-  var synth = window.speechSynthesis;
-  document.querySelectorAll("[data-speak]").forEach(function (btn) {
-    if (!synth || !window.SpeechSynthesisUtterance) { btn.hidden = true; return; }
-    var target = document.querySelector(btn.getAttribute("data-speak"));
-    var playing = false;
+  // A timestamp button jumps its recording to that part and plays it. The recordings load only when asked for,
+  // so a jump before the file has loaded waits for it.
+  document.querySelectorAll("[data-audio]").forEach(function (btn) {
+    var audio = document.getElementById(btn.getAttribute("data-audio"));
+    var at = parseFloat(btn.getAttribute("data-t"));
+    if (!audio || isNaN(at)) { btn.hidden = true; return; }
     btn.addEventListener("click", function () {
-      if (playing) { synth.cancel(); return; }
-      var lines = Array.prototype.map.call(target.querySelectorAll("[data-say]"), function (el) { return el.textContent; });
-      var voice = new window.SpeechSynthesisUtterance(lines.join(" "));
-      voice.lang = "en-GB";
-      voice.rate = 0.95;
-      voice.onend = voice.onerror = function () { playing = false; btn.textContent = "Hear it"; };
-      playing = true;
-      btn.textContent = "Stop";
-      synth.speak(voice);
+      function go() {
+        audio.currentTime = at;
+        var started = audio.play();
+        if (started && started.catch) started.catch(function () { /* the controls are still there to press */ });
+      }
+      if (audio.readyState > 0) { go(); return; }
+      audio.addEventListener("loadedmetadata", go, { once: true });
+      audio.load();
     });
   });
-  window.addEventListener("pagehide", function () { if (synth) synth.cancel(); });
 })();
