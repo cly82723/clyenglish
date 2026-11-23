@@ -74,13 +74,10 @@ A classmate who types someone else's email gets nowhere without access to that i
   - If a backup has already gone live for a week, a set you approve later for that same week is ignored, so nobody is marked against a different passage. Give it a later Monday instead.
   - `Data`: the challenge content. I prepare this for you; you don't need to edit it by hand.
 - **Attempts tab**: one row per student per week.
-  - `Switches` and `Away (s)`: how many times they left the page for 3 seconds or more, and for how long in total. Leaving counts whether they switch tab or app, click into another window beside the paper, or close the page and open it again (timed from when it was last open).
+  - `Switches` and `Away (s)`: how many times they left the page for more than 3 seconds, and for how long in total.
   - `Reopened`: how many times they closed and reopened the challenge.
   - `Late`: their answers arrived after the 20 minutes.
-  - **Disqualified**: from the week of 9 November (as soon as this version is deployed), the league types `yes` here by itself on a student's second switch. They are told at once, can finish for practice, see no score, and drop out of the board and the league. To disqualify an attempt yourself, type `yes`. To reinstate one (say a phone locked by itself), clear the cell.
-  - `Last seen` and `Timeline`: when the page was last open, and when each answer came in. The league uses these; you can ignore them.
-  - **Check**: a note for you only, written at hand-in, when the timing looks odd: a quiet spell of 4 minutes or more between answers followed by 5 or more answers within a minute, or 14 or 15 out of 15 in under 5 minutes. It never disqualifies anyone and students never see it. Look at it alongside the student before deciding anything.
-- **Earlier weeks** (before 9 November): switches were counted, but nobody was disqualified and there was no promise to tick. Attempts already handed in are never disqualified afterwards.
+  - To disqualify an attempt, type `yes` in **Disqualified**. It drops out of the board and the league.
 - **Sessions tab**: one row per signed-in device. You can ignore it. Deleting a row signs that device out. It never holds anything that could be used to sign in.
 - **CLY League → Show attempts week by week**: writes a tidy **Weekly** tab: one block per week (newest first) with the challenge's name and how many counted, then each student in class and number order with their score, time, status (Counted, Not counted or In progress), switches, time away, Check note, Late and start time. Run it again whenever you want it up to date. It only reads Attempts, so it's safe at any time; make any changes (like clearing Disqualified) in Attempts, not in Weekly.
 - **CLY League → Show league table**: writes the season table, with emails, into a **League** tab, so you know who to give prizes to.
