@@ -4,9 +4,10 @@ The notebook on the home page shows one word a day. The lists are in `assets/js/
 
 ## Each month
 
-1. On the 22nd GitHub opens a reminder and emails you (`.github/workflows/words-reminder.yml`). It reminds again on the 28th only if the list is still missing.
-2. Ask Claude to draft the next month's list, or write it yourself in the same shape.
-3. Check every entry. Nothing should go live unchecked.
+1. On the 20th a scheduled Claude session drafts next month's list. It adds the block to `assets/js/data/words.js`, writes the table to `docs/words-YYYY-MM-drafts.md`, and opens a pull request titled "Words of the day for <Month Year> (draft for review)". It never merges.
+2. On the 22nd GitHub opens a reminder and emails you (`.github/workflows/words-reminder.yml`). It reminds again on the 28th only if the list is still missing.
+3. Check every entry in the pull request. Ask for changes there, or edit them yourself, then merge. Nothing should go live unchecked.
+4. If no draft arrived, ask Claude to draft the list, or write it yourself in the same shape.
 
 ## November 2026: for CLY to check
 

@@ -1,0 +1,23 @@
+# Runs the site's checks (tests/*.test.js) on every pull request and on every push to main.
+# A red cross on a pull request means something broke: open "Details" to see which check failed.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run the checks
+        run: node --test tests/*.test.js

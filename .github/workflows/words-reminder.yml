@@ -39,6 +39,8 @@ jobs:
           fi
           gh issue create --title "$title" --assignee "$OWNER" --body "The notebook on the home page needs its list of words for **$name**.
 
-          Add a block keyed \`\"$next\"\` to \`assets/js/data/words.js\`, with up to 31 entries (word, weak, strong, topic, href), or ask Claude to draft them for you to check.
+          Claude drafts the list on the 20th and opens a pull request titled \"Words of the day for $name (draft for review)\". Check every entry there, ask for changes in the pull request, and merge it when you are happy.
+
+          If there is no such pull request, add a block keyed \`\"$next\"\` to \`assets/js/data/words.js\` yourself, with up to 31 entries (word, weak, strong, topic, href), or ask Claude to draft them.
 
           Until it is added, the site keeps showing this month's words, so nothing breaks."
