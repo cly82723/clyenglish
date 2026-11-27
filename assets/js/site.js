@@ -560,6 +560,8 @@
       panel.hidden = !on;
       btn.setAttribute("aria-expanded", String(on));
       wrap.classList.toggle("is-open", on);
+      // the page behind goes slightly out of focus while the menu is in front of it (motion.css: focus pull)
+      document.documentElement.classList.toggle("menu-open", on);
       if (!on) pinned = false;
     }
     btn.addEventListener("click", function () {
