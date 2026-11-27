@@ -389,7 +389,13 @@
   // The top three places are the podium: their rows rise as steps when the table is scrolled to (motion.js).
   var PODIUM = 3;
   var rowClass = function (r) { return ((r.place <= PODIUM ? "step step-" + r.place : "") + (r.you ? " you" : "")).trim() || null; };
-  var placeCell = function (r) { return h("td", null, r.place <= PODIUM ? h("span", { class: "podium" }, ordinal(r.place)) : ordinal(r.place)); };
+  // The student's own top-five place is a medal: it turns over once as its table arrives (challenge.css: .medal).
+  var MEDAL_PLACES = 5;
+  var placeCell = function (r) {
+    var medal = r.you && r.place <= MEDAL_PLACES ? " medal" : "";
+    if (r.place <= PODIUM) return h("td", null, h("span", { class: "podium" + medal }, ordinal(r.place)));
+    return h("td", null, medal ? h("span", { class: medal.trim() }, ordinal(r.place)) : ordinal(r.place));
+  };
 
   function weekBoards(d) {
     var board = function (rows, caption) {

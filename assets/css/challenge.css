@@ -222,6 +222,8 @@ tr.you > td { background: var(--chest); }
 .step-1 .podium { background: #f6cb4c; }
 .step-2 .podium { background: #d4dbe4; }
 .step-3 .podium { background: #ecb487; }
+/* your own fourth or fifth place is a medal too, in the league's own green */
+.medal:not(.podium) { display: inline-block; min-width: 3.2em; padding: 1px 10px; border-radius: 999px; text-align: center; font: 800 1rem/1.5 var(--font-display); color: var(--ink); background: var(--chest); box-shadow: inset 0 0 0 1.5px var(--leaf); }
 
 /* The rules: each one a numbered card of its own. */
 .how .skeleton > li { margin: 0 0 10px; padding: 14px 16px; border: 1px solid var(--edge); border-radius: 12px; background: var(--paper); }
@@ -276,6 +278,10 @@ tr.you > td { background: var(--chest); }
   @keyframes step-rise { from { opacity: 0; transform: perspective(700px) translateY(24px) rotateX(-18deg); } 60% { opacity: 1; } }
   .board-panel table.arrives tr.you:not(.step) { animation: you-lift 0.5s var(--spring) 0.4s backwards; }
   @keyframes you-lift { from { opacity: 0; transform: translateY(12px); } }
+  /* your own top-five place swings round to face you, like a medal on its ribbon, after its row has landed. It turns
+     one way only, no further than a hand would turn it, and settles on a spring, so it never swings back. */
+  .board-panel table.arrives .medal { animation: medal-turn 0.8s var(--spring) 0.75s backwards; }
+  @keyframes medal-turn { from { opacity: 0.4; transform: perspective(240px) rotateY(-60deg) scale(0.9); } 55% { opacity: 1; transform: perspective(240px) rotateY(-8deg) scale(1.08); } }
 
   /* the countdown: a tile whose number changed turns over */
   .flip-clock b.tick { animation: flip-tick 0.4s var(--ease-out); transform-origin: 50% 0; }

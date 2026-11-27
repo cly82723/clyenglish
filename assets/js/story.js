@@ -147,6 +147,21 @@
   var sceneStarts = [], marks = [], away = null, outOfBag = null;
   var width = 0, height = 0, pointer = { x: 0, y: 0 }, aim = { x: 0, y: 0 }, queued = false, tint = "";
 
+  // Never quite still: while nobody is touching it, the notebook sways a little on a slow, even breath and the stickers
+  // bob, so the cover is alive even when the page is not being scrolled. Two slow waves of different lengths, so the
+  // sway never visibly repeats and never stops to turn back. It fades out while the notebook is held open, and is off
+  // in lite mode, in a hidden tab, and with reduced motion (this whole part of the file is).
+  var DRIFT_TURN = 1.8;          // degrees the notebook sways from side to side
+  var DRIFT_TIP = 0.9;           // degrees it tips towards and away from the reader
+  var DRIFT_SWAY_MS = 9000;      // one sway, there and back
+  var DRIFT_TIP_MS = 13000;      // one tip, which is longer, so the two drift apart
+  var DRIFT_BOB_PX = 7;          // how far the nearest sticker bobs; farther ones bob less
+  var DRIFT_EASE = 0.05;         // the share of the way to full or no sway covered each frame
+  var drift = 0;                 // 0 (still) to 1 (full sway)
+  function drifting() {
+    return !document.hidden && !document.documentElement.hasAttribute("data-lite");
+  }
+
   function clamp(t) { return Math.min(1, Math.max(0, t)); }
   function ease(t) { return t * t * (3 - 2 * t); }
 
@@ -205,8 +220,14 @@
     if (easing) { pointer.x += dx * POINTER_EASE; pointer.y += dy * POINTER_EASE; }
     var y = window.scrollY, at = pose(y), held = null;
     if (shown) held = fromBag ? outOfBag : (narrow.matches ? TAPPED_NARROW : TAPPED_WIDE);
+    var alive = drifting();
+    drift += ((alive && !shown ? 1 : 0) - drift) * DRIFT_EASE;
+    if (drift < 0.001) drift = 0;
+    var now = performance.now();
+    var sway = Math.sin(now / DRIFT_SWAY_MS * 2 * Math.PI) * DRIFT_TURN * drift;
+    var tip = Math.sin(now / DRIFT_TIP_MS * 2 * Math.PI) * DRIFT_TIP * drift;
     KEYS.forEach(function (k) {
-      var lean = held && fromBag ? 0 : k === "ry" ? pointer.x * POINTER_TURN : k === "rx" ? -pointer.y * POINTER_TURN : 0;
+      var lean = held && fromBag ? 0 : k === "ry" ? pointer.x * POINTER_TURN + sway : k === "rx" ? -pointer.y * POINTER_TURN + tip : 0;
       var value = held && k in held ? held[k] : at[k];
       book.style.setProperty("--" + k, (value + lean).toFixed(3));
     });
@@ -238,13 +259,15 @@
     var name = scenes[i].getAttribute("data-scene");
     if (name !== tint) { tint = name; stage.setAttribute("data-scene", name); }
 
-    floaters.forEach(function (f) {
+    floaters.forEach(function (f, i) {
       var travelled = y * f.speed, top = (narrow.matches ? f.py : f.y) / 100 * height;
-      f.el.style.setProperty("--fy", (top - travelled).toFixed(1));
+      // each sticker on its own phase, so they never bob in step
+      var bob = Math.sin(now / DRIFT_SWAY_MS * 2 * Math.PI + i * 1.7) * DRIFT_BOB_PX * f.speed * drift;
+      f.el.style.setProperty("--fy", (top - travelled + bob).toFixed(1));
       f.el.style.setProperty("--fr", (f.spin + travelled * SPIN_PER_PX * (f.spin < 0 ? -1 : 1)).toFixed(2));
       f.el.style.setProperty("--px", (-pointer.x * f.speed * POINTER_DRIFT).toFixed(1));
     });
-    if (easing) soon();
+    if (easing || alive || drift > 0) soon();
   }
   function soon() {
     if (queued) return;
@@ -258,6 +281,7 @@
     soon();
   }, { passive: true });
   window.addEventListener("resize", remeasure);
+  document.addEventListener("visibilitychange", soon);   // back in view: the sway picks up again
   window.addEventListener("load", remeasure);
   // the sheets change height as their contents arrive (the stickers, the tip), so the scenes are measured again
   if ("ResizeObserver" in window) new ResizeObserver(remeasure).observe(document.querySelector(".story"));

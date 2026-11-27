@@ -8,15 +8,26 @@
   }
 
   /* ---------- Route: a tick on every finished step ---------- */
+  // A tick the hub has not shown on this device before lands like a stamp (motion.css: .step-done.stamp-in), once.
+  var SEEN_SUFFIX = ":seen";
   function markDone() {
     var nav = document.querySelector(".steps");
-    var done = load((nav && nav.getAttribute("data-done-key")) || "cly:partb-done") || [];
+    var key = (nav && nav.getAttribute("data-done-key")) || "cly:partb-done";
+    var done = load(key) || [];
+    var seen = load(key + SEEN_SUFFIX);
+    var firstVisit = !Array.isArray(seen);   // ticks already there before this was added simply show
     document.querySelectorAll("[data-step-link]").forEach(function (a) {
-      var finished = done.indexOf(a.getAttribute("data-step-link")) >= 0;
+      var id = a.getAttribute("data-step-link");
+      var finished = done.indexOf(id) >= 0;
       a.classList.toggle("is-done", finished);
       var tick = a.querySelector(".step-done");
-      if (tick) tick.hidden = !finished;
+      if (!tick) return;
+      tick.hidden = !finished;
+      // added, never taken off: markDone runs again on pageshow, by when this tick has already been seen
+      if (finished && !firstVisit && seen.indexOf(id) < 0) tick.classList.add("stamp-in");
+      if (!finished) tick.classList.remove("stamp-in");
     });
+    try { localStorage.setItem(key + SEEN_SUFFIX, JSON.stringify(done)); } catch (e) { /* no stamp next time either */ }
   }
   markDone();
   window.addEventListener("pageshow", markDone);   // back from a step page: the tick is already there

@@ -24,9 +24,64 @@
     var from = pageOf(activation.from.url), to = pageOf(activation.entry.url);
     return TAB_PAGES.indexOf(from) >= 0 || TAB_PAGES.indexOf(to) >= 0;
   }
+  // Between a hub and one of its pages there is no page turn: the row that was tapped grows into the page's title,
+  // and going back, the title shrinks into its row. Everything else on the page simply fades, quickly, because these
+  // are the moves students make most. In lite mode, or when either end is not on screen, the change is instant.
+  var MORPH_KEY = "cly:morph";
+  var MORPH_NAME = "lesson-title";
+  var MORPH_FRESH_MS = 2000;   // how long the leaving page's note stays good for the arriving page
+  function onScreen(el) {
+    var box = el.getBoundingClientRect();
+    return box.height > 0 && box.bottom > 0 && box.top < window.innerHeight;
+  }
+  function rowFor(page) {
+    var rows = document.querySelectorAll(".steps .step-link[href]");
+    for (var i = 0; i < rows.length; i++) {
+      if (pageOf(rows[i].getAttribute("href")) === page) return rows[i].querySelector(".row-title") || rows[i];
+    }
+    return null;
+  }
+  // the page this lesson sits under: the last link in its breadcrumb
+  function parentOf() {
+    var crumbs = document.querySelectorAll(".crumbs a[href]");
+    return crumbs.length ? pageOf(crumbs[crumbs.length - 1].getAttribute("href")) : "";
+  }
+  function morphFrom(activation) {
+    if (document.documentElement.hasAttribute("data-lite") || !activation || !activation.entry) return null;
+    var to = pageOf(activation.entry.url);
+    var row = rowFor(to);
+    if (row && onScreen(row)) return { el: row, role: "row" };
+    var title = document.querySelector("h1.title");
+    if (title && to === parentOf() && onScreen(title)) return { el: title, role: "title" };
+    return null;
+  }
+  // A turn the browser has to drop (a resize mid-turn, a page that is not ready) rejects all three of its promises;
+  // the page simply appears, so none of them is an error worth reporting.
+  function quiet(transition) {
+    ["ready", "finished", "updateCallbackDone"].forEach(function (name) {
+      if (transition[name]) transition[name].catch(function () {});
+    });
+  }
+  // a page kept in the back-forward cache keeps the name it was given; two elements with one name stop a transition
+  window.addEventListener("pageshow", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-morph]"), function (el) {
+      el.style.viewTransitionName = "";
+      el.removeAttribute("data-morph");
+    });
+  });
+
   window.addEventListener("pageswap", function (e) {
     if (!e.viewTransition) return;
-    if (!touchesCoverTab(e.activation)) { e.viewTransition.skipTransition(); return; }
+    // the leaving page's side of a turn the browser drops (or that is skipped below) is not an error worth reporting
+    quiet(e.viewTransition);
+    if (!touchesCoverTab(e.activation)) {
+      var morph = morphFrom(e.activation);
+      if (!morph) { e.viewTransition.skipTransition(); return; }
+      morph.el.style.viewTransitionName = MORPH_NAME;
+      morph.el.setAttribute("data-morph", "");
+      try { sessionStorage.setItem(MORPH_KEY, morph.role + "@" + Date.now()); } catch (err) { e.viewTransition.skipTransition(); }
+      return;
+    }
     var y = hingeOf();
     try { if (y !== null) sessionStorage.setItem(HINGE_KEY, String(y)); } catch (err) { /* no hinge: the 30vh default */ }
   });
@@ -49,6 +104,25 @@
   window.addEventListener("pagereveal", function (e) {
     if (!e.viewTransition) return;
     var root = document.documentElement;
+    quiet(e.viewTransition);
+    var role = null;
+    try { role = sessionStorage.getItem(MORPH_KEY); sessionStorage.removeItem(MORPH_KEY); } catch (err) { role = null; }
+    // a note left by a move whose new page revealed before this file ran is stale: it is for that move, not this one
+    var parts = role ? role.split("@") : [];
+    role = parts.length === 2 && Date.now() - Number(parts[1]) < MORPH_FRESH_MS ? parts[0] : null;
+    if (role) {
+      // the old page named its row (or its title); this page names the other end, so one becomes the other
+      var from = window.navigation && navigation.activation && navigation.activation.from;
+      var end = role === "row" ? document.querySelector("h1.title") : from && rowFor(pageOf(from.url));
+      if (end) end.style.viewTransitionName = MORPH_NAME;
+      root.setAttribute("data-turn", "morph");
+      var settle = function () {
+        root.removeAttribute("data-turn");
+        if (end) end.style.viewTransitionName = "";
+      };
+      e.viewTransition.finished.then(settle, settle);
+      return;
+    }
     var y = null;
     try { y = sessionStorage.getItem(HINGE_KEY); sessionStorage.removeItem(HINGE_KEY); } catch (err) { y = null; }
     if (y) root.style.setProperty("--turn-old-y", y + "px");

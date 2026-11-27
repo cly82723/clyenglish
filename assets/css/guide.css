@@ -422,7 +422,7 @@ mark.vague.swapped { text-decoration: none; font-weight: 700; color: var(--do); 
 .fc-card.is-flipped .fc-inner { transform: rotateY(180deg); }
 .fc-face {
   grid-area: 1 / 1; min-height: 280px; padding: 22px 20px; background: var(--paper); color: var(--ink);
-  border: 1px solid var(--ink); border-radius: 16px; box-shadow: 0 8px 22px rgb(16 38 59 / 0.14);
+  border: 1px solid var(--ink); border-radius: 16px; box-shadow: 2px 8px 22px rgb(16 38 59 / 0.14);
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
 .fc-front { display: grid; align-content: center; justify-items: center; text-align: center; gap: 6px; }
