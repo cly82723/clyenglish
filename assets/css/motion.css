@@ -169,7 +169,7 @@ html[data-turn="back"]::view-transition-new(sheet) {
 .sticker-toast .sticker-art { flex: none; width: 52px; }
 .sticker-toast p { margin: 0; display: grid; line-height: 1.3; }
 .sticker-toast strong { font-weight: 800; }
-.sticker-toast a { font-weight: 600; }
+.sticker-toast a { font-weight: 600; padding-block: 2px; }
 @media (prefers-reduced-motion: no-preference) {
   .sticker-toast.show .sticker-art { animation: peel-in 0.65s var(--spring-bounce); }
   @keyframes peel-in { from { opacity: 0; transform: perspective(300px) rotateY(-35deg) rotate(-6deg) scale(0.75); } }

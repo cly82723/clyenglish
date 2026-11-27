@@ -20,3 +20,6 @@ images/599c2b2c96296dd3aa4b147e20b53520.jpg
 images/bc19a80616467b494dca539a33625d9c.jpg
 images/s88.png
 images/brand/cly_fox_refined_logo_v11.png
+
+# Installed by the test workflow (Playwright)
+node_modules/
