@@ -23,3 +23,11 @@ images/brand/cly_fox_refined_logo_v11.png
 
 # Installed by the test workflow (Playwright)
 node_modules/
+
+# League answer files: the bank and everything made from it hold answers, and this repo is public.
+# See docs/agents/league-second-marker.md
+bank.json
+challenges.tsv
+review.html
+second-marker.md
+*.answers.json

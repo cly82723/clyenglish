@@ -18,6 +18,10 @@ This file is the instructions for every coding agent (Codex reads it directly; `
 - Before building an issue, check its premise against the code as it is now (issues quote numbers and line references that go stale). If it no longer holds, comment on the issue with what you found instead of building it.
 - Proposals CLY must review go in `docs/` as a draft. Once built and merged, move it to `docs/archive/` and add a row to its README. Never plan from `docs/archive/`: the site and `tests/` are the source of truth.
 
+## League papers
+
+The weekly challenge's question bank holds answers and must never be committed: this repo is public and is the website. To draft or check league papers, follow `docs/agents/league-second-marker.md` (structural check, then a blind second marker that never sees the key).
+
 ## Working in parallel
 
 When several agents or sessions work at once, give each its own files and say which in its task, so no two edit the same file. Shared files (`assets/css/site.css`, `assets/js/site.js`, the header and menu) belong to one session at a time. Plan a merge step at the end and run the tests after it.
